@@ -292,11 +292,11 @@ button{cursor:pointer;font-family:var(--sans)}
       Help &amp; Support
     </div>
     <div class="sb-section">Resources</div>
-    <div class="sb-link">
+    <div class="sb-link" onclick="showView('export-guides')">
       <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14 2z"/></svg>
       Export Guides
     </div>
-    <div class="sb-link">
+    <div class="sb-link" onclick="showView('contact')">
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
       Contact Support
     </div>
@@ -499,16 +499,22 @@ button{cursor:pointer;font-family:var(--sans)}
 
   <!-- ACCOUNT VIEW -->
   <div class="view content" id="v-account">
-    <div style="max-width:600px">
+    <div style="max-width:640px">
       <div class="form-card">
         <div class="form-section-title"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Account Details</div>
         <div class="form-grid">
-          <div class="field"><label>First Name</label><input type="text" value="Waylon"></div>
-          <div class="field"><label>Last Name</label><input type="text" value="HDD"></div>
-          <div class="field field-full"><label>Company Name</label><input type="text" value="ABC Steel Fabricators"></div>
-          <div class="field field-full"><label>Email Address</label><input type="text" value="waylon@steelfab.com"></div>
+          <div class="field"><label>First Name</label><input type="text" id="acctFirstName" value="Waylon"></div>
+          <div class="field"><label>Last Name</label><input type="text" id="acctLastName" value="HDD"></div>
+          <div class="field field-full"><label>Company / Fabricator Name</label><input type="text" id="acctCompany" value="ABC Steel Fabricators"></div>
+          <div class="field field-full"><label>Email Address</label><input type="text" id="acctEmail" value="waylon@steelfab.com"></div>
+          <div class="field field-full"><label>Phone (optional)</label><input type="text" id="acctPhone" placeholder="(601) 555-0100"></div>
         </div>
-        <div style="margin-top:18px"><button class="btn btn-primary">Save Changes</button></div>
+        <div style="margin-top:18px;display:flex;align-items:center;gap:12px">
+          <button class="btn btn-primary" onclick="saveAccount()">
+            <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Save Changes
+          </button>
+          <span id="acctSaveMsg" style="font-size:14px;color:var(--green);font-weight:600;display:none">&#10003; Saved!</span>
+        </div>
       </div>
       <div class="form-card">
         <div class="form-section-title"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Current Plan</div>
@@ -519,22 +525,133 @@ button{cursor:pointer;font-family:var(--sans)}
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn btn-ghost">Manage Billing</button>
-          <button class="btn btn-danger">Cancel Plan</button>
+          <button class="btn btn-danger btn-sm">Cancel Plan</button>
         </div>
+      </div>
+      <div class="form-card">
+        <div class="form-section-title"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Security</div>
+        <div class="form-grid">
+          <div class="field field-full"><label>Current Password</label><input type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div>
+          <div class="field"><label>New Password</label><input type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div>
+          <div class="field"><label>Confirm Password</label><input type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div>
+        </div>
+        <div style="margin-top:14px"><button class="btn btn-ghost btn-sm">Update Password</button></div>
       </div>
     </div>
   </div>
 
   <!-- HELP VIEW -->
   <div class="view content" id="v-help">
-    <div style="max-width:640px">
-      <div class="form-card">
-        <div class="form-section-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/></svg>Help &amp; Support</div>
+    <div style="max-width:680px">
+      <div class="form-card" style="margin-bottom:20px">
+        <div class="form-section-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Help &amp; Support</div>
         <div style="display:flex;flex-direction:column;gap:10px">
-          <a href="mailto:support@steelcaller.com" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--navy);border-radius:10px">
-            <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#fff;stroke-width:2;fill:none;flex-shrink:0"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-            <div><div style="font-weight:600;font-size:15px;color:#fff">Contact Support</div><div style="font-size:13px;color:rgba(255,255,255,.6);margin-top:2px">support@steelcaller.com</div></div>
+          <div onclick="showView('export-guides')" style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--off);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'">
+            <svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:var(--orange);stroke-width:2;fill:none;flex-shrink:0"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div><div style="font-weight:600;font-size:15px">How to Export Files from Your Modeling Software</div><div style="font-size:13px;color:var(--txt3);margin-top:2px">Step-by-step guides for IFC, KSS, and NC1 files from SDS2, Tekla, RISA, and others</div></div>
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--txt3);stroke-width:2;fill:none;margin-left:auto;flex-shrink:0"><polyline points="9,18 15,12 9,6"/></svg>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--off);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'">
+            <svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:var(--orange);stroke-width:2;fill:none;flex-shrink:0"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+            <div><div style="font-weight:600;font-size:15px">Voice Commands &mdash; "Call [Mark]"</div><div style="font-size:13px;color:var(--txt3);margin-top:2px">Everything the field crew can say to use the app hands-free, in English and Spanish</div></div>
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--txt3);stroke-width:2;fill:none;margin-left:auto;flex-shrink:0"><polyline points="9,18 15,12 9,6"/></svg>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--off);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'">
+            <svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:var(--orange);stroke-width:2;fill:none;flex-shrink:0"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+            <div><div style="font-weight:600;font-size:15px">How to Upload a Revision</div><div style="font-size:13px;color:var(--txt3);margin-top:2px">Update your project when the steel model changes. Field crew sees revision alerts instantly.</div></div>
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--txt3);stroke-width:2;fill:none;margin-left:auto;flex-shrink:0"><polyline points="9,18 15,12 9,6"/></svg>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--off);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'">
+            <svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:var(--orange);stroke-width:2;fill:none;flex-shrink:0"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>
+            <div><div style="font-weight:600;font-size:15px">Using QR Codes on Your Drawings</div><div style="font-size:13px;color:var(--txt3);margin-top:2px">How to add QR codes to title blocks and shop drawings so field crews can scan for instant access</div></div>
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--txt3);stroke-width:2;fill:none;margin-left:auto;flex-shrink:0"><polyline points="9,18 15,12 9,6"/></svg>
+          </div>
+          <a href="mailto:support@steelcaller.com" style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--navy);border-radius:10px">
+            <svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:#fff;stroke-width:2;fill:none;flex-shrink:0"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            <div><div style="font-weight:600;font-size:15px;color:#fff">Contact Support</div><div style="font-size:13px;color:rgba(255,255,255,.6);margin-top:2px">support@steelcaller.com &mdash; We respond within 1 business day</div></div>
           </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPORT GUIDES VIEW -->
+  <div class="view content" id="v-export-guides">
+    <div style="max-width:680px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+        <button class="btn btn-ghost btn-sm" onclick="showView('help')"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/></svg> Back</button>
+        <div style="font-family:var(--serif);font-size:22px;font-weight:800">Export Guides</div>
+      </div>
+      <div class="form-card">
+        <div class="form-section-title"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14 2z"/></svg>IFC File (Required)</div>
+        <p style="font-size:14px;color:var(--txt2);line-height:1.7;margin-bottom:14px">The IFC file contains all piece marks, locations, member properties, elevations, and grid coordinates. This is the most important file.</p>
+        <div style="background:var(--off);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px">
+          <div style="font-weight:700;font-size:14px;color:var(--txt);margin-bottom:8px">SDS2 / Design Data</div>
+          <div style="font-size:14px;color:var(--txt2);line-height:1.8">Home &rarr; Export &rarr; 3D &rarr; Export Model &rarr; IFC4 &rarr; Save<br>Make sure IFC4 is selected (not IFC2x3).</div>
+        </div>
+        <div style="background:var(--off);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px">
+          <div style="font-weight:700;font-size:14px;color:var(--txt);margin-bottom:8px">Tekla Structures</div>
+          <div style="font-size:14px;color:var(--txt2);line-height:1.8">File &rarr; Export &rarr; IFC &rarr; Select IFC4 &rarr; Export<br>Use the "Steel" export filter for best results.</div>
+        </div>
+        <div style="background:var(--off);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-weight:700;font-size:14px;color:var(--txt);margin-bottom:8px">RISA-3D / Other Software</div>
+          <div style="font-size:14px;color:var(--txt2);line-height:1.8">File &rarr; Export &rarr; BIM/IFC &rarr; IFC4 format &rarr; Save<br>Contact support@steelcaller.com if your software is not listed.</div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-section-title"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14 2z"/></svg>KSS File (Recommended)</div>
+        <p style="font-size:14px;color:var(--txt2);line-height:1.7;margin-bottom:14px">The KSS file provides full bolt specifications, attached material, plate sizes, and assembly weights. Highly recommended for complete field data.</p>
+        <div style="background:var(--off);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-weight:700;font-size:14px;color:var(--txt);margin-bottom:8px">SDS2 / Design Data</div>
+          <div style="font-size:14px;color:var(--txt2);line-height:1.8">Home &rarr; Export &rarr; MRP Interface &rarr; KiSS Software &rarr; Export<br>Accept defaults. The .kss file will be saved to your export folder.</div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-section-title"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/></svg>NC1 / DSTV Files (Recommended)</div>
+        <p style="font-size:14px;color:var(--txt2);line-height:1.7;margin-bottom:14px">NC1 files provide per-end hole counts and section dimensions for each piece. Zip all .nc1 files into a single .zip before uploading.</p>
+        <div style="background:var(--off);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-weight:700;font-size:14px;color:var(--txt);margin-bottom:8px">SDS2 / Design Data</div>
+          <div style="font-size:14px;color:var(--txt2);line-height:1.8">Home &rarr; Export &rarr; CNC Download &rarr; DSTV &rarr; Select all members &rarr; Export<br>Select .nc1 format. Then zip all exported .nc1 files into one folder and upload the .zip.</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,107,0,.08);border:1.5px solid rgba(255,107,0,.2);border-radius:10px;padding:16px;font-size:14px;color:var(--txt2);line-height:1.7">
+        <strong style="color:var(--orange)">&#128161; Pro Tip:</strong> Export all three files right after your model is complete and approved. Re-export and upload a new revision any time the model changes &mdash; the field crew sees revision alerts automatically.
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT VIEW -->
+  <div class="view content" id="v-contact">
+    <div style="max-width:560px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+        <button class="btn btn-ghost btn-sm" onclick="showView('help')"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/></svg> Back</button>
+        <div style="font-family:var(--serif);font-size:22px;font-weight:800">Contact Support</div>
+      </div>
+      <div class="form-card">
+        <div class="form-section-title"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Send a Message</div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="field field-full"><label>Your Name</label><input type="text" id="ctName" placeholder="Waylon HDD"></div>
+          <div class="field field-full"><label>Email Address</label><input type="text" id="ctEmail" placeholder="waylon@steelfab.com"></div>
+          <div class="field field-full"><label>Subject</label>
+            <select id="ctSubject" style="padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:var(--sans);color:var(--txt);background:var(--white);outline:none">
+              <option>File upload issue</option>
+              <option>Field app not loading</option>
+              <option>Parser / piece mark question</option>
+              <option>Billing question</option>
+              <option>Feature request</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field field-full"><label>Message</label><textarea id="ctMessage" rows="5" placeholder="Describe your issue..." style="padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:var(--sans);color:var(--txt);resize:vertical;outline:none;transition:border-color .15s;width:100%" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'"></textarea></div>
+        </div>
+        <div style="margin-top:16px;display:flex;align-items:center;gap:12px">
+          <button class="btn btn-primary" onclick="sendSupportMessage()">
+            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9 22,2"/></svg>Send Message
+          </button>
+          <span style="font-size:13px;color:var(--txt3)">Or email directly: <a href="mailto:support@steelcaller.com" style="color:var(--orange);font-weight:600">support@steelcaller.com</a></span>
+        </div>
+        <div style="margin-top:16px;font-size:13px;color:var(--txt3);line-height:1.6">
+          We respond within 1 business day. For urgent issues call or text <strong style="color:var(--txt)">(601) 555-STEEL</strong>.
         </div>
       </div>
     </div>
@@ -653,8 +770,8 @@ var FAB_ID = (function() {
 })();
 
 // ── NAVIGATION ────────────────────────────────────────────────────────────
-var views = { projects: 'v-projects', 'new-project': 'v-new-project', account: 'v-account', help: 'v-help' };
-var titles = { projects: 'My Projects', 'new-project': 'New Project', account: 'My Account', help: 'Help & Support' };
+var views = { projects: 'v-projects', 'new-project': 'v-new-project', account: 'v-account', help: 'v-help', 'export-guides': 'v-export-guides', contact: 'v-contact' };
+var titles = { projects: 'My Projects', 'new-project': 'New Project', account: 'My Account', help: 'Help & Support', 'export-guides': 'Export Guides', contact: 'Contact Support' };
 
 function showView(name) {
   Object.values(views).forEach(function(id) {
@@ -1277,9 +1394,74 @@ function acKey(e, input) {
   else if (e.key === 'Escape') { dd.classList.remove('show'); }
 }
 
+
+// ── ACCOUNT ────────────────────────────────────────────────────────────────
+function saveAccount() {
+  var first   = document.getElementById('acctFirstName').value.trim();
+  var last    = document.getElementById('acctLastName').value.trim();
+  var company = document.getElementById('acctCompany').value.trim();
+  var email   = document.getElementById('acctEmail').value.trim();
+
+  if (!first || !email) { showToast('Name and email are required', false); return; }
+
+  // Save to localStorage for now (until auth is wired)
+  var acct = { firstName: first, lastName: last, company: company, email: email };
+  localStorage.setItem('sc_account', JSON.stringify(acct));
+
+  // Update sidebar display
+  var nameEl  = document.querySelector('.sb-user-name');
+  var emailEl = document.querySelector('.sb-user-email');
+  var avatarEl = document.querySelector('.sb-avatar');
+  if (nameEl)   nameEl.textContent  = first + ' ' + last;
+  if (emailEl)  emailEl.textContent = email;
+  if (avatarEl) avatarEl.textContent = (first[0]||'') + (last[0]||'');
+
+  // Show saved confirmation
+  var msg = document.getElementById('acctSaveMsg');
+  if (msg) { msg.style.display = 'inline'; setTimeout(function() { msg.style.display = 'none'; }, 3000); }
+
+  // Also save company name to autocomplete list for new projects
+  if (company) acSet('fab_names', company);
+
+  showToast('&#10003; Account saved', true);
+}
+
+// Load saved account on init
+function loadAccount() {
+  try {
+    var acct = JSON.parse(localStorage.getItem('sc_account') || 'null');
+    if (!acct) return;
+    if (document.getElementById('acctFirstName')) document.getElementById('acctFirstName').value = acct.firstName || '';
+    if (document.getElementById('acctLastName'))  document.getElementById('acctLastName').value  = acct.lastName  || '';
+    if (document.getElementById('acctCompany'))   document.getElementById('acctCompany').value   = acct.company   || '';
+    if (document.getElementById('acctEmail'))     document.getElementById('acctEmail').value     = acct.email     || '';
+    var nameEl  = document.querySelector('.sb-user-name');
+    var emailEl = document.querySelector('.sb-user-email');
+    var avatarEl = document.querySelector('.sb-avatar');
+    if (nameEl && acct.firstName)  nameEl.textContent  = acct.firstName + ' ' + (acct.lastName||'');
+    if (emailEl && acct.email)     emailEl.textContent = acct.email;
+    if (avatarEl && acct.firstName) avatarEl.textContent = (acct.firstName[0]||'') + (acct.lastName||'  ')[0];
+  } catch(e) {}
+}
+
+// ── CONTACT SUPPORT ────────────────────────────────────────────────────────
+function sendSupportMessage() {
+  var name    = document.getElementById('ctName').value.trim();
+  var email   = document.getElementById('ctEmail').value.trim();
+  var subject = document.getElementById('ctSubject').value;
+  var msg     = document.getElementById('ctMessage').value.trim();
+  if (!name || !email || !msg) { showToast('Please fill in all fields', false); return; }
+  var mailto  = 'mailto:support@steelcaller.com'
+    + '?subject=SteelCaller%20Support%3A%20' + encodeURIComponent(subject)
+    + '&body=' + encodeURIComponent('From: ' + name + ' (' + email + ')\n\n' + msg);
+  window.location.href = mailto;
+  showToast('Opening email client...', true);
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
   loadProjects();
+  loadAccount();
   var fabEl = document.getElementById('jobFabricator');
   if (fabEl) { var saved = acGet('fab_names')[0]; if (saved) fabEl.value = saved; }
 });
