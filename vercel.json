@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/p/:slug",
+      "destination": "https://iywmeagdabutcydzjtqf.supabase.co/storage/v1/object/public/field-apps/projects/:slug/app.html"
+    }
+  ]
+}
