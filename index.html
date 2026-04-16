@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SteelCaller — Every Mark. Every Location.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B2A;
+  --navy2:#132236;
+  --navy3:#1A2F47;
+  --orange:#FF6B00;
+  --orange2:#E55F00;
+  --amber:#FFB800;
+  --steel:#8BA3BC;
+  --steel2:#C2D4E4;
+  --white:#FFFFFF;
+  --off:#F4F7FA;
+  --txt:#0D1B2A;
+  --txt2:#3A5068;
+  --txt3:#6A8098;
+  --green:#00A845;
+  --serif:'Barlow Condensed',sans-serif;
+  --sans:'Barlow',sans-serif;
+  --mono:'Share Tech Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--txt);background:#fff;overflow-x:hidden}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(13,27,42,.96);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  padding:0 48px;height:70px;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:all .3s;
+}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.nav-logo-icon{
+  width:40px;height:40px;background:var(--orange);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.nav-logo-icon svg{width:26px;height:26px}
+.nav-logo-name{font-family:var(--serif);font-size:24px;font-weight:800;color:#fff;letter-spacing:.3px}
+.nav-logo-name span{color:var(--orange)}
+.nav-links{display:flex;align-items:center;gap:36px}
+.nav-links a{
+  color:rgba(255,255,255,.7);text-decoration:none;font-size:15px;font-weight:500;
+  transition:color .2s;letter-spacing:.2px;
+}
+.nav-links a:hover{color:#fff}
+.nav-cta{display:flex;align-items:center;gap:12px}
+.btn-ghost{
+  padding:9px 22px;border:1.5px solid rgba(255,255,255,.3);border-radius:8px;
+  color:#fff;text-decoration:none;font-size:14px;font-weight:600;
+  transition:all .2s;letter-spacing:.3px;
+}
+.btn-ghost:hover{border-color:rgba(255,255,255,.7);background:rgba(255,255,255,.08)}
+.btn-orange{
+  padding:10px 24px;background:var(--orange);border-radius:8px;
+  color:#fff;text-decoration:none;font-size:14px;font-weight:700;
+  transition:all .2s;letter-spacing:.3px;border:none;cursor:pointer;
+}
+.btn-orange:hover{background:var(--orange2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,107,0,.35)}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;background:var(--navy);
+  display:flex;align-items:center;
+  padding:120px 48px 80px;
+  position:relative;overflow:hidden;
+}
+/* Structural grid background */
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,107,0,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,107,0,.04) 1px, transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;
+}
+/* Orange glow */
+.hero::after{
+  content:'';position:absolute;
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle, rgba(255,107,0,.15) 0%, transparent 70%);
+  top:-100px;right:-100px;pointer-events:none;
+}
+.hero-inner{max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;position:relative;z-index:1}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.3);
+  border-radius:20px;padding:6px 16px;margin-bottom:24px;
+}
+.hero-eyebrow span{font-family:var(--serif);font-size:13px;font-weight:700;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero-h1{
+  font-family:var(--serif);font-size:72px;font-weight:900;
+  color:#fff;line-height:.95;letter-spacing:-1px;margin-bottom:24px;
+}
+.hero-h1 em{color:var(--orange);font-style:normal;display:block}
+.hero-sub{
+  font-size:20px;color:var(--steel2);line-height:1.6;margin-bottom:40px;
+  max-width:480px;font-weight:400;
+}
+.hero-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:48px}
+.btn-hero{
+  padding:16px 36px;background:var(--orange);border-radius:10px;
+  color:#fff;text-decoration:none;font-family:var(--serif);
+  font-size:20px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;
+  transition:all .2s;border:none;cursor:pointer;
+  box-shadow:0 8px 32px rgba(255,107,0,.4);
+}
+.btn-hero:hover{background:var(--orange2);transform:translateY(-2px);box-shadow:0 12px 40px rgba(255,107,0,.5)}
+.btn-hero-ghost{
+  padding:15px 32px;border:2px solid rgba(255,255,255,.25);border-radius:10px;
+  color:#fff;text-decoration:none;font-family:var(--serif);
+  font-size:18px;font-weight:700;letter-spacing:.3px;
+  transition:all .2s;
+}
+.btn-hero-ghost:hover{border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.06)}
+.hero-proof{display:flex;align-items:center;gap:24px}
+.hero-proof-stat{text-align:center}
+.hero-proof-n{font-family:var(--serif);font-size:32px;font-weight:800;color:var(--orange);line-height:1}
+.hero-proof-l{font-size:13px;color:var(--steel);margin-top:4px;letter-spacing:.3px}
+.hero-proof-div{width:1px;height:36px;background:rgba(255,255,255,.12)}
+
+/* PHONE MOCKUP */
+.hero-visual{position:relative;display:flex;justify-content:center}
+.phone-wrap{
+  position:relative;
+  width:300px;
+  filter:drop-shadow(0 40px 80px rgba(0,0,0,.6));
+}
+.phone-frame{
+  width:100%;border-radius:40px;
+  background:var(--navy2);
+  border:2px solid rgba(255,255,255,.12);
+  overflow:hidden;
+  padding:12px;
+}
+.phone-screen{border-radius:30px;overflow:hidden;background:#111}
+.phone-notch{
+  width:120px;height:26px;background:var(--navy);border-radius:0 0 18px 18px;
+  margin:0 auto 8px;
+}
+/* Simulated app screen */
+.phone-app{padding:0;background:#161B22}
+.phone-app-header{
+  background:#161B22;border-bottom:2px solid var(--orange);
+  padding:10px 14px;
+}
+.ph-logo-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.ph-logo-box{width:30px;height:30px;background:var(--orange);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.ph-logo-box svg{width:18px;height:18px}
+.ph-brand{font-family:var(--serif);font-size:15px;font-weight:800;color:#fff}
+.ph-brand span{color:var(--orange)}
+.ph-job{font-family:var(--mono);font-size:22px;color:var(--orange);font-weight:700;text-align:center;letter-spacing:-1px}
+.ph-jobname{font-size:11px;color:#9BA8BD;text-align:center;margin-top:1px}
+.phone-search{
+  margin:10px 14px;background:#1C2330;border:1.5px solid #3A4555;
+  border-radius:10px;padding:10px 12px;
+  display:flex;align-items:center;gap:8px;
+}
+.phone-search-icon{width:14px;height:14px;stroke:#FF6B00;stroke-width:2;fill:none}
+.phone-search-text{font-size:11px;color:#5A6478;flex:1}
+.phone-mic{width:26px;height:26px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.phone-mic svg{width:13px;height:13px;stroke:#fff;stroke-width:2;fill:none}
+.phone-piece{margin:0 10px 10px;background:#1C2330;border-radius:10px;border:1px solid #2A3444;overflow:hidden}
+.phone-piece-rev{background:#7B0000;padding:6px 10px;font-family:var(--serif);font-size:9px;font-weight:700;color:#fff;letter-spacing:.3px}
+.phone-piece-body{padding:10px}
+.phone-mark{font-family:var(--mono);font-size:30px;font-weight:700;color:var(--orange);line-height:1}
+.phone-section{font-family:var(--mono);font-size:13px;color:#fff;margin-top:2px}
+.phone-weight{
+  background:#242D3C;border-radius:8px;padding:8px 10px;margin-top:8px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.phone-weight-label{font-size:9px;color:#9BA8BD;text-transform:uppercase;letter-spacing:.5px}
+.phone-weight-val{font-family:var(--mono);font-size:18px;color:#fff;font-weight:700}
+.phone-weight-unit{font-size:9px;color:#9BA8BD}
+.phone-bolts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.phone-bolt-box{background:#242D3C;border-radius:7px;padding:7px 8px;border-top:2px solid}
+.phone-bolt-box.left{border-color:#29B6F6}
+.phone-bolt-box.right{border-color:#00C853}
+.phone-bolt-end{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.left .phone-bolt-end{color:#29B6F6}
+.right .phone-bolt-end{color:#00C853}
+.phone-bolt-count{font-family:var(--serif);font-size:24px;font-weight:800;color:var(--orange);line-height:1}
+.phone-bolt-spec{font-family:var(--mono);font-size:8px;color:#fff;margin-top:1px}
+.phone-complete-btn{
+  margin:0 10px 10px;background:#00C853;border-radius:8px;
+  padding:10px;text-align:center;
+  font-family:var(--serif);font-size:13px;font-weight:800;
+  color:#fff;letter-spacing:.5px;text-transform:uppercase;
+}
+/* Floating badges */
+.phone-badge{
+  position:absolute;background:#fff;border-radius:12px;
+  padding:8px 14px;box-shadow:0 8px 24px rgba(0,0,0,.3);
+  font-family:var(--serif);font-size:13px;font-weight:700;
+  white-space:nowrap;
+}
+.badge-voice{
+  left:-80px;top:120px;
+  display:flex;align-items:center;gap:8px;
+  animation:float1 4s ease-in-out infinite;
+}
+.badge-rev{
+  right:-70px;top:200px;
+  display:flex;align-items:center;gap:8px;
+  animation:float2 4s ease-in-out infinite .5s;
+}
+.badge-complete{
+  left:-60px;bottom:180px;
+  display:flex;align-items:center;gap:8px;
+  animation:float1 4s ease-in-out infinite 1s;
+}
+@keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes float2{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+.badge-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* ── SECTION SHARED ── */
+.section{padding:100px 48px}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-label{
+  font-family:var(--serif);font-size:13px;font-weight:700;
+  color:var(--orange);letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:16px;display:flex;align-items:center;gap:10px;
+}
+.section-label::before{content:'';width:24px;height:2px;background:var(--orange)}
+.section-h2{
+  font-family:var(--serif);font-size:54px;font-weight:900;
+  color:var(--navy);line-height:1;letter-spacing:-.5px;margin-bottom:20px;
+}
+.section-h2 em{color:var(--orange);font-style:normal}
+.section-sub{font-size:18px;color:var(--txt2);line-height:1.65;max-width:560px}
+
+/* ── VIDEO SECTION ── */
+.video-section{
+  background:var(--navy);
+  padding:90px 48px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.video-section-inner{max-width:960px;margin:0 auto;text-align:center}
+.video-eyebrow{
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  margin-bottom:16px;
+}
+.video-eyebrow span{
+  font-family:var(--serif);font-size:13px;font-weight:700;
+  color:var(--orange);letter-spacing:2px;text-transform:uppercase;
+  white-space:nowrap;
+}
+.video-eyebrow-line{height:1px;width:48px;background:rgba(255,107,0,.4)}
+.video-h2{
+  font-family:var(--serif);font-size:52px;font-weight:900;
+  color:#fff;line-height:1;letter-spacing:-.5px;margin-bottom:16px;
+}
+.video-sub{font-size:18px;color:var(--steel2);line-height:1.6;margin-bottom:40px;max-width:560px;margin-left:auto;margin-right:auto}
+/* PLAYER WRAPPER */
+.video-player-wrap{width:100%}
+.video-player{
+  position:relative;width:100%;aspect-ratio:16/9;
+  border-radius:16px;overflow:hidden;cursor:pointer;
+  background:var(--navy2);
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 24px 80px rgba(0,0,0,.6);
+  margin-bottom:20px;
+}
+/* THUMBNAIL DESIGN */
+.video-thumb{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#0D1B2A 0%,#1A2F47 50%,#0D1B2A 100%);
+  transition:opacity .3s;
+}
+.video-thumb-bg{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,107,0,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,107,0,.05) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+/* PLAY BUTTON */
+.video-play-btn{
+  width:84px;height:84px;border-radius:50%;
+  background:var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:2;
+  box-shadow:0 0 0 0 rgba(255,107,0,.5);
+  animation:play-pulse 2.5s infinite;
+  transition:transform .2s;
+}
+.video-player:hover .video-play-btn{transform:scale(1.08)}
+@keyframes play-pulse{
+  0%{box-shadow:0 0 0 0 rgba(255,107,0,.5)}
+  70%{box-shadow:0 0 0 24px rgba(255,107,0,0)}
+  100%{box-shadow:0 0 0 0 rgba(255,107,0,0)}
+}
+/* THUMB LABEL */
+.video-thumb-label{
+  position:absolute;bottom:20px;left:24px;
+  display:flex;align-items:center;gap:12px;z-index:2;
+}
+.vtl-tag{
+  font-family:var(--serif);font-size:13px;font-weight:700;
+  color:#fff;letter-spacing:1px;text-transform:uppercase;
+  background:rgba(255,107,0,.85);padding:5px 12px;border-radius:6px;
+}
+.vtl-time{
+  font-family:var(--mono);font-size:13px;color:rgba(255,255,255,.7);
+  background:rgba(0,0,0,.5);padding:4px 10px;border-radius:6px;
+}
+/* ANIMATED BADGE OVERLAYS */
+.vt-mark{
+  position:absolute;top:28px;left:32px;z-index:2;
+  font-family:var(--mono);font-size:42px;font-weight:700;color:var(--orange);
+  line-height:1;letter-spacing:-1px;opacity:.85;
+  animation:float-mark 4s ease-in-out infinite;
+}
+@keyframes float-mark{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.vt-badge{
+  position:absolute;z-index:2;
+  background:#fff;border-radius:10px;
+  padding:7px 14px;font-family:var(--serif);font-size:13px;font-weight:700;
+  box-shadow:0 6px 20px rgba(0,0,0,.3);white-space:nowrap;
+}
+.vt-badge-rev{
+  top:28px;right:24px;color:#C0392B;
+  animation:float-a 5s ease-in-out infinite;
+}
+.vt-badge-voice{
+  top:50%;right:24px;color:var(--orange);
+  animation:float-b 5s ease-in-out infinite .7s;
+}
+.vt-badge-done{
+  top:50%;left:24px;color:#00A845;
+  animation:float-a 5s ease-in-out infinite 1.2s;
+}
+@keyframes float-a{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes float-b{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+/* CHIPS */
+.video-chips{
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:center;
+  margin-bottom:32px;
+}
+.vchip{
+  display:flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;padding:7px 16px;
+  font-size:14px;color:var(--steel2);font-weight:500;
+}
+.vchip-icon{font-size:15px}
+/* VIDEO CTA */
+.video-cta{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:8px}
+.video-cta-or{font-size:15px;color:var(--steel);}
+.problem{background:var(--navy);padding:80px 48px}
+.problem-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.problem-quote{
+  font-family:var(--serif);font-size:48px;font-weight:900;
+  color:#fff;line-height:1.05;letter-spacing:-.5px;
+}
+.problem-quote em{color:var(--orange);font-style:normal}
+.problem-stats{display:flex;flex-direction:column;gap:20px}
+.problem-stat{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  border-left:3px solid var(--orange);border-radius:8px;padding:20px 24px;
+}
+.ps-n{font-family:var(--serif);font-size:40px;font-weight:900;color:var(--orange);line-height:1}
+.ps-l{font-size:15px;color:var(--steel2);margin-top:6px;line-height:1.5}
+
+/* ── HOW IT WORKS ── */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;margin-top:64px;position:relative}
+.steps::before{
+  content:'';position:absolute;top:36px;left:calc(12.5%);right:calc(12.5%);height:2px;
+  background:linear-gradient(90deg,var(--orange),rgba(255,107,0,.2));
+  z-index:0;
+}
+.step{position:relative;z-index:1;text-align:center}
+.step-num{
+  width:72px;height:72px;border-radius:50%;background:var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+  font-family:var(--serif);font-size:28px;font-weight:900;color:#fff;
+  box-shadow:0 8px 24px rgba(255,107,0,.35);
+}
+.step-icon{width:32px;height:32px;stroke:#fff;stroke-width:2;fill:none}
+.step-title{font-family:var(--serif);font-size:22px;font-weight:800;color:var(--navy);margin-bottom:10px;letter-spacing:.3px}
+.step-body{font-size:15px;color:var(--txt2);line-height:1.65}
+.step-badge{
+  display:inline-block;background:var(--off);border:1px solid var(--steel2);
+  border-radius:6px;padding:4px 10px;margin-top:12px;
+  font-family:var(--mono);font-size:12px;color:var(--txt3);
+}
+
+/* ── FEATURES ── */
+.features-bg{background:var(--off)}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:64px}
+.feature-card{
+  background:#fff;border-radius:16px;padding:32px;
+  border:1px solid #E0EAF4;transition:all .2s;
+  position:relative;overflow:hidden;
+}
+.feature-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--orange);transform:scaleX(0);transform-origin:left;
+  transition:transform .3s;
+}
+.feature-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(13,27,42,.12)}
+.feature-card:hover::before{transform:scaleX(1)}
+.feature-icon{
+  width:52px;height:52px;border-radius:12px;background:rgba(255,107,0,.1);
+  display:flex;align-items:center;justify-content:center;margin-bottom:20px;
+}
+.feature-icon svg{width:26px;height:26px;stroke:var(--orange);stroke-width:2;fill:none}
+.feature-title{font-family:var(--serif);font-size:22px;font-weight:800;color:var(--navy);margin-bottom:10px;letter-spacing:.2px}
+.feature-body{font-size:15px;color:var(--txt2);line-height:1.7}
+
+/* ── VOICE SECTION ── */
+.voice-section{
+  background:var(--navy);padding:100px 48px;
+  position:relative;overflow:hidden;
+}
+.voice-section::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,107,0,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,0,.03) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+.voice-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;position:relative;z-index:1}
+.voice-demo{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;padding:32px;
+}
+.voice-cmd{
+  display:flex;align-items:center;gap:14px;padding:16px 20px;
+  background:rgba(255,255,255,.06);border-radius:12px;margin-bottom:12px;
+  border:1px solid rgba(255,255,255,.08);
+}
+.voice-cmd:last-child{margin-bottom:0}
+.voice-cmd-icon{
+  width:40px;height:40px;border-radius:50%;background:var(--orange);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.voice-cmd-icon svg{width:20px;height:20px;stroke:#fff;stroke-width:2;fill:none}
+.voice-cmd-text{flex:1}
+.voice-cmd-say{font-family:var(--mono);font-size:16px;color:var(--orange);font-weight:700}
+.voice-cmd-result{font-size:13px;color:var(--steel);margin-top:4px}
+.voice-cmd-icon.green{background:var(--green)}
+.voice-cmd-icon.blue{background:#2196F3}
+
+/* ── PRICING ── */
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:64px;max-width:900px;margin-left:auto;margin-right:auto}
+.price-card{
+  background:#fff;border:2px solid #E0EAF4;border-radius:20px;
+  overflow:hidden;transition:all .2s;
+}
+.price-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(13,27,42,.12)}
+.price-card.featured{border-color:var(--orange);position:relative}
+.price-featured-banner{
+  background:var(--orange);color:#fff;text-align:center;
+  font-family:var(--serif);font-size:13px;font-weight:800;
+  padding:8px;letter-spacing:1.5px;text-transform:uppercase;
+}
+.price-head{padding:36px 36px 28px}
+.price-plan{font-family:var(--serif);font-size:24px;font-weight:800;color:var(--navy);margin-bottom:12px}
+.price-amount{font-family:var(--serif);font-size:64px;font-weight:900;color:var(--navy);line-height:1}
+.price-amount sup{font-size:28px;vertical-align:top;margin-top:10px;display:inline-block;color:var(--orange)}
+.price-amount sub{font-size:20px;color:var(--txt3);font-weight:400;font-family:var(--sans)}
+.price-desc{font-size:15px;color:var(--txt2);margin-top:12px;line-height:1.6}
+.price-divider{height:1px;background:#E0EAF4;margin:0 36px}
+.price-features{padding:28px 36px 36px}
+.price-feature{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.price-feature:last-child{margin-bottom:0}
+.price-check{
+  width:22px;height:22px;border-radius:50%;background:rgba(0,168,69,.12);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+}
+.price-check svg{width:12px;height:12px;stroke:var(--green);stroke-width:3;fill:none}
+.price-feat-text{font-size:15px;color:var(--txt2);line-height:1.5}
+.price-feat-text strong{color:var(--txt)}
+.price-cta{
+  display:block;margin:0 36px 36px;padding:16px;text-align:center;
+  background:var(--navy);color:#fff;border-radius:10px;text-decoration:none;
+  font-family:var(--serif);font-size:18px;font-weight:800;
+  letter-spacing:.3px;text-transform:uppercase;transition:all .2s;
+}
+.price-card.featured .price-cta{background:var(--orange)}
+.price-cta:hover{opacity:.9;transform:translateY(-1px)}
+.price-note{text-align:center;margin-top:24px;font-size:14px;color:var(--txt3)}
+
+/* ── SOCIAL PROOF ── */
+.proof{background:var(--off);padding:80px 48px}
+.proof-inner{max-width:1200px;margin:0 auto;text-align:center}
+.proof-label{
+  font-family:var(--serif);font-size:14px;font-weight:700;
+  color:var(--txt3);letter-spacing:2px;text-transform:uppercase;margin-bottom:48px;
+}
+.proof-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:#E0EAF4;border-radius:16px;overflow:hidden}
+.proof-stat{background:#fff;padding:36px 20px;text-align:center}
+.proof-n{font-family:var(--serif);font-size:52px;font-weight:900;color:var(--navy);line-height:1}
+.proof-n em{color:var(--orange);font-style:normal}
+.proof-l{font-size:14px;color:var(--txt2);margin-top:8px;line-height:1.5}
+
+/* ── FINAL CTA ── */
+.final-cta{
+  background:var(--navy);padding:120px 48px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.final-cta::before{
+  content:'';position:absolute;
+  width:800px;height:800px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,107,0,.12) 0%,transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.final-cta-inner{position:relative;z-index:1}
+.final-cta h2{
+  font-family:var(--serif);font-size:68px;font-weight:900;
+  color:#fff;line-height:.95;letter-spacing:-1px;margin-bottom:24px;
+}
+.final-cta h2 em{color:var(--orange);font-style:normal;display:block}
+.final-cta p{font-size:20px;color:var(--steel2);margin-bottom:48px;line-height:1.6}
+.final-actions{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+
+/* ── FOOTER ── */
+footer{background:#08121D;padding:60px 48px 40px}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;margin-bottom:48px}
+.footer-brand{margin-bottom:20px}
+.footer-logo{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.footer-logo-icon{width:36px;height:36px;background:var(--orange);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.footer-logo-name{font-family:var(--serif);font-size:20px;font-weight:800;color:#fff}
+.footer-logo-name span{color:var(--orange)}
+.footer-tagline{font-size:14px;color:rgba(255,255,255,.4);line-height:1.7;max-width:260px}
+.footer-col-title{font-family:var(--serif);font-size:13px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px}
+.footer-links{display:flex;flex-direction:column;gap:10px}
+.footer-links a{color:rgba(255,255,255,.6);text-decoration:none;font-size:14px;transition:color .15s}
+.footer-links a:hover{color:#fff}
+.footer-bottom{
+  border-top:1px solid rgba(255,255,255,.06);padding-top:28px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+}
+.footer-copy{font-size:13px;color:rgba(255,255,255,.3)}
+.footer-legal{display:flex;gap:24px}
+.footer-legal a{font-size:13px;color:rgba(255,255,255,.3);text-decoration:none;transition:color .15s}
+.footer-legal a:hover{color:rgba(255,255,255,.6)}
+
+/* ── REVEAL ANIMATIONS ── */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+.reveal-delay-4{transition-delay:.4s}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  nav{padding:0 24px}
+  .nav-links{display:none}
+  .hero{padding:100px 24px 60px}
+  .hero-inner{grid-template-columns:1fr;gap:60px}
+  .hero-h1{font-size:52px}
+  .phone-wrap{width:260px}
+  .badge-voice,.badge-rev,.badge-complete{display:none}
+  .problem-inner{grid-template-columns:1fr}
+  .section{padding:70px 24px}
+  .problem{padding:60px 24px}
+  .steps{grid-template-columns:1fr 1fr;gap:24px}
+  .steps::before{display:none}
+  .features-grid{grid-template-columns:1fr}
+  .voice-inner{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr}
+  .proof-grid{grid-template-columns:1fr 1fr}
+  .final-cta{padding:80px 24px}
+  .final-cta h2{font-size:48px}
+  .footer-top{grid-template-columns:1fr 1fr;gap:40px}
+  .footer{padding:48px 24px 32px}
+  .video-section{padding:60px 24px}
+  .video-h2{font-size:38px}
+  .vt-badge-voice,.vt-badge-done{display:none}
+  .vt-mark{font-size:28px;top:16px;left:16px}
+  .video-play-btn{width:64px;height:64px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 30 30" width="26" height="26">
+        <rect x="2" y="2" width="26" height="7" rx="1.5" fill="white"/>
+        <rect x="11" y="9" width="8" height="12" rx="0.8" fill="white"/>
+        <rect x="2" y="21" width="26" height="7" rx="1.5" fill="white"/>
+      </svg>
+    </div>
+    <div class="nav-logo-name">Steel<span>Caller</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="#how-it-works">How It Works</a>
+    <a href="#watch" style="color:var(--orange);font-weight:600">▶ Watch Demo</a>
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="nav-cta">
+    <a href="#" class="btn-ghost">Log In</a>
+    <a href="#pricing" class="btn-orange">Start Free Project</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <div class="hero-eyebrow-dot"></div>
+        <span>Built for the Iron</span>
+      </div>
+      <h1 class="hero-h1">Your Steel.<em>Field-Ready</em>in Minutes.</h1>
+      <p class="hero-sub">Upload your model files and give your field crew instant access to every piece mark, bolt spec, and location — on their phone, no login required.</p>
+      <div class="hero-actions">
+        <a href="#pricing" class="btn-hero">Upload Your First Project</a>
+        <a href="#how-it-works" class="btn-hero-ghost">See How It Works</a>
+      </div>
+      <div class="hero-proof">
+        <div class="hero-proof-stat">
+          <div class="hero-proof-n">$249</div>
+          <div class="hero-proof-l">Per Project</div>
+        </div>
+        <div class="hero-proof-div"></div>
+        <div class="hero-proof-stat">
+          <div class="hero-proof-n">3 Files</div>
+          <div class="hero-proof-l">IFC · KSS · NC1</div>
+        </div>
+        <div class="hero-proof-div"></div>
+        <div class="hero-proof-stat">
+          <div class="hero-proof-n">90 Days</div>
+          <div class="hero-proof-l">Live Access</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHONE MOCKUP -->
+    <div class="hero-visual">
+      <div class="phone-wrap">
+        <!-- Floating badges -->
+        <div class="phone-badge badge-voice">
+          <svg width="16" height="16" viewBox="0 0 24 24" stroke="var(--orange)" stroke-width="2" fill="none"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+          <span style="color:var(--orange)">Voice Lookup</span>
+        </div>
+        <div class="phone-badge badge-rev">
+          <div class="badge-dot" style="background:var(--orange)"></div>
+          <span style="color:#C0392B;font-weight:800">⚠ REVISED</span>
+        </div>
+        <div class="phone-badge badge-complete">
+          <div class="badge-dot" style="background:#00A845"></div>
+          <span style="color:#00A845;font-weight:800">✓ Complete</span>
+        </div>
+
+        <div class="phone-frame">
+          <div class="phone-screen">
+            <div class="phone-notch"></div>
+            <div class="phone-app">
+              <div class="phone-app-header">
+                <div class="ph-logo-row">
+                  <div class="ph-logo-box">
+                    <svg viewBox="0 0 30 30" width="18" height="18">
+                      <rect x="2" y="2" width="26" height="7" rx="1.5" fill="white"/>
+                      <rect x="11" y="9" width="8" height="12" rx="0.8" fill="white"/>
+                      <rect x="2" y="21" width="26" height="7" rx="1.5" fill="white"/>
+                    </svg>
+                  </div>
+                  <div class="ph-brand">Steel<span>Caller</span></div>
+                </div>
+                <div class="ph-job">5665</div>
+                <div class="ph-jobname">Parkway Support</div>
+              </div>
+              <div class="phone-search">
+                <svg class="phone-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span class="phone-search-text">Piece mark, grid, elevation…</span>
+                <div class="phone-mic">
+                  <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+                </div>
+              </div>
+              <div class="phone-piece">
+                <div class="phone-piece-rev">⚠ REVISED — REV 2 · Section changed W16→W18</div>
+                <div class="phone-piece-body">
+                  <div class="phone-mark">52B1</div>
+                  <div class="phone-section">W18 × 40 · A992 · Beam · Seq 3</div>
+                  <div class="phone-weight">
+                    <div><div class="phone-weight-label">Crane Pick Weight</div><div class="phone-weight-val">2,232 <span class="phone-weight-unit">lbs</span></div></div>
+                    <div><div class="phone-weight-label">El.</div><div class="phone-weight-val" style="font-size:14px">33'-06"</div></div>
+                  </div>
+                  <div class="phone-bolts">
+                    <div class="phone-bolt-box left">
+                      <div class="phone-bolt-end">← Left End</div>
+                      <div class="phone-bolt-count">6</div>
+                      <div class="phone-bolt-spec">3/4"×1-3/4" A325N</div>
+                    </div>
+                    <div class="phone-bolt-box right">
+                      <div class="phone-bolt-end">Right End →</div>
+                      <div class="phone-bolt-count">4</div>
+                      <div class="phone-bolt-spec">3/4"×1-3/4" A325N</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="phone-complete-btn">✓ Mark Complete — Set & Bolted</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO SECTION -->
+<section class="video-section" id="watch">
+  <div class="video-section-inner">
+    <div class="video-eyebrow reveal">
+      <div class="video-eyebrow-line"></div>
+      <span>See It In Action</span>
+      <div class="video-eyebrow-line"></div>
+    </div>
+    <h2 class="video-h2 reveal">Watch How It Works</h2>
+    <p class="video-sub reveal reveal-delay-1">From file upload to field crew ready — see the full SteelCaller workflow in under two minutes.</p>
+    <div class="video-player-wrap reveal reveal-delay-2">
+      <!-- VIDEO THUMBNAIL / PLAYER -->
+      <!-- REPLACE src="YOUR_VIDEO_URL_HERE" with your InVideo exported video URL -->
+      <!-- OR replace the entire block with an iframe if using YouTube/Vimeo -->
+      <div class="video-player" id="videoPlayer" onclick="playVideo()">
+        <!-- Thumbnail overlay — shown before play -->
+        <div class="video-thumb" id="videoThumb">
+          <div class="video-thumb-bg"></div>
+          <!-- Play button -->
+          <div class="video-play-btn">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
+          </div>
+          <div class="video-thumb-label">
+            <div class="vtl-tag">▶ STEELCALLER OVERVIEW</div>
+            <div class="vtl-time">1:45</div>
+          </div>
+          <!-- Animated elements over the thumbnail -->
+          <div class="vt-mark">52B1</div>
+          <div class="vt-badge vt-badge-rev">⚠ REVISED</div>
+          <div class="vt-badge vt-badge-voice">🎤 "Call 52B1"</div>
+          <div class="vt-badge vt-badge-done">✓ Complete</div>
+        </div>
+        <!-- Actual video — hidden until play clicked -->
+        <!-- OPTION A: Self-hosted MP4 -->
+        <video id="mainVideo" style="display:none;width:100%;border-radius:16px" controls>
+          <source src="YOUR_VIDEO_FILE.mp4" type="video/mp4">
+        </video>
+        <!-- OPTION B: YouTube embed — uncomment and replace VIDEO_ID -->
+        <!--
+        <iframe id="ytEmbed" style="display:none;width:100%;aspect-ratio:16/9;border:none;border-radius:16px"
+          src="https://www.youtube.com/embed/VIDEO_ID?autoplay=1"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+        -->
+        <!-- OPTION C: Vimeo embed — uncomment and replace VIDEO_ID -->
+        <!--
+        <iframe id="vimeoEmbed" style="display:none;width:100%;aspect-ratio:16/9;border:none;border-radius:16px"
+          src="https://player.vimeo.com/video/VIDEO_ID?autoplay=1"
+          allow="autoplay; fullscreen"
+          allowfullscreen></iframe>
+        -->
+      </div>
+      <!-- Feature chips below video -->
+      <div class="video-chips">
+        <div class="vchip"><span class="vchip-icon">🎤</span>Voice Lookup Demo</div>
+        <div class="vchip"><span class="vchip-icon">⚠</span>Revision Alerts</div>
+        <div class="vchip"><span class="vchip-icon">🔩</span>Bolt Specifications</div>
+        <div class="vchip"><span class="vchip-icon">🇪🇸</span>Bilingual EN/ES</div>
+        <div class="vchip"><span class="vchip-icon">✓</span>Status Tracking</div>
+      </div>
+    </div>
+    <div class="video-cta reveal reveal-delay-3">
+      <a href="#pricing" class="btn-orange" style="padding:14px 32px;font-size:16px;font-weight:700;border-radius:10px;text-decoration:none">Upload Your First Project — $249</a>
+      <span class="video-cta-or">or</span>
+      <a href="#how-it-works" style="color:var(--steel2);font-size:15px;text-decoration:underline;text-underline-offset:3px">Read how it works →</a>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="problem-inner">
+    <div class="reveal">
+      <div class="problem-quote">Paper drawings on a job site get wet, torn, and <em>left in the truck.</em></div>
+      <p style="color:var(--steel);font-size:17px;margin-top:24px;line-height:1.7">Ironworkers call the office to check bolt specs. Supers dig through submittals to find the section size. Foremen don't know a piece is revised until the crane is already in the air. SteelCaller fixes all of it.</p>
+    </div>
+    <div class="problem-stats reveal reveal-delay-2">
+      <div class="problem-stat">
+        <div class="ps-n">One Tap</div>
+        <div class="ps-l">Every piece mark, bolt spec, elevation, and revision status — instantly on any phone. No app download, no login, no training required.</div>
+      </div>
+      <div class="problem-stat">
+        <div class="ps-n">"Call 52B1"</div>
+        <div class="ps-l">Hands-free voice lookup reads the entire piece out loud. Gloves on, both hands on iron, the information comes to you.</div>
+      </div>
+      <div class="problem-stat">
+        <div class="ps-n">EN / ES</div>
+        <div class="ps-l">Full English and Spanish support — the AI voice speaks in whichever language the ironworker prefers. Every label, button, and voice command bilingual.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how-it-works">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">How It Works</div>
+      <h2 class="section-h2">Upload Once.<em>Live in Minutes.</em></h2>
+      <p class="section-sub">No IT department. No custom integration. No training. If you can export files from your modeling software, you're ready.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">
+          <svg class="step-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div class="step-title">Upload Your Files</div>
+        <div class="step-body">Drop in your IFC, KSS, and NC1 zip from your steel modeling software. Takes about 2 minutes.</div>
+        <div class="step-badge">IFC · KSS · NC1</div>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-num">
+          <svg class="step-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </div>
+        <div class="step-title">We Build the App</div>
+        <div class="step-body">Our server parses all three files, merges the data, calculates assembly weights, and generates your project app. Typically 2–5 minutes.</div>
+        <div class="step-badge">Auto-processed</div>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num">
+          <svg class="step-icon" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        </div>
+        <div class="step-title">Share the Link</div>
+        <div class="step-body">You get a unique URL. Text it to the foreman, email it to the GC, post it in your job chat. Anyone with the link can open it — no account needed.</div>
+        <div class="step-badge">No login for crew</div>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <div class="step-num">
+          <svg class="step-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </div>
+        <div class="step-title">Field Crew Uses It</div>
+        <div class="step-body">Ironworkers open it on their phone. Search any piece, hear the bolt specs read aloud, mark it complete. Works 60 feet in the air, gloves on.</div>
+        <div class="step-badge">Works offline</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section features-bg" id="features">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Features</div>
+      <h2 class="section-h2">Everything the<em>Field Needs.</em></h2>
+      <p class="section-sub">Designed with 30+ years of steel detailing experience. Every feature exists because an ironworker or superintendent actually needs it.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div>
+        <div class="feature-title">Hands-Free Voice Lookup</div>
+        <div class="feature-body">Say "Call 52B1" and the AI voice reads back the section, elevation, bolt specs, and any revision or camber warnings. Works while wearing gloves 60 feet in the air. Wake word always listening.</div>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="feature-title">Revision Alerts</div>
+        <div class="feature-body">When you upload a revised model, SteelCaller automatically compares it to the previous version and flags every changed piece with a red REVISED banner showing exactly what changed. No guessing.</div>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 012 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg></div>
+        <div class="feature-title">Full Bolt Specifications</div>
+        <div class="feature-body">Every connection end shows the exact bolt count, diameter, length, grade, and washer requirement — pulled from your KSS file and verified against your NC1 hole counts. Left end and right end shown separately.</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 2C9.24 2 7 4.24 7 7l-4 13h18l-4-13c0-2.76-2.24-5-5-5z"/></svg></div>
+        <div class="feature-title">Accurate Crane Pick Weight</div>
+        <div class="feature-body">Full assembly weight calculated from dimensions — main member plus every shop-welded plate, angle, clip, and stud. Not just the bare section weight. Calculated from your actual model data, not estimated.</div>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></div>
+        <div class="feature-title">English &amp; Spanish</div>
+        <div class="feature-body">The entire app — every label, button, and AI voice readout — is available in English and Spanish. One tap to switch. Settings saved per phone so each crew member gets their preferred language every time.</div>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></div>
+        <div class="feature-title">Live Progress Tracking</div>
+        <div class="feature-body">The field crew marks pieces Complete as they go. The superintendent and GC see the erection sequence progress in real time — what's done, what's pending, what's been revised. No more radio calls asking for counts.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VOICE SECTION -->
+<section class="voice-section">
+  <div class="voice-inner">
+    <div class="reveal">
+      <div class="section-label" style="color:var(--orange)">Hands-Free Operation</div>
+      <h2 class="section-h2" style="color:#fff;font-size:52px">The App Talks.<em style="color:var(--orange)">You Listen.</em></h2>
+      <p style="font-size:18px;color:var(--steel2);line-height:1.65;margin-bottom:32px">Ironworkers don't have time to type. They have gloves on. They're on the iron. SteelCaller's voice system handles everything so they never have to look at the screen.</p>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0"></div>
+          <span style="color:var(--steel2);font-size:16px">Adjust speed, pitch, and volume to match job site conditions</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0"></div>
+          <span style="color:var(--steel2);font-size:16px">Choose from male or female voices installed on the device</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0"></div>
+          <span style="color:var(--steel2);font-size:16px">Preview any voice before selecting — tap play next to each option</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0"></div>
+          <span style="color:var(--steel2);font-size:16px">Settings saved per phone — each crew member keeps their preference</span>
+        </div>
+      </div>
+    </div>
+    <div class="voice-demo reveal reveal-delay-2">
+      <div style="font-family:var(--serif);font-size:13px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px">Voice Commands</div>
+      <div class="voice-cmd">
+        <div class="voice-cmd-icon"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg></div>
+        <div class="voice-cmd-text">
+          <div class="voice-cmd-say">"Call 52B1"</div>
+          <div class="voice-cmd-result">Reads full piece — section, elevation, bolts, warnings</div>
+        </div>
+      </div>
+      <div class="voice-cmd">
+        <div class="voice-cmd-icon green"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div>
+        <div class="voice-cmd-text">
+          <div class="voice-cmd-say">"Call 52B1 complete"</div>
+          <div class="voice-cmd-result">Marks the piece set and bolted — no screen needed</div>
+        </div>
+      </div>
+      <div class="voice-cmd">
+        <div class="voice-cmd-icon blue"><svg viewBox="0 0 24 24"><polyline points="5,12 19,12"/><polyline points="12,5 19,12 12,19"/></svg></div>
+        <div class="voice-cmd-text">
+          <div class="voice-cmd-say">"Call siguiente"</div>
+          <div class="voice-cmd-result">Next piece in sequence — in Spanish</div>
+        </div>
+      </div>
+      <div class="voice-cmd">
+        <div class="voice-cmd-icon" style="background:#9C27B0"><svg viewBox="0 0 24 24"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></div>
+        <div class="voice-cmd-text">
+          <div class="voice-cmd-say">"Call repeat"</div>
+          <div class="voice-cmd-result">Replays the last piece readout</div>
+        </div>
+      </div>
+      <div style="margin-top:20px;padding:14px 18px;background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.2);border-radius:10px">
+        <div style="font-size:14px;color:rgba(255,255,255,.6);line-height:1.6">Also works in Spanish: <span style="color:var(--orange);font-family:var(--mono)">"Call 52B1 completo"</span> · <span style="color:var(--orange);font-family:var(--mono)">"Trace repetir"</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="section-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label" style="justify-content:center">Pricing</div>
+      <h2 class="section-h2">Simple.<em>Transparent.</em></h2>
+      <p class="section-sub" style="margin:0 auto">No per-seat fees. No mark limits. No hidden charges. The fabricator pays once — the field crew accesses for free.</p>
+    </div>
+    <div class="pricing-grid reveal reveal-delay-1">
+      <div class="price-card">
+        <div class="price-head">
+          <div class="price-plan">Per Project</div>
+          <div class="price-amount"><sup>$</sup>249<sub>/project</sub></div>
+          <div class="price-desc">Pay once per project. No subscription required. Perfect for shops that need it for a specific job.</div>
+        </div>
+        <div class="price-divider"></div>
+        <div class="price-features">
+          <div class="price-feature"><div class="price-check"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div><div class="price-feat-text"><strong>Unlimited piece marks</strong> — no limits on project size</div></div>
+          <div class="price-feature"><div class="price-check"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div><div class="price-feat-text"><strong>3 revisions included</strong> — upload updated files as the model changes</div></div>
+          <div class="price-feature"><div class="price-check"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div><div class="price-feat-text"><strong>90-day live access</strong> — link stays active for the whole job</div></div>
+          <div class="price-feature"><div class="price-check"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div><div class="price-feat-text"><strong>Shareable link</strong> — no login required for field crew</div></div>
+          <div class="price-feature"><div class="price-check"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div><div class="price-feat-text">Voice lookup · bilingual EN/ES · bolt specs · weights · revision alerts</div></div>
+        </div>
+        <a href="#" class="price-cta">Get Started — $249</a>
+      </div>
+
+      <div class="price-card featured">
+        <div class="price-featured-banner">⭐ Best Value for Active Shops</div>
+        <div class="price-head">
+          <div class="price-plan">Pro Subscription</div>
+          <div class="price-amount"><sup>$</sup>799<sub>/month</sub></div>
+          <div class="price-desc">Unlimited projects every month. Pays for itself at just 4 projects. For shops running steel year-round.</div>
+        </div>
+        <div class="price-divider"></div>
+        <div class="price-features">
+          <div class="price-feature"><div class="price-check"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div><div class="price-feat-text"><strong>Unlimited projects</strong> — as many as you run each month</div></div>
+          <div class="price-feature"><div class="price-check"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div><div class="price-feat-text"><strong>Unlimited revisions</strong> — update as many times as needed</div></div>
+          <div class="price-feature"><div class="price-check"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div><div class="price-feat-text"><strong>Unlimited piece marks</strong> — no project size limits ever</div></div>
+          <div class="price-feature"><div class="price-check"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div><div class="price-feat-text"><strong>90-day storage per project</strong></div></div>
+          <div class="price-feature"><div class="price-check"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div><div class="price-feat-text"><strong>Priority processing</strong> — your files go to the front of the queue</div></div>
+          <div class="price-feature"><div class="price-check"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div><div class="price-feat-text"><strong>Fabricator dashboard</strong> — manage all projects in one place</div></div>
+        </div>
+        <a href="#" class="price-cta">Start Pro — $799/mo</a>
+      </div>
+    </div>
+    <p class="price-note reveal">The fabricator pays — field crew accesses for free. No per-seat fees. No contracts. Cancel anytime.</p>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="proof">
+  <div class="proof-inner">
+    <div class="proof-label reveal">Why fabricators use SteelCaller</div>
+    <div class="proof-grid reveal">
+      <div class="proof-stat">
+        <div class="proof-n">3<em>min</em></div>
+        <div class="proof-l">Average time from file upload to live field app</div>
+      </div>
+      <div class="proof-stat">
+        <div class="proof-n">0</div>
+        <div class="proof-l">Logins required for field crew to access their project</div>
+      </div>
+      <div class="proof-stat">
+        <div class="proof-n">90<em>days</em></div>
+        <div class="proof-l">Live app access from a single upload — covers most erection schedules</div>
+      </div>
+      <div class="proof-stat">
+        <div class="proof-n"><em>EN</em>+<em>ES</em></div>
+        <div class="proof-l">Full bilingual support — English and Spanish throughout the entire app</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta" id="contact">
+  <div class="final-cta-inner reveal">
+    <h2>Ready to Give Your<em>Field Crew the Edge?</em></h2>
+    <p>Upload your first project in under 5 minutes. No contracts, no IT setup, no training sessions.<br>Just upload, share, and let your crew find the iron.</p>
+    <div class="final-actions">
+      <a href="#" class="btn-hero">Start Your First Project — $249</a>
+      <a href="mailto:support@steelcaller.com" class="btn-hero-ghost" style="font-size:16px;padding:14px 28px">Questions? Email Us</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">
+          <div class="footer-logo-icon">
+            <svg viewBox="0 0 30 30" width="22" height="22">
+              <rect x="2" y="2" width="26" height="7" rx="1.5" fill="white"/>
+              <rect x="11" y="9" width="8" height="12" rx="0.8" fill="white"/>
+              <rect x="2" y="21" width="26" height="7" rx="1.5" fill="white"/>
+            </svg>
+          </div>
+          <div class="footer-logo-name">Steel<span>Caller</span></div>
+        </div>
+        <div class="footer-tagline">Every Mark. Every Location. Built for the people who raise the steel.</div>
+      </div>
+      <div>
+        <div class="footer-col-title">Product</div>
+        <div class="footer-links">
+          <a href="#how-it-works">How It Works</a>
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#">Field App Demo</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Files</div>
+        <div class="footer-links">
+          <a href="#">IFC4 Export Guide</a>
+          <a href="#">KSS Export Guide</a>
+          <a href="#">NC1 Export Guide</a>
+          <a href="#">Supported Software</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <div class="footer-links">
+          <a href="#">About</a>
+          <a href="mailto:support@steelcaller.com">Support</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 SteelCaller. All rights reserved.</div>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="mailto:support@steelcaller.com">support@steelcaller.com</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Nav scroll effect
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').style.background =
+    window.scrollY > 60 ? 'rgba(13,27,42,.98)' : 'rgba(13,27,42,.96)';
+});
+
+// Video player — swap thumbnail for video on click
+function playVideo(){
+  const thumb = document.getElementById('videoThumb');
+  if(!thumb) return;
+  // ── OPTION A: Self-hosted MP4 ──────────────────────────
+  const vid = document.getElementById('mainVideo');
+  if(vid && vid.querySelector('source[src]')?.getAttribute('src') !== 'YOUR_VIDEO_FILE.mp4'){
+    thumb.style.display = 'none';
+    vid.style.display = 'block';
+    vid.play();
+    return;
+  }
+  // ── OPTION B: YouTube ──────────────────────────────────
+  // Uncomment when you have a YouTube video ID
+  // const yt = document.getElementById('ytEmbed');
+  // if(yt){ thumb.style.display='none'; yt.style.display='block'; return; }
+
+  // ── PLACEHOLDER: No video yet — open a modal prompt ───
+  // Replace this with your actual video logic once uploaded
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;display:flex;align-items:center;justify-content:center;cursor:pointer';
+  overlay.innerHTML = `
+    <div style="background:#1A2F47;border:2px solid rgba(255,107,0,.4);border-radius:20px;padding:40px 48px;text-align:center;max-width:480px;margin:24px">
+      <div style="font-size:48px;margin-bottom:16px">🎬</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:12px">Video Coming Soon</div>
+      <div style="font-size:16px;color:#C2D4E4;line-height:1.6;margin-bottom:24px">Upload your InVideo export here once it's ready.<br>See the script file for instructions.</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:rgba(255,107,0,.8);background:rgba(255,107,0,.1);padding:12px 16px;border-radius:8px;margin-bottom:24px">Replace YOUR_VIDEO_FILE.mp4<br>in the HTML with your video URL</div>
+      <button onclick="this.closest('div[style]').remove()" style="background:#FF6B00;color:#fff;border:none;padding:12px 28px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.3px">Close</button>
+    </div>`;
+  overlay.addEventListener('click', e => { if(e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+</script>
+</body>
+</html>
