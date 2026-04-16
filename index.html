@@ -586,6 +586,12 @@ footer{background:#08121D;padding:60px 48px 40px}
   .video-play-btn{width:64px;height:64px}
 }
 </style>
+<script>
+// If Supabase redirected here with an access token, send to dashboard
+if (window.location.hash && window.location.hash.indexOf('access_token=') !== -1) {
+  window.location.replace('/dashboard.html' + window.location.hash);
+}
+</script>
 </head>
 <body>
 
