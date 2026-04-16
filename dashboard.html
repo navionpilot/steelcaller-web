@@ -508,7 +508,7 @@ button{cursor:pointer;font-family:var(--sans)}
           <div class="field"><label>Last Name</label><input type="text" id="acctLastName" value=""></div>
           <div class="field field-full"><label>Company / Fabricator Name</label><input type="text" id="acctCompany" value=""></div>
           <div class="field field-full"><label>Email Address</label><input type="text" id="acctEmail" value=""></div>
-          <div class="field field-full"><label>Phone (optional)</label><input type="text" id="acctPhone" placeholder="(601) 555-0100"></div>
+          <div class="field field-full"><label>Phone (optional)</label><input type="text" id="acctPhone" placeholder="(000) 000-0000"></div>
         </div>
         <div style="margin-top:18px;display:flex;align-items:center;gap:12px">
           <button class="btn btn-primary" onclick="saveAccount()">
@@ -631,8 +631,8 @@ button{cursor:pointer;font-family:var(--sans)}
       <div class="form-card">
         <div class="form-section-title"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Send a Message</div>
         <div style="display:flex;flex-direction:column;gap:14px">
-          <div class="field field-full"><label>Your Name</label><input type="text" id="ctName" placeholder="Waylon HDD"></div>
-          <div class="field field-full"><label>Email Address</label><input type="text" id="ctEmail" placeholder="waylon@steelfab.com"></div>
+          <div class="field field-full"><label>Your Name</label><input type="text" id="ctName" placeholder="Your name"></div>
+          <div class="field field-full"><label>Email Address</label><input type="text" id="ctEmail" placeholder="your@email.com"></div>
           <div class="field field-full"><label>Subject</label>
             <select id="ctSubject" style="padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:var(--sans);color:var(--txt);background:var(--white);outline:none">
               <option>File upload issue</option>
@@ -1482,6 +1482,12 @@ function updateSidebarUser(user) {
   if (nameEl)   nameEl.textContent  = fullName  || 'My Account';
   if (emailEl)  emailEl.textContent = email;
   if (avatarEl) avatarEl.textContent = initials || '?';
+
+  // Pre-fill contact support form with real user data
+  var ctName  = document.getElementById('ctName');
+  var ctEmail = document.getElementById('ctEmail');
+  if (ctName  && !ctName.value)  ctName.value  = fullName || '';
+  if (ctEmail && !ctEmail.value) ctEmail.value = email    || '';
 
   // Pre-fill account page — always overwrite with real auth data
   var fn = document.getElementById('acctFirstName');
