@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SteelCaller — Fabricator Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B2A;--navy2:#132236;--navy3:#1A2F47;
+  --orange:#FF6B00;--orange2:#E55F00;
+  --white:#FFFFFF;--off:#F2F5F9;--off2:#E8EDF3;
+  --border:#DDE4ED;--border2:#C8D4E0;
+  --txt:#0D1B2A;--txt2:#3A5068;--txt3:#6A8098;
+  --green:#00A845;--green-bg:#E8F7EE;
+  --amber:#B07000;--amber-bg:#FFF7E0;
+  --red:#C0392B;--red-bg:#FEF0EE;
+  --blue:#1A6BAA;--blue-bg:#EBF3FB;
+  --serif:'Barlow Condensed',sans-serif;
+  --sans:'Barlow',sans-serif;
+  --mono:'Share Tech Mono',monospace;
+  --sidebar:260px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--off);font-family:var(--sans);color:var(--txt);font-size:15px;line-height:1.5}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:var(--sans)}
+
+/* ── LAYOUT ── */
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar);min-width:var(--sidebar);
+  background:var(--navy);display:flex;flex-direction:column;
+  height:100vh;overflow-y:auto;flex-shrink:0;
+}
+.sidebar::-webkit-scrollbar{width:0}
+.sb-logo{
+  padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.07);
+}
+.sb-logo-inner{display:flex;align-items:center;gap:10px}
+.sb-icon{
+  width:40px;height:40px;background:var(--orange);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.sb-name{font-family:var(--serif);font-size:22px;font-weight:800;color:#fff;letter-spacing:.3px;line-height:1}
+.sb-name span{color:var(--orange)}
+.sb-plan{
+  margin-top:8px;font-size:11px;font-weight:600;
+  color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;
+}
+.sb-plan strong{color:var(--orange)}
+
+/* NAV */
+.sb-nav{flex:1;padding:16px 12px}
+.sb-section{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;padding:0 8px;margin-bottom:6px;margin-top:20px}
+.sb-section:first-of-type{margin-top:0}
+.sb-link{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 10px;border-radius:8px;
+  font-size:14px;font-weight:500;color:rgba(255,255,255,.6);
+  transition:all .15s;margin-bottom:2px;
+}
+.sb-link svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0;opacity:.7}
+.sb-link:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.9)}
+.sb-link.on{background:rgba(255,107,0,.15);color:#fff;font-weight:600}
+.sb-link.on svg{opacity:1;stroke:var(--orange)}
+.sb-badge{
+  margin-left:auto;background:var(--orange);color:#fff;
+  font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;
+}
+/* SIDEBAR BOTTOM */
+.sb-bottom{padding:16px 12px;border-top:1px solid rgba(255,255,255,.07)}
+.sb-user{display:flex;align-items:center;gap:10px}
+.sb-avatar{
+  width:36px;height:36px;border-radius:50%;background:var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:15px;font-weight:800;color:#fff;flex-shrink:0;
+}
+.sb-user-info{}
+.sb-user-name{font-size:13px;font-weight:600;color:#fff;line-height:1.2}
+.sb-user-email{font-size:11px;color:rgba(255,255,255,.4);margin-top:1px}
+.sb-logout{
+  margin-left:auto;width:30px;height:30px;border-radius:6px;
+  background:transparent;border:none;display:flex;align-items:center;justify-content:center;
+  transition:background .15s;
+}
+.sb-logout:hover{background:rgba(255,255,255,.08)}
+.sb-logout svg{width:16px;height:16px;stroke:rgba(255,255,255,.4);stroke-width:2;fill:none}
+
+/* ── MAIN AREA ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* TOP BAR */
+.topbar{
+  background:var(--white);border-bottom:1px solid var(--border);
+  padding:0 32px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.tb-title{font-family:var(--serif);font-size:24px;font-weight:800;color:var(--txt);letter-spacing:.2px}
+.tb-right{display:flex;align-items:center;gap:12px}
+.btn{
+  padding:9px 20px;border-radius:8px;font-size:14px;font-weight:600;
+  border:none;transition:all .15s;display:flex;align-items:center;gap:7px;
+  font-family:var(--sans);letter-spacing:.2px;
+}
+.btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none}
+.btn-primary{background:var(--orange);color:#fff}
+.btn-primary:hover{background:var(--orange2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(255,107,0,.3)}
+.btn-ghost{background:transparent;color:var(--txt2);border:1.5px solid var(--border2)}
+.btn-ghost:hover{border-color:var(--navy);color:var(--txt)}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy:hover{background:var(--navy2)}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1.5px solid #F5C0BB}
+.btn-danger:hover{background:#FDDFDC}
+.btn-sm{padding:6px 14px;font-size:13px}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+.content::-webkit-scrollbar{width:6px}
+.content::-webkit-scrollbar-track{background:transparent}
+.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* VIEWS */
+.view{display:none}
+.view.on{display:block}
+
+/* ── STATS ROW ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{
+  background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:20px 24px;
+}
+.stat-n{font-family:var(--serif);font-size:40px;font-weight:900;color:var(--txt);line-height:1}
+.stat-n.orange{color:var(--orange)}
+.stat-n.green{color:var(--green)}
+.stat-n.amber{color:var(--amber)}
+.stat-l{font-size:13px;color:var(--txt3);margin-top:6px;font-weight:500}
+.stat-sub{font-size:12px;color:var(--txt3);margin-top:4px}
+
+/* ── PROJECT CARDS ── */
+.projects-grid{display:flex;flex-direction:column;gap:14px}
+.project-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:14px;padding:22px 24px;
+  display:flex;align-items:center;gap:20px;
+  transition:box-shadow .15s,border-color .15s;
+}
+.project-card:hover{box-shadow:0 4px 20px rgba(13,27,42,.08);border-color:var(--border2)}
+.project-card.expired{opacity:.65}
+/* Status dot */
+.proj-status{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.proj-status.live{background:var(--green-bg)}
+.proj-status.processing{background:var(--amber-bg)}
+.proj-status.expired{background:var(--off2)}
+.proj-status svg{width:22px;height:22px;stroke-width:2;fill:none}
+.proj-status.live svg{stroke:var(--green)}
+.proj-status.processing svg{stroke:var(--amber)}
+.proj-status.expired svg{stroke:var(--txt3)}
+/* Project info */
+.proj-info{flex:1;min-width:0}
+.proj-top{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.proj-num{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--orange)}
+.proj-name{font-family:var(--serif);font-size:19px;font-weight:800;color:var(--txt);letter-spacing:.2px}
+.proj-meta{font-size:13px;color:var(--txt3);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.proj-meta-item{display:flex;align-items:center;gap:4px}
+.proj-meta-item svg{width:13px;height:13px;stroke:var(--txt3);stroke-width:2;fill:none}
+/* Status badge */
+.status-badge{
+  font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;
+  letter-spacing:.3px;text-transform:uppercase;white-space:nowrap;
+  font-family:var(--serif);
+}
+.badge-live{background:var(--green-bg);color:var(--green)}
+.badge-processing{background:var(--amber-bg);color:var(--amber)}
+.badge-expired{background:var(--off2);color:var(--txt3)}
+.badge-revised{background:#FEF0EE;color:var(--red)}
+/* Storage bar */
+.storage-bar{width:80px}
+.storage-label{font-size:11px;color:var(--txt3);margin-bottom:4px;text-align:right}
+.storage-track{height:4px;background:var(--off2);border-radius:2px;overflow:hidden}
+.storage-fill{height:100%;border-radius:2px;background:var(--green)}
+.storage-fill.warn{background:var(--amber)}
+.storage-fill.crit{background:var(--red)}
+/* Project actions */
+.proj-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+/* ── EMPTY STATE ── */
+.empty-state{
+  text-align:center;padding:80px 40px;
+  background:var(--white);border:1px solid var(--border);
+  border-radius:14px;border-style:dashed;
+}
+.empty-icon{
+  width:72px;height:72px;border-radius:50%;
+  background:rgba(255,107,0,.08);border:2px solid rgba(255,107,0,.15);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
+}
+.empty-icon svg{width:32px;height:32px;stroke:var(--orange);stroke-width:1.5;fill:none}
+.empty-title{font-family:var(--serif);font-size:24px;font-weight:800;color:var(--txt);margin-bottom:8px}
+.empty-body{font-size:15px;color:var(--txt3);margin-bottom:24px;line-height:1.6}
+
+/* ── NEW PROJECT WIZARD ── */
+.wizard-steps{display:flex;align-items:center;gap:0;margin-bottom:32px}
+.ws{display:flex;align-items:center;gap:10px;flex:1}
+.ws-num{
+  width:32px;height:32px;border-radius:50%;border:2px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:14px;font-weight:800;color:var(--txt3);
+  flex-shrink:0;transition:all .2s;
+}
+.ws.active .ws-num{border-color:var(--orange);background:var(--orange);color:#fff}
+.ws.done .ws-num{border-color:var(--green);background:var(--green);color:#fff}
+.ws-label{font-size:14px;font-weight:600;color:var(--txt3)}
+.ws.active .ws-label{color:var(--txt);font-weight:700}
+.ws.done .ws-label{color:var(--green)}
+.ws-line{flex:1;height:2px;background:var(--border);margin:0 12px}
+.ws-line.done{background:var(--green)}
+
+/* FORM */
+.form-card{
+  background:var(--white);border:1px solid var(--border);border-radius:14px;padding:28px 32px;
+  margin-bottom:20px;
+}
+.form-section-title{
+  font-family:var(--serif);font-size:18px;font-weight:800;color:var(--txt);
+  margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.form-section-title svg{width:20px;height:20px;stroke:var(--orange);stroke-width:2;fill:none}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field-full{grid-column:span 2}
+.field label{font-size:13px;font-weight:600;color:var(--txt2);letter-spacing:.2px}
+.field input,.field select,.field textarea{
+  padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:14px;font-family:var(--sans);color:var(--txt);background:var(--white);
+  outline:none;transition:border-color .15s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange)}
+.field textarea{resize:vertical;min-height:80px}
+.field-hint{font-size:12px;color:var(--txt3)}
+
+/* UPLOAD ZONES */
+.upload-zones{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.upload-zone{
+  border:2px dashed var(--border2);border-radius:12px;
+  padding:28px 20px;text-align:center;
+  transition:all .2s;cursor:pointer;background:var(--off);
+  position:relative;
+}
+.upload-zone:hover{border-color:var(--orange);background:rgba(255,107,0,.03)}
+.upload-zone.required{border-color:var(--orange);background:rgba(255,107,0,.04)}
+.upload-zone.uploaded{border-color:var(--green);background:var(--green-bg);border-style:solid}
+.uz-icon{
+  width:52px;height:52px;border-radius:12px;margin:0 auto 14px;
+  display:flex;align-items:center;justify-content:center;
+}
+.uz-icon.req{background:rgba(255,107,0,.12)}
+.uz-icon.rec{background:rgba(26,107,170,.12)}
+.uz-icon.done{background:rgba(0,168,69,.15)}
+.uz-icon svg{width:26px;height:26px;stroke-width:1.8;fill:none}
+.uz-icon.req svg{stroke:var(--orange)}
+.uz-icon.rec svg{stroke:var(--blue)}
+.uz-icon.done svg{stroke:var(--green)}
+.uz-label{font-family:var(--serif);font-size:17px;font-weight:800;color:var(--txt);margin-bottom:4px}
+.uz-ext{font-family:var(--mono);font-size:13px;color:var(--orange);margin-bottom:8px;font-weight:700}
+.uz-desc{font-size:13px;color:var(--txt3);line-height:1.5;margin-bottom:14px}
+.uz-req-badge{
+  display:inline-block;font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;
+  font-family:var(--serif);margin-bottom:10px;
+}
+.uz-req-badge.required{background:rgba(255,107,0,.15);color:var(--orange)}
+.uz-req-badge.recommended{background:var(--blue-bg);color:var(--blue)}
+.uz-btn{
+  padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;
+  border:1.5px solid var(--border2);background:var(--white);color:var(--txt2);
+  cursor:pointer;transition:all .15s;
+}
+.uz-btn:hover{border-color:var(--orange);color:var(--orange)}
+.uz-uploaded{display:none}
+.upload-zone.uploaded .uz-btn{display:none}
+.upload-zone.uploaded .uz-uploaded{display:block;font-size:13px;color:var(--green);font-weight:600}
+.upload-zone.uploaded .uz-icon.req,.upload-zone.uploaded .uz-icon.rec{display:none}
+.upload-zone.uploaded .uz-icon.done{display:flex}
+.upload-zone:not(.uploaded) .uz-icon.done{display:none}
+
+/* REVIEW CARD */
+.review-card{
+  background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;
+  margin-bottom:20px;
+}
+.review-card-head{
+  padding:18px 24px;background:var(--off);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.review-card-head svg{width:18px;height:18px;stroke:var(--orange);stroke-width:2;fill:none}
+.review-card-title{font-family:var(--serif);font-size:16px;font-weight:800;color:var(--txt);letter-spacing:.2px}
+.review-card-body{padding:18px 24px}
+.review-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.review-row:last-child{border-bottom:none}
+.review-label{font-size:13px;color:var(--txt3);font-weight:500}
+.review-val{font-size:14px;font-weight:600;color:var(--txt)}
+.review-file{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--green);font-weight:600}
+.review-file svg{width:14px;height:14px;stroke:var(--green);stroke-width:2;fill:none}
+.file-missing{color:var(--txt3);font-style:italic}
+
+/* PRICING SUMMARY */
+.pricing-summary{
+  background:var(--navy);border-radius:14px;padding:24px;color:#fff;margin-bottom:20px;
+}
+.ps-plan{font-family:var(--serif);font-size:14px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.ps-price{font-family:var(--serif);font-size:48px;font-weight:900;color:#fff;line-height:1}
+.ps-price span{font-size:20px;color:rgba(255,255,255,.5);font-weight:400}
+.ps-desc{font-size:14px;color:rgba(255,255,255,.6);margin-top:8px;line-height:1.6}
+.ps-features{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.ps-feat{display:flex;align-items:center;gap:8px;font-size:14px;color:rgba(255,255,255,.8)}
+.ps-feat svg{width:16px;height:16px;stroke:var(--orange);stroke-width:2.5;fill:none;flex-shrink:0}
+
+/* ── PROJECT DETAIL ── */
+.detail-header{
+  background:var(--white);border:1px solid var(--border);border-radius:14px;
+  padding:24px 28px;margin-bottom:20px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
+}
+.dh-left{}
+.dh-job{
+  font-family:var(--mono);font-size:14px;font-weight:700;color:var(--orange);
+  margin-bottom:4px;letter-spacing:.5px;
+}
+.dh-name{font-family:var(--serif);font-size:32px;font-weight:900;color:var(--txt);line-height:1;letter-spacing:-.3px;margin-bottom:8px}
+.dh-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.dh-meta-item{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--txt3)}
+.dh-meta-item svg{width:14px;height:14px;stroke:var(--txt3);stroke-width:2;fill:none}
+.dh-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex-shrink:0}
+
+/* SHARE LINK */
+.share-box{
+  background:var(--off);border:1.5px solid var(--border);border-radius:10px;
+  padding:16px 20px;margin-bottom:20px;
+  display:flex;align-items:center;gap:12px;
+}
+.share-icon{width:42px;height:42px;background:var(--green-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.share-icon svg{width:20px;height:20px;stroke:var(--green);stroke-width:2;fill:none}
+.share-info{flex:1;min-width:0}
+.share-label{font-size:12px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.share-url{
+  font-family:var(--mono);font-size:14px;color:var(--blue);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700;
+}
+.share-actions{display:flex;gap:8px;flex-shrink:0}
+.copy-btn{
+  padding:8px 16px;background:var(--navy);color:#fff;border:none;
+  border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:6px;transition:background .15s;
+}
+.copy-btn:hover{background:var(--navy2)}
+.copy-btn svg{width:14px;height:14px;stroke:#fff;stroke-width:2;fill:none}
+.copy-btn.copied{background:var(--green)}
+
+/* DETAIL GRID */
+.detail-grid{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+.detail-card{background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.dc-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.dc-title{font-family:var(--serif);font-size:16px;font-weight:800;color:var(--txt);letter-spacing:.2px;display:flex;align-items:center;gap:8px}
+.dc-title svg{width:17px;height:17px;stroke:var(--orange);stroke-width:2;fill:none}
+.dc-body{padding:16px 20px}
+
+/* ACTIVITY */
+.activity-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.act-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.act-dot.green{background:var(--green)}
+.act-dot.orange{background:var(--orange)}
+.act-dot.blue{background:var(--blue)}
+.act-dot.gray{background:var(--txt3)}
+.act-text{font-size:14px;color:var(--txt2);line-height:1.5}
+.act-time{font-size:12px;color:var(--txt3);margin-top:2px}
+
+/* PROGRESS RING */
+.marks-progress{text-align:center;padding:10px 0}
+.mp-n{font-family:var(--serif);font-size:44px;font-weight:900;color:var(--txt);line-height:1}
+.mp-n span{font-size:20px;color:var(--txt3)}
+.mp-label{font-size:13px;color:var(--txt3);margin-top:4px}
+.mp-bar{height:8px;background:var(--off2);border-radius:4px;overflow:hidden;margin:12px 0 4px}
+.mp-fill{height:100%;border-radius:4px;background:var(--green)}
+.mp-split{display:flex;justify-content:space-between;font-size:12px;color:var(--txt3)}
+.mp-split span{display:flex;align-items:center;gap:4px}
+.mp-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* STORAGE */
+.storage-detail{padding:4px 0}
+.sd-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px}
+.sd-row:last-child{border-bottom:none}
+.sd-label{color:var(--txt2)}
+.sd-val{font-weight:600;color:var(--txt)}
+.sd-warn{color:var(--red)}
+
+/* ── ACCOUNT PAGE ── */
+.account-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.account-card{background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.ac-head{padding:18px 22px;border-bottom:1px solid var(--border);background:var(--off)}
+.ac-title{font-family:var(--serif);font-size:17px;font-weight:800;color:var(--txt);letter-spacing:.2px}
+.ac-body{padding:18px 22px}
+.plan-card{
+  background:var(--navy);border-radius:10px;padding:20px;color:#fff;margin-bottom:14px;
+}
+.plan-name{font-family:var(--serif);font-size:14px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.plan-price{font-family:var(--serif);font-size:36px;font-weight:900;line-height:1}
+.plan-price span{font-size:16px;color:rgba(255,255,255,.5);font-weight:400}
+.plan-renewal{font-size:13px;color:rgba(255,255,255,.5);margin-top:6px}
+.usage-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
+.usage-row:last-child{border-bottom:none}
+.usage-label{color:var(--txt2)}
+.usage-val{font-weight:700;color:var(--txt)}
+.danger-zone{border:1.5px solid #F5C0BB;border-radius:10px;padding:16px;background:#FEF8F8}
+.dz-title{font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.dz-desc{font-size:13px;color:var(--txt3);margin-bottom:12px;line-height:1.5}
+
+/* NOTIFICATION TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:var(--navy);color:#fff;padding:14px 22px;border-radius:10px;
+  font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.2);
+  transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast svg{width:18px;height:18px;stroke:#fff;stroke-width:2.5;fill:none;flex-shrink:0}
+.toast.green{background:var(--green)}
+
+/* PROCESSING OVERLAY */
+.processing-card{
+  background:var(--white);border:1px solid var(--border);border-radius:14px;
+  padding:60px;text-align:center;
+}
+.processing-spinner{
+  width:60px;height:60px;border:4px solid var(--border);border-top-color:var(--orange);
+  border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SECTION HEADER */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.section-hdr-title{font-family:var(--serif);font-size:20px;font-weight:800;color:var(--txt);letter-spacing:.2px}
+.section-hdr-sub{font-size:14px;color:var(--txt3);margin-top:2px}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px}
+.tab{
+  padding:10px 18px;font-size:14px;font-weight:600;color:var(--txt3);
+  cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;
+  transition:all .15px;
+}
+.tab.on{color:var(--orange);border-bottom-color:var(--orange)}
+.tab:hover:not(.on){color:var(--txt)}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-inner">
+      <div class="sb-icon">
+        <svg viewBox="0 0 30 30" width="26" height="26">
+          <rect x="2" y="2" width="26" height="7" rx="1.5" fill="white"/>
+          <rect x="11" y="9" width="8" height="12" rx="0.8" fill="white"/>
+          <rect x="2" y="21" width="26" height="7" rx="1.5" fill="white"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sb-name">Steel<span>Caller</span></div>
+      </div>
+    </div>
+    <div class="sb-plan">Fabricator Dashboard · <strong>Pro Plan</strong></div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-section">Projects</div>
+    <a class="sb-link on" onclick="showView('projects')" href="#">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      All Projects
+      <span class="sb-badge">3</span>
+    </a>
+    <a class="sb-link" onclick="showView('new-project')" href="#">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      New Project
+    </a>
+
+    <div class="sb-section">Account</div>
+    <a class="sb-link" onclick="showView('account')" href="#">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      My Account
+    </a>
+    <a class="sb-link" href="#">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Billing
+    </a>
+    <a class="sb-link" onclick="showView('help')" href="#">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Help &amp; Support
+    </a>
+
+    <div class="sb-section">Resources</div>
+    <a class="sb-link" href="#">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14 2z"/></svg>
+      Export Guides
+    </a>
+    <a class="sb-link" href="#">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Contact Support
+    </a>
+  </nav>
+
+  <div class="sb-bottom">
+    <div class="sb-user">
+      <div class="sb-avatar">WH</div>
+      <div class="sb-user-info">
+        <div class="sb-user-name">Waylon HDD</div>
+        <div class="sb-user-email">waylon@steelfab.com</div>
+      </div>
+      <button class="sb-logout" title="Log out">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN AREA ══ -->
+<div class="main">
+
+  <!-- TOP BAR -->
+  <div class="topbar" id="topbar">
+    <div class="tb-title" id="pageTitle">My Projects</div>
+    <div class="tb-right">
+      <button class="btn btn-ghost btn-sm" onclick="showView('account')">
+        <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Pro Plan
+      </button>
+      <button class="btn btn-primary" onclick="showView('new-project')">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Project
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: PROJECTS ══ -->
+  <div class="view on" id="v-projects">
+    <div class="content">
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-n orange">3</div>
+          <div class="stat-l">Total Projects</div>
+          <div class="stat-sub">This account</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-n green">2</div>
+          <div class="stat-l">Active &amp; Live</div>
+          <div class="stat-sub">Field crew can access</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-n" style="color:var(--amber)">1</div>
+          <div class="stat-l">Processing</div>
+          <div class="stat-sub">Files being parsed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-n">∞</div>
+          <div class="stat-l">Projects This Month</div>
+          <div class="stat-sub">Pro Plan — unlimited</div>
+        </div>
+      </div>
+
+      <!-- Project List -->
+      <div class="section-hdr">
+        <div>
+          <div class="section-hdr-title">All Projects</div>
+          <div class="section-hdr-sub">Click any project to view details and share links</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm">Filter</button>
+          <button class="btn btn-ghost btn-sm">Sort</button>
+        </div>
+      </div>
+
+      <div class="projects-grid">
+
+        <!-- Project 1 — Live -->
+        <div class="project-card" onclick="showView('detail')">
+          <div class="proj-status live">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+          </div>
+          <div class="proj-info">
+            <div class="proj-top">
+              <span class="proj-num">5665</span>
+              <span class="proj-name">Parkway Support</span>
+              <span class="status-badge badge-live">● Live</span>
+            </div>
+            <div class="proj-meta">
+              <span class="proj-meta-item"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Meridian, MS</span>
+              <span class="proj-meta-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="7"/></svg>334 marks</span>
+              <span class="proj-meta-item"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/></svg>Rev 2</span>
+              <span class="proj-meta-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>47 days left</span>
+            </div>
+          </div>
+          <div class="storage-bar">
+            <div class="storage-label">47 days</div>
+            <div class="storage-track"><div class="storage-fill warn" style="width:48%"></div></div>
+          </div>
+          <div class="proj-actions">
+            <button class="btn btn-ghost btn-sm" onclick="copyLink(event,'steelcaller.com/p/5665-parkway-support')">
+              <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copy Link
+            </button>
+            <button class="btn btn-navy btn-sm" onclick="showView('detail')">View</button>
+          </div>
+        </div>
+
+        <!-- Project 2 — Processing -->
+        <div class="project-card">
+          <div class="proj-status processing">
+            <svg viewBox="0 0 24 24"><polyline points="23,4 23,11 16,11"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 11"/></svg>
+          </div>
+          <div class="proj-info">
+            <div class="proj-top">
+              <span class="proj-num">5712</span>
+              <span class="proj-name">Henderson Warehouse</span>
+              <span class="status-badge badge-processing">⟳ Processing</span>
+            </div>
+            <div class="proj-meta">
+              <span class="proj-meta-item"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Jackson, MS</span>
+              <span class="proj-meta-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Uploaded 8 min ago</span>
+              <span class="proj-meta-item" style="color:var(--amber)">Parsing IFC + KSS + NC1...</span>
+            </div>
+          </div>
+          <div class="storage-bar" style="opacity:.3">
+            <div class="storage-label">90 days</div>
+            <div class="storage-track"><div class="storage-fill" style="width:100%"></div></div>
+          </div>
+          <div class="proj-actions">
+            <button class="btn btn-ghost btn-sm" disabled style="opacity:.4">Copy Link</button>
+            <button class="btn btn-ghost btn-sm" disabled style="opacity:.4">View</button>
+          </div>
+        </div>
+
+        <!-- Project 3 — Expired -->
+        <div class="project-card expired">
+          <div class="proj-status expired">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="proj-info">
+            <div class="proj-top">
+              <span class="proj-num">5590</span>
+              <span class="proj-name">Linda Griffin Office</span>
+              <span class="status-badge badge-expired">Expired</span>
+            </div>
+            <div class="proj-meta">
+              <span class="proj-meta-item"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Hattiesburg, MS</span>
+              <span class="proj-meta-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="7"/></svg>1,169 marks</span>
+              <span class="proj-meta-item" style="color:var(--red)">Storage expired 12 days ago</span>
+            </div>
+          </div>
+          <div class="storage-bar">
+            <div class="storage-label" style="color:var(--red)">Expired</div>
+            <div class="storage-track"><div class="storage-fill crit" style="width:100%"></div></div>
+          </div>
+          <div class="proj-actions">
+            <button class="btn btn-ghost btn-sm" style="color:var(--orange);border-color:var(--orange)">
+              Renew — $249
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: NEW PROJECT ══ -->
+  <div class="view" id="v-new-project">
+    <div class="content">
+
+      <!-- Steps -->
+      <div class="wizard-steps">
+        <div class="ws active" id="ws1">
+          <div class="ws-num" id="wsn1">1</div>
+          <div class="ws-label">Job Information</div>
+        </div>
+        <div class="ws-line" id="wsl1"></div>
+        <div class="ws" id="ws2">
+          <div class="ws-num" id="wsn2">2</div>
+          <div class="ws-label">Upload Files</div>
+        </div>
+        <div class="ws-line" id="wsl2"></div>
+        <div class="ws" id="ws3">
+          <div class="ws-num" id="wsn3">3</div>
+          <div class="ws-label">Review &amp; Launch</div>
+        </div>
+      </div>
+
+      <!-- STEP 1: Job Info -->
+      <div id="step1">
+        <div class="form-card">
+          <div class="form-section-title">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14 2z"/></svg>
+            Project Information
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>Job Number *</label>
+              <input type="text" placeholder="e.g. 5713" id="jobNum">
+            </div>
+            <div class="field">
+              <label>Job Name *</label>
+              <input type="text" placeholder="e.g. Riverside Medical Center" id="jobName">
+            </div>
+            <div class="field field-full">
+              <label>Job Location</label>
+              <input type="text" placeholder="City, State">
+            </div>
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-section-title">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            Project Parties
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>General Contractor</label>
+              <input type="text" placeholder="Contractor name">
+            </div>
+            <div class="field">
+              <label>Erection Contractor</label>
+              <input type="text" placeholder="Erector name">
+            </div>
+            <div class="field">
+              <label>Your Fabrication Company</label>
+              <input type="text" placeholder="Your shop name" value="ABC Steel Fab">
+            </div>
+            <div class="field">
+              <label>Project Start Date</label>
+              <input type="date">
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px">
+          <button class="btn btn-ghost" onclick="showView('projects')">Cancel</button>
+          <button class="btn btn-primary" onclick="goStep(2)">
+            Next — Upload Files
+            <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Upload Files -->
+      <div id="step2" style="display:none">
+        <div class="form-card">
+          <div class="form-section-title">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload Your Model Files
+          </div>
+          <p style="font-size:14px;color:var(--txt3);margin-bottom:22px;line-height:1.6">Export these files directly from your steel modeling software. The more files you upload, the richer the field app experience for your crew.</p>
+          <div class="upload-zones">
+
+            <!-- Hidden real file inputs -->
+            <input type="file" id="file-input-ifc" accept=".ifc" style="display:none" onchange="handleFileSelected('ifc',this)">
+            <input type="file" id="file-input-kss" accept=".kss" style="display:none" onchange="handleFileSelected('kss',this)">
+            <input type="file" id="file-input-nc1" accept=".zip" style="display:none" onchange="handleFileSelected('nc1',this)">
+
+            <!-- IFC -->
+            <div class="upload-zone required" id="uz-ifc" onclick="triggerFileInput('ifc')">
+              <div class="uz-icon req"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14 2z"/><polyline points="14,2 14,8 20,8"/></svg></div>
+              <div class="uz-icon done"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div>
+              <div class="uz-label">IFC File</div>
+              <div class="uz-ext">.ifc</div>
+              <div class="uz-req-badge required">Required</div>
+              <div class="uz-desc">Piece marks, locations, connections, elevations, member types, and weights</div>
+              <button class="uz-btn" onclick="event.stopPropagation();triggerFileInput('ifc')">Choose File</button>
+              <div class="uz-uploaded" id="ifc-uploaded"></div>
+            </div>
+
+            <!-- KSS -->
+            <div class="upload-zone" id="uz-kss" onclick="triggerFileInput('kss')">
+              <div class="uz-icon rec"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14 2z"/><polyline points="14,2 14,8 20,8"/></svg></div>
+              <div class="uz-icon done"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div>
+              <div class="uz-label">KSS File</div>
+              <div class="uz-ext">.kss</div>
+              <div class="uz-req-badge recommended">Recommended</div>
+              <div class="uz-desc">Full bolt specifications, attached material detail, plate sizes, and assembly weights</div>
+              <button class="uz-btn" onclick="event.stopPropagation();triggerFileInput('kss')">Choose File</button>
+              <div class="uz-uploaded" id="kss-uploaded"></div>
+            </div>
+
+            <!-- NC1 -->
+            <div class="upload-zone" id="uz-nc1" onclick="triggerFileInput('nc1')">
+              <div class="uz-icon rec"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+              <div class="uz-icon done"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg></div>
+              <div class="uz-label">NC1 Files</div>
+              <div class="uz-ext">.zip</div>
+              <div class="uz-req-badge recommended">Recommended</div>
+              <div class="uz-desc">Per-end bolt counts and section dimensions. Zip all .nc1 files into one folder before uploading</div>
+              <button class="uz-btn" onclick="event.stopPropagation();triggerFileInput('nc1')">Choose ZIP</button>
+              <div class="uz-uploaded" id="nc1-uploaded"></div>
+            </div>
+
+          </div>
+        </div>
+        <div style="font-size:13px;color:var(--txt3);background:var(--off);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:flex-start;gap:10px">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--blue);stroke-width:2;fill:none;flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Export IFC from your modeling software via Home → Export → 3D → Export Model → IFC4. Export KSS via Home → Export → MRP Interface → KiSS. Zip all NC1 files from Home → Export → CNC Download → DSTV → .nc1.
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:10px">
+          <button class="btn btn-ghost" onclick="goStep(1)">
+            <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/></svg>
+            Back
+          </button>
+          <button class="btn btn-primary" onclick="goStep(3)">
+            Next — Review &amp; Launch
+            <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Review & Launch -->
+      <div id="step3" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:20px">
+          <div>
+            <div class="review-card">
+              <div class="review-card-head">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14 2z"/></svg>
+                <div class="review-card-title">Job Information</div>
+              </div>
+              <div class="review-card-body">
+                <div class="review-row"><span class="review-label">Job Number</span><span class="review-val" id="rev-num">—</span></div>
+                <div class="review-row"><span class="review-label">Job Name</span><span class="review-val" id="rev-name">—</span></div>
+                <div class="review-row"><span class="review-label">Location</span><span class="review-val" id="rev-loc">—</span></div>
+                <div class="review-row"><span class="review-label">Contractor</span><span class="review-val" id="rev-contractor">—</span></div>
+                <div class="review-row"><span class="review-label">Erector</span><span class="review-val" id="rev-erector">—</span></div>
+                <div class="review-row"><span class="review-label">Fabricator</span><span class="review-val" id="rev-fabricator">—</span></div>
+              </div>
+            </div>
+            <div class="review-card">
+              <div class="review-card-head">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/></svg>
+                <div class="review-card-title">Uploaded Files</div>
+              </div>
+              <div class="review-card-body">
+                <div class="review-row">
+                  <span class="review-label">IFC File (Required)</span>
+                  <span id="rev-file-ifc" class="file-missing">No file selected</span>
+                </div>
+                <div class="review-row">
+                  <span class="review-label">KSS File (Recommended)</span>
+                  <span id="rev-file-kss" class="file-missing">Not uploaded</span>
+                </div>
+                <div class="review-row">
+                  <span class="review-label">NC1 Files (Recommended)</span>
+                  <span id="rev-file-nc1" class="file-missing">Not uploaded</span>
+                </div>
+              </div>
+            </div>
+            <div class="review-card">
+              <div class="review-card-head">
+                <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                <div class="review-card-title">Your Field App URL</div>
+              </div>
+              <div class="review-card-body">
+                <div style="font-family:var(--mono);font-size:15px;color:var(--blue);font-weight:700;background:var(--off);padding:12px 14px;border-radius:8px;border:1px solid var(--border)">
+                  <span id="rev-url-text">steelcaller.com/p/...</span>
+                </div>
+                <div style="font-size:13px;color:var(--txt3);margin-top:8px">Share this link with the foreman, GC, and erection crew. No login required to access.</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="pricing-summary">
+              <div class="ps-plan">Pro Plan — Unlimited</div>
+              <div class="ps-price">$0<span>/this project</span></div>
+              <div class="ps-desc">Your Pro subscription covers this project. You have unlimited projects this month.</div>
+              <div class="ps-features">
+                <div class="ps-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Unlimited piece marks</div>
+                <div class="ps-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>3 revisions included</div>
+                <div class="ps-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>90-day live access</div>
+                <div class="ps-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Priority processing</div>
+                <div class="ps-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Voice lookup + bilingual</div>
+              </div>
+            </div>
+            <div style="font-size:13px;color:var(--txt3);line-height:1.65;background:var(--off);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:16px">
+              ⚡ Processing typically takes <strong style="color:var(--txt)">2–5 minutes</strong>. You'll receive an email when the field app is ready. Your Pro subscription renews on <strong style="color:var(--txt)">May 15, 2026</strong>.
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:16px;font-family:var(--serif);font-weight:800;letter-spacing:.3px;text-transform:uppercase" onclick="launchProject()">
+              <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21 5,3"/></svg>
+              Launch Project
+            </button>
+            <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px" onclick="goStep(2)">
+              <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/></svg>
+              Back to Files
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ VIEW: PROJECT DETAIL ══ -->
+  <div class="view" id="v-detail">
+    <div class="content">
+
+      <!-- Header -->
+      <div class="detail-header">
+        <div class="dh-left">
+          <div class="dh-job">JOB 5665</div>
+          <div class="dh-name">Parkway Support</div>
+          <div class="dh-meta">
+            <span class="dh-meta-item"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Meridian, MS</span>
+            <span class="dh-meta-item"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Steel Works Inc.</span>
+            <span class="dh-meta-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="7"/></svg>334 marks</span>
+            <span class="dh-meta-item"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/></svg>Revision 2</span>
+          </div>
+        </div>
+        <div class="dh-right">
+          <span class="status-badge badge-live" style="font-size:14px;padding:6px 14px">● Live</span>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm">Upload Revision</button>
+            <button class="btn btn-danger btn-sm">Delete Project</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Share Link -->
+      <div class="share-box">
+        <div class="share-icon"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
+        <div class="share-info">
+          <div class="share-label">Field App Link — Share with foreman, GC, and field crew</div>
+          <div class="share-url">steelcaller.com/p/5665-parkway-support</div>
+        </div>
+        <div class="share-actions">
+          <button class="copy-btn" id="copyBtn" onclick="copyLink(event,'steelcaller.com/p/5665-parkway-support')">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy Link
+          </button>
+          <button class="copy-btn" style="background:var(--blue)">
+            <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16,6 12,2 8,6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            Share
+          </button>
+        </div>
+      </div>
+
+      <!-- Detail Grid -->
+      <div class="detail-grid">
+        <div>
+          <!-- Progress -->
+          <div class="detail-card" style="margin-bottom:16px">
+            <div class="dc-head">
+              <div class="dc-title"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>Field Progress</div>
+              <span class="status-badge badge-live" style="font-size:11px">Live Updates</span>
+            </div>
+            <div class="dc-body">
+              <div class="marks-progress">
+                <div class="mp-n">187 <span>/ 334</span></div>
+                <div class="mp-label">Pieces marked Complete</div>
+                <div class="mp-bar"><div class="mp-fill" style="width:56%"></div></div>
+                <div class="mp-split">
+                  <span><span class="mp-dot" style="background:var(--green)"></span>187 Complete</span>
+                  <span><span class="mp-dot" style="background:var(--border2)"></span>147 Pending</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Revisions -->
+          <div class="detail-card" style="margin-bottom:16px">
+            <div class="dc-head">
+              <div class="dc-title"><svg viewBox="0 0 24 24"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Revisions</div>
+              <button class="btn btn-ghost btn-sm">Upload Rev 3</button>
+            </div>
+            <div class="dc-body">
+              <div class="review-row">
+                <div>
+                  <div style="font-weight:600;font-size:14px">Revision 2 — Current</div>
+                  <div style="font-size:12px;color:var(--txt3);margin-top:2px">Uploaded Apr 14, 2026 · 2 marks changed</div>
+                </div>
+                <span class="status-badge badge-live">Active</span>
+              </div>
+              <div class="review-row">
+                <div>
+                  <div style="font-weight:600;font-size:14px;color:var(--txt3)">Revision 1</div>
+                  <div style="font-size:12px;color:var(--txt3);margin-top:2px">Uploaded Apr 8, 2026 · Original release</div>
+                </div>
+                <span class="status-badge badge-expired">Superseded</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Field Issues -->
+          <div class="detail-card">
+            <div class="dc-head">
+              <div class="dc-title"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>Field Issues</div>
+              <span class="status-badge badge-processing" style="font-size:11px">1 Open</span>
+            </div>
+            <div class="dc-body">
+              <div class="review-row">
+                <div>
+                  <div style="font-weight:600;font-size:14px">52B1 — Wrong piece delivered</div>
+                  <div style="font-size:12px;color:var(--txt3);margin-top:2px">Reported by field crew · Apr 15, 2026 · 9:34 AM</div>
+                </div>
+                <button class="btn btn-ghost btn-sm">Resolve</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- Storage -->
+          <div class="detail-card" style="margin-bottom:16px">
+            <div class="dc-head">
+              <div class="dc-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Storage</div>
+            </div>
+            <div class="dc-body">
+              <div class="storage-detail">
+                <div class="sd-row"><span class="sd-label">Plan</span><span class="sd-val">Pro — Unlimited</span></div>
+                <div class="sd-row"><span class="sd-label">Uploaded</span><span class="sd-val">Apr 8, 2026</span></div>
+                <div class="sd-row"><span class="sd-label">Expires</span><span class="sd-val sd-warn">Jul 7, 2026</span></div>
+                <div class="sd-row"><span class="sd-label">Days Remaining</span><span class="sd-val">47 days</span></div>
+                <div class="sd-row"><span class="sd-label">Revisions Used</span><span class="sd-val">2 of ∞</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Files -->
+          <div class="detail-card" style="margin-bottom:16px">
+            <div class="dc-head">
+              <div class="dc-title"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14 2z"/></svg>Uploaded Files</div>
+            </div>
+            <div class="dc-body">
+              <div class="storage-detail">
+                <div class="sd-row"><span class="sd-label">IFC</span><span class="review-file" style="font-size:13px"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--green);stroke-width:2;fill:none"><polyline points="20,6 9,17 4,12"/></svg>5665-Parkway.ifc</span></div>
+                <div class="sd-row"><span class="sd-label">KSS</span><span class="review-file" style="font-size:13px"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--green);stroke-width:2;fill:none"><polyline points="20,6 9,17 4,12"/></svg>5665.kss</span></div>
+                <div class="sd-row"><span class="sd-label">NC1 ZIP</span><span class="review-file" style="font-size:13px"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--green);stroke-width:2;fill:none"><polyline points="20,6 9,17 4,12"/></svg>5665_nc1_files.zip</span></div>
+                <div class="sd-row"><span class="sd-label">Marks Parsed</span><span class="sd-val">334</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity -->
+          <div class="detail-card">
+            <div class="dc-head">
+              <div class="dc-title"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Activity</div>
+            </div>
+            <div class="dc-body">
+              <div class="activity-item">
+                <div class="act-dot green"></div>
+                <div><div class="act-text">52B1 marked Complete by field crew</div><div class="act-time">Today, 9:12 AM</div></div>
+              </div>
+              <div class="activity-item">
+                <div class="act-dot orange"></div>
+                <div><div class="act-text">Field issue reported on 52B1</div><div class="act-time">Today, 9:34 AM</div></div>
+              </div>
+              <div class="activity-item">
+                <div class="act-dot blue"></div>
+                <div><div class="act-text">Revision 2 uploaded and processed</div><div class="act-time">Apr 14, 8:22 AM</div></div>
+              </div>
+              <div class="activity-item">
+                <div class="act-dot gray"></div>
+                <div><div class="act-text">Project link accessed by 6 devices</div><div class="act-time">Apr 14, 7:45 AM</div></div>
+              </div>
+              <div class="activity-item">
+                <div class="act-dot green"></div>
+                <div><div class="act-text">Project launched — app live</div><div class="act-time">Apr 8, 10:14 AM</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ VIEW: ACCOUNT ══ -->
+  <div class="view" id="v-account">
+    <div class="content">
+      <div class="account-grid">
+
+        <!-- Plan -->
+        <div class="account-card">
+          <div class="ac-head"><div class="ac-title">Current Plan</div></div>
+          <div class="ac-body">
+            <div class="plan-card">
+              <div class="plan-name">Pro Subscription</div>
+              <div class="plan-price">$799<span>/month</span></div>
+              <div class="plan-renewal">Next billing: May 15, 2026</div>
+            </div>
+            <div class="usage-row"><span class="usage-label">Projects This Month</span><span class="usage-val">3 of ∞</span></div>
+            <div class="usage-row"><span class="usage-label">Total Projects (All Time)</span><span class="usage-val">11</span></div>
+            <div class="usage-row"><span class="usage-label">Active Field Apps</span><span class="usage-val">2</span></div>
+            <div class="usage-row"><span class="usage-label">Storage Used</span><span class="usage-val">2 projects</span></div>
+            <div style="margin-top:14px;display:flex;gap:8px">
+              <button class="btn btn-ghost" style="flex:1;justify-content:center">Manage Billing</button>
+              <button class="btn btn-danger" style="flex:1;justify-content:center">Cancel Plan</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile -->
+        <div class="account-card">
+          <div class="ac-head"><div class="ac-title">Account Details</div></div>
+          <div class="ac-body">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+              <div class="sb-avatar" style="width:56px;height:56px;font-size:20px;border-radius:12px">WH</div>
+              <div>
+                <div style="font-weight:700;font-size:16px">Waylon HDD</div>
+                <div style="font-size:13px;color:var(--txt3)">waylon@steelfab.com</div>
+              </div>
+            </div>
+            <div class="form-grid" style="margin-bottom:14px">
+              <div class="field"><label>First Name</label><input type="text" value="Waylon"></div>
+              <div class="field"><label>Last Name</label><input type="text" value="HDD"></div>
+              <div class="field field-full"><label>Company Name</label><input type="text" value="ABC Steel Fabricators"></div>
+              <div class="field field-full"><label>Email Address</label><input type="text" value="waylon@steelfab.com"></div>
+            </div>
+            <button class="btn btn-primary">Save Changes</button>
+          </div>
+        </div>
+
+        <!-- Invoices -->
+        <div class="account-card">
+          <div class="ac-head"><div class="ac-title">Recent Invoices</div></div>
+          <div class="ac-body">
+            <div class="usage-row"><span class="usage-label">Apr 15, 2026</span><span class="usage-val" style="display:flex;align-items:center;gap:8px">$799 <span class="status-badge badge-live" style="font-size:10px">Paid</span></span></div>
+            <div class="usage-row"><span class="usage-label">Mar 15, 2026</span><span class="usage-val" style="display:flex;align-items:center;gap:8px">$799 <span class="status-badge badge-live" style="font-size:10px">Paid</span></span></div>
+            <div class="usage-row"><span class="usage-label">Feb 15, 2026</span><span class="usage-val" style="display:flex;align-items:center;gap:8px">$799 <span class="status-badge badge-live" style="font-size:10px">Paid</span></span></div>
+            <div class="usage-row"><span class="usage-label">Jan 15, 2026</span><span class="usage-val" style="display:flex;align-items:center;gap:8px">$799 <span class="status-badge badge-live" style="font-size:10px">Paid</span></span></div>
+            <button class="btn btn-ghost" style="margin-top:14px;width:100%;justify-content:center">Download All Invoices</button>
+          </div>
+        </div>
+
+        <!-- Security / Danger -->
+        <div class="account-card">
+          <div class="ac-head"><div class="ac-title">Security</div></div>
+          <div class="ac-body">
+            <div class="form-grid" style="margin-bottom:14px">
+              <div class="field field-full"><label>Current Password</label><input type="password" placeholder="••••••••"></div>
+              <div class="field"><label>New Password</label><input type="password" placeholder="••••••••"></div>
+              <div class="field"><label>Confirm Password</label><input type="password" placeholder="••••••••"></div>
+            </div>
+            <button class="btn btn-ghost" style="margin-bottom:20px">Update Password</button>
+            <div class="danger-zone">
+              <div class="dz-title">⚠ Danger Zone</div>
+              <div class="dz-desc">Permanently delete your account and all projects. This cannot be undone.</div>
+              <button class="btn btn-danger btn-sm">Delete Account</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: HELP ══ -->
+  <div class="view" id="v-help">
+    <div class="content">
+      <div style="max-width:700px">
+        <div class="form-card">
+          <div class="form-section-title">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Help &amp; Support
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <a href="#" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--off);border:1px solid var(--border);border-radius:10px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'">
+              <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--orange);stroke-width:2;fill:none;flex-shrink:0"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <div><div style="font-weight:600;font-size:15px">How to Export Files from Your Modeling Software</div><div style="font-size:13px;color:var(--txt3);margin-top:2px">Step-by-step export guides for IFC, KSS, and NC1 files</div></div>
+            </a>
+            <a href="#" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--off);border:1px solid var(--border);border-radius:10px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'">
+              <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--orange);stroke-width:2;fill:none;flex-shrink:0"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+              <div><div style="font-weight:600;font-size:15px">Voice Commands — "Call 52B1"</div><div style="font-size:13px;color:var(--txt3);margin-top:2px">Everything the field crew can say to use the app hands-free</div></div>
+            </a>
+            <a href="#" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--off);border:1px solid var(--border);border-radius:10px;transition:border-color .15s" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'">
+              <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--orange);stroke-width:2;fill:none;flex-shrink:0"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+              <div><div style="font-weight:600;font-size:15px">How to Upload a Revision</div><div style="font-size:13px;color:var(--txt3);margin-top:2px">Update your project when the model changes</div></div>
+            </a>
+            <a href="mailto:support@steelcaller.com" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--navy);border:1px solid var(--navy);border-radius:10px">
+              <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#fff;stroke-width:2;fill:none;flex-shrink:0"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              <div><div style="font-weight:600;font-size:15px;color:#fff">Contact Support</div><div style="font-size:13px;color:rgba(255,255,255,.6);margin-top:2px">support@steelcaller.com — we respond within 1 business day</div></div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+  <span id="toastMsg">Link copied!</span>
+</div>
+
+<script>
+// ── NAVIGATION ────────────────────────────────────────────
+const views = {
+  'projects':    {id:'v-projects',    title:'My Projects',      nav:0},
+  'new-project': {id:'v-new-project', title:'New Project',      nav:1},
+  'detail':      {id:'v-detail',      title:'Project Detail',   nav:0},
+  'account':     {id:'v-account',     title:'My Account',       nav:2},
+  'help':        {id:'v-help',        title:'Help & Support',   nav:5},
+};
+
+function showView(name){
+  Object.values(views).forEach(v=>{
+    const el=document.getElementById(v.id);
+    if(el) el.classList.remove('on');
+  });
+  const v = views[name];
+  if(!v) return;
+  const el = document.getElementById(v.id);
+  if(el) el.classList.add('on');
+  document.getElementById('pageTitle').textContent = v.title;
+  // Update sidebar active state
+  document.querySelectorAll('.sb-link').forEach(l=>l.classList.remove('on'));
+  const links = document.querySelectorAll('.sb-link');
+  if(links[v.nav]) links[v.nav].classList.add('on');
+}
+
+// ── WIZARD STEPS ──────────────────────────────────────────
+function goStep(n){
+  [1,2,3].forEach(i=>{
+    document.getElementById('step'+i).style.display = i===n ? 'block' : 'none';
+    const ws = document.getElementById('ws'+i);
+    const line = document.getElementById('wsl'+i);
+    if(i < n){ ws.className='ws done'; if(line) line.className='ws-line done'; }
+    else if(i === n){ ws.className='ws active'; if(line) line.className='ws-line'; }
+    else{ ws.className='ws'; if(line) line.className='ws-line'; }
+  });
+  // Update step number icons
+  [1,2,3].forEach(i=>{
+    const wsn = document.getElementById('wsn'+i);
+    if(i < n) wsn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="white" stroke-width="3" fill="none"><polyline points="20,6 9,17 4,12"/></svg>';
+    else wsn.textContent = i;
+  });
+
+  // Populate review screen with real values when advancing to step 3
+  if(n === 3) _populateReview();
+}
+
+function _populateReview(){
+  // Pull form values
+  const jobNum     = document.getElementById('jobNum')?.value?.trim()    || '—';
+  const jobName    = document.getElementById('jobName')?.value?.trim()   || '—';
+  const loc        = document.querySelector('#step1 input[placeholder="City, State"]')?.value?.trim()            || '—';
+  const contractor = document.querySelector('#step1 input[placeholder="Contractor name"]')?.value?.trim()        || '—';
+  const erector    = document.querySelector('#step1 input[placeholder="Erector name"]')?.value?.trim()           || '—';
+  const fabricator = document.querySelector('#step1 input[placeholder="Your shop name"]')?.value?.trim()         || '—';
+
+  // Populate job info
+  _setText('rev-num',        jobNum);
+  _setText('rev-name',       jobName);
+  _setText('rev-loc',        loc);
+  _setText('rev-contractor', contractor);
+  _setText('rev-erector',    erector);
+  _setText('rev-fabricator', fabricator);
+
+  // Populate uploaded files
+  _setFile('rev-file-ifc', selectedFiles.ifc, 'No file selected — IFC is required');
+  _setFile('rev-file-kss', selectedFiles.kss, 'Not uploaded — bolt specs will be limited');
+  _setFile('rev-file-nc1', selectedFiles.nc1, 'Not uploaded — hole counts will be estimated');
+
+  // Generate URL preview from job number + name
+  const slug = (jobNum + '-' + jobName)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .substring(0, 50);
+  const urlEl = document.getElementById('rev-url-text');
+  if(urlEl) urlEl.textContent = 'steelcaller.com/p/' + slug;
+}
+
+function _setText(id, val){
+  const el = document.getElementById(id);
+  if(el) el.textContent = val;
+}
+
+function _setFile(id, file, emptyMsg){
+  const el = document.getElementById(id);
+  if(!el) return;
+  if(file){
+    el.className = 'review-file';
+    el.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--green);stroke-width:2.5;fill:none"><polyline points="20,6 9,17 4,12"/></svg> ' + file.name + ' <span style="color:var(--txt3);font-weight:400">(' + _fmtSize(file.size) + ')</span>';
+  } else {
+    el.className = 'file-missing';
+    el.textContent = emptyMsg;
+  }
+}
+
+// ── API CONFIG ────────────────────────────────────────────
+const API_BASE = 'https://steelcaller-api.onrender.com';
+// Temp fabricator ID until auth is wired up
+const FABRICATOR_ID = localStorage.getItem('sc_fabricator_id') || 'demo-fabricator';
+
+// ── REAL FILE UPLOAD ──────────────────────────────────────
+// Hidden file inputs — one per zone
+let selectedFiles = { ifc: null, kss: null, nc1: null };
+
+function triggerFileInput(type) {
+  const input = document.getElementById('file-input-' + type);
+  if (input) input.click();
+}
+
+function handleFileSelected(type, input) {
+  const file = input.files[0];
+  if (!file) return;
+  selectedFiles[type] = file;
+
+  const zone     = document.getElementById('uz-' + type);
+  const uploaded = document.getElementById(type + '-uploaded');
+
+  zone.classList.add('uploaded');
+  if (uploaded) {
+    uploaded.textContent = '✓ ' + file.name + ' (' + _fmtSize(file.size) + ')';
+    uploaded.style.display = 'block';
+  }
+
+  // Update review screen filename
+  const revEl = document.getElementById('rev-file-' + type);
+  if (revEl) revEl.textContent = file.name;
+
+  showToast(file.name + ' ready to upload', true);
+}
+
+function _fmtSize(bytes) {
+  if (bytes > 1048576) return (bytes / 1048576).toFixed(1) + ' MB';
+  return (bytes / 1024).toFixed(0) + ' KB';
+}
+
+// Override upload zone click to trigger real file picker
+function simulateUpload(zoneId, uploadedId) {
+  const type = zoneId.replace('uz-', '');
+  triggerFileInput(type);
+}
+
+// ── LAUNCH PROJECT — REAL API CALL ────────────────────────
+async function launchProject() {
+  const btn = event.target.closest('button');
+
+  // Validate
+  if (!selectedFiles.ifc) {
+    showToast('Please select an IFC file first', false);
+    return;
+  }
+  const jobNum  = document.getElementById('jobNum')?.value?.trim();
+  const jobName = document.getElementById('jobName')?.value?.trim();
+  if (!jobNum || !jobName) {
+    showToast('Please fill in Job Number and Job Name in Step 1', false);
+    goStep(1);
+    return;
+  }
+
+  // Get all form values
+  const jobLocation  = document.querySelector('#step1 input[placeholder="City, State"]')?.value?.trim() || '';
+  const contractor   = document.querySelector('#step1 input[placeholder="Contractor name"]')?.value?.trim() || '';
+  const erector      = document.querySelector('#step1 input[placeholder="Erector name"]')?.value?.trim() || '';
+  const fabricator   = document.querySelector('#step1 input[placeholder="Your shop name"]')?.value?.trim() || '';
+
+  // Show spinner
+  const origHTML = btn.innerHTML;
+  btn.innerHTML  = '<div style="width:20px;height:20px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite"></div> Creating project...';
+  btn.disabled   = true;
+
+  try {
+    // ── STEP 1: Create the project record ──────────────────
+    const projectForm = new FormData();
+    projectForm.append('fabricator_id',   FABRICATOR_ID);
+    projectForm.append('job_number',      jobNum);
+    projectForm.append('job_name',        jobName);
+    projectForm.append('job_location',    jobLocation);
+    projectForm.append('contractor',      contractor);
+    projectForm.append('erector',         erector);
+    projectForm.append('fabricator_name', fabricator);
+
+    const createRes = await fetch(API_BASE + '/api/projects', {
+      method: 'POST', body: projectForm
+    });
+
+    if (!createRes.ok) throw new Error('Failed to create project: ' + createRes.status);
+    const project = await createRes.json();
+    const projectId  = project.project_id;
+    const projectUrl = project.field_app_url;
+    const slug       = project.slug;
+
+    // ── STEP 2: Upload files ────────────────────────────────
+    btn.innerHTML = '<div style="width:20px;height:20px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite"></div> Uploading files...';
+
+    const uploadForm = new FormData();
+    uploadForm.append('ifc_file', selectedFiles.ifc);
+    if (selectedFiles.kss) uploadForm.append('kss_file', selectedFiles.kss);
+    if (selectedFiles.nc1) uploadForm.append('nc1_file', selectedFiles.nc1);
+
+    const uploadRes = await fetch(API_BASE + '/api/projects/' + projectId + '/process', {
+      method: 'POST', body: uploadForm
+    });
+
+    if (!uploadRes.ok) throw new Error('Upload failed: ' + uploadRes.status);
+
+    // ── STEP 3: Poll until processed ───────────────────────
+    btn.innerHTML = '<div style="width:20px;height:20px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite"></div> Parsing files...';
+
+    const finalStatus = await _pollStatus(projectId, (status) => {
+      if (status === 'processing') {
+        btn.innerHTML = '<div style="width:20px;height:20px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite"></div> Parsing files...';
+      }
+    });
+
+    if (finalStatus.status === 'error') {
+      throw new Error(finalStatus.error || 'Processing failed');
+    }
+
+    // ── STEP 4: Success ────────────────────────────────────
+    const markCount = finalStatus.mark_count || 0;
+    showToast('✓ ' + jobName + ' is live — ' + markCount + ' marks ready!', true);
+
+    // Reset wizard and files
+    selectedFiles = { ifc: null, kss: null, nc1: null };
+    goStep(1);
+
+    // Show success panel and redirect to projects
+    setTimeout(() => {
+      _addLiveProjectCard(jobNum, jobName, jobLocation, markCount, slug, projectId);
+      showView('projects');
+    }, 1500);
+
+  } catch(err) {
+    console.error('Launch error:', err);
+    showToast('Error: ' + err.message, false);
+    btn.innerHTML = origHTML;
+    btn.disabled  = false;
+  }
+}
+
+// ── POLL PROJECT STATUS ───────────────────────────────────
+async function _pollStatus(projectId, onPoll, maxAttempts = 60) {
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(r => setTimeout(r, 5000)); // poll every 5s
+    try {
+      const res  = await fetch(API_BASE + '/api/projects/' + projectId + '/status');
+      const data = await res.json();
+      onPoll && onPoll(data.status);
+      if (data.status === 'live' || data.status === 'error') return data;
+    } catch(e) {
+      console.warn('Poll error:', e);
+    }
+  }
+  return { status: 'error', error: 'Processing timed out after 5 minutes' };
+}
+
+// ── ADD NEW LIVE PROJECT CARD TO LIST ─────────────────────
+function _addLiveProjectCard(jobNum, jobName, location, markCount, slug, projectId) {
+  const grid    = document.querySelector('.projects-grid');
+  if (!grid) return;
+  const appUrl  = 'steelcaller.com/p/' + slug;
+  const card    = document.createElement('div');
+  card.className = 'project-card';
+  card.innerHTML = `
+    <div class="proj-status live">
+      <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+    </div>
+    <div class="proj-info">
+      <div class="proj-top">
+        <span class="proj-num">${jobNum}</span>
+        <span class="proj-name">${jobName}</span>
+        <span class="status-badge badge-live">● Live</span>
+      </div>
+      <div class="proj-meta">
+        <span class="proj-meta-item">${location || 'Location TBD'}</span>
+        <span class="proj-meta-item">${markCount} marks</span>
+        <span class="proj-meta-item">90 days remaining</span>
+      </div>
+    </div>
+    <div class="proj-actions">
+      <button class="btn btn-ghost btn-sm" onclick="copyLink(event,'${appUrl}')">
+        <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copy Link
+      </button>
+      <a class="btn btn-navy btn-sm" href="https://${appUrl}" target="_blank">Open App</a>
+    </div>
+  `;
+  grid.insertBefore(card, grid.firstChild);
+
+  // Update stats
+  const statCards = document.querySelectorAll('.stat-n');
+  if (statCards[0]) statCards[0].textContent = parseInt(statCards[0].textContent || 0) + 1;
+  if (statCards[1]) statCards[1].textContent = parseInt(statCards[1].textContent || 0) + 1;
+}
+
+// ── COPY LINK ─────────────────────────────────────────────
+function copyLink(e, url){
+  e.stopPropagation();
+  navigator.clipboard.writeText('https://'+url).catch(()=>{});
+  showToast('Link copied to clipboard!', true);
+  const btn = e.target.closest('button');
+  if(btn){
+    const orig = btn.innerHTML;
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;stroke-width:2;fill:none"><polyline points="20,6 9,17 4,12"/></svg> Copied!';
+    setTimeout(()=>{ btn.classList.remove('copied'); btn.innerHTML=orig; }, 2000);
+  }
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, green){
+  const t = document.getElementById('toast');
+  const m = document.getElementById('toastMsg');
+  m.textContent = msg;
+  t.className = 'toast show' + (green ? ' green' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
