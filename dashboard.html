@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SteelCaller — Fabricator Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 :root{
   --navy:#0D1B2A;--navy2:#132236;--navy3:#1A2F47;
@@ -302,11 +303,11 @@ button{cursor:pointer;font-family:var(--sans)}
     </div>
   </nav>
   <div class="sb-bottom">
-    <div class="sb-user">
-      <div class="sb-avatar">WH</div>
+    <div class="sb-user" style="cursor:pointer" onclick="logout()" title="Log out">
+      <div class="sb-avatar" id="sbAvatar">?</div>
       <div>
-        <div class="sb-user-name">Waylon HDD</div>
-        <div class="sb-user-email">waylon@steelfab.com</div>
+        <div class="sb-user-name" id="sbName">Loading...</div>
+        <div class="sb-user-email" id="sbEmail"></div>
       </div>
     </div>
   </div>
@@ -506,7 +507,7 @@ button{cursor:pointer;font-family:var(--sans)}
           <div class="field"><label>First Name</label><input type="text" id="acctFirstName" value="Waylon"></div>
           <div class="field"><label>Last Name</label><input type="text" id="acctLastName" value="HDD"></div>
           <div class="field field-full"><label>Company / Fabricator Name</label><input type="text" id="acctCompany" value="ABC Steel Fabricators"></div>
-          <div class="field field-full"><label>Email Address</label><input type="text" id="acctEmail" value="waylon@steelfab.com"></div>
+          <div class="field field-full"><label>Email Address</label><input type="text" id="acctEmail" value=""></div>
           <div class="field field-full"><label>Phone (optional)</label><input type="text" id="acctPhone" placeholder="(601) 555-0100"></div>
         </div>
         <div style="margin-top:18px;display:flex;align-items:center;gap:12px">
@@ -1458,7 +1459,75 @@ function sendSupportMessage() {
   showToast('Opening email client...', true);
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────
+
+// ── SUPABASE AUTH ─────────────────────────────────────────────────────────
+var SUPABASE_URL  = 'https://iywmeagdabutcydzjtqf.supabase.co';
+var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5d21lYWdkYWJ1dGN5ZHpqdHFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTg4MTcsImV4cCI6MjA5MTg3NDgxN30.sC_nHfcFBo5wTpWDQYzyvsCXzreV1f9A9X4rUXejT2Q';
+var sbClient = null;
+try { sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON); } catch(e) {}
+
+function updateSidebarUser(user) {
+  if (!user) return;
+  var meta      = user.user_metadata || {};
+  var firstName = meta.first_name || '';
+  var lastName  = meta.last_name  || '';
+  var company   = meta.company_name || '';
+  var email     = user.email || '';
+  var fullName  = (firstName + ' ' + lastName).trim() || company || email.split('@')[0];
+  var initials  = ((firstName[0]||'') + (lastName[0]||'')).toUpperCase() || fullName.slice(0,2).toUpperCase();
+
+  var nameEl   = document.getElementById('sbName');
+  var emailEl  = document.getElementById('sbEmail');
+  var avatarEl = document.getElementById('sbAvatar');
+  if (nameEl)   nameEl.textContent  = fullName  || 'My Account';
+  if (emailEl)  emailEl.textContent = email;
+  if (avatarEl) avatarEl.textContent = initials || '?';
+
+  // Pre-fill account page
+  var fn = document.getElementById('acctFirstName');
+  var ln = document.getElementById('acctLastName');
+  var co = document.getElementById('acctCompany');
+  var em = document.getElementById('acctEmail');
+  if (fn && !fn.value) fn.value = firstName;
+  if (ln && !ln.value) ln.value = lastName;
+  if (co && !co.value) co.value = company;
+  if (em && !em.value) em.value = email;
+}
+
+// Check auth on load — redirect to login if not signed in
+document.addEventListener('DOMContentLoaded', function() {
+  if (!sbClient) return;
+  sbClient.auth.getSession().then(function(res) {
+    var session = res.data && res.data.session;
+    if (!session) {
+      // Not logged in — redirect to login
+      window.location.href = '/login.html';
+      return;
+    }
+    updateSidebarUser(session.user);
+    loadProjects();
+  });
+
+  // Listen for auth changes (logout etc.)
+  sbClient.auth.onAuthStateChange(function(event, session) {
+    if (event === 'SIGNED_OUT' || !session) {
+      window.location.href = '/login.html';
+    }
+  });
+});
+
+// ── LOGOUT ────────────────────────────────────────────────────────────────
+function logout() {
+  if (sbClient) {
+    sbClient.auth.signOut().then(function() {
+      window.location.href = '/login.html';
+    });
+  } else {
+    window.location.href = '/login.html';
+  }
+}
+
+// ── INIT (overridden by auth above) ─────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
   loadProjects();
   loadAccount();
