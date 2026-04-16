@@ -1414,7 +1414,17 @@ function _setFile(id, file, emptyMsg){
 // ── API CONFIG ────────────────────────────────────────────
 const API_BASE = 'https://steelcaller-api.onrender.com';
 // Temp fabricator ID until auth is wired up
-const FABRICATOR_ID = localStorage.getItem('sc_fabricator_id') || 'demo-fabricator';
+// ── PERMANENT FABRICATOR ACCOUNT ─────────────────────────────
+// Your permanent fabricator ID — all projects are tied to this
+const FABRICATOR_ID = (() => {
+  let id = localStorage.getItem('sc_fabricator_id');
+  if (!id) {
+    // Generate a permanent ID for this account
+    id = 'fab-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
+    localStorage.setItem('sc_fabricator_id', id);
+  }
+  return id;
+})();
 
 // ── REAL FILE UPLOAD ──────────────────────────────────────
 // Hidden file inputs — one per zone
@@ -1573,11 +1583,12 @@ async function _pollStatus(projectId, onPoll, maxAttempts = 60) {
 
 // ── ADD NEW LIVE PROJECT CARD TO LIST ─────────────────────
 function _addLiveProjectCard(jobNum, jobName, location, markCount, slug, projectId) {
-  const grid    = document.querySelector('.projects-grid');
+  const grid   = document.querySelector('.projects-grid');
   if (!grid) return;
-  const appUrl  = 'steelcaller.com/p/' + slug;
-  const card    = document.createElement('div');
+  const appUrl = 'steelcaller.com/p/' + slug;
+  const card   = document.createElement('div');
   card.className = 'project-card';
+  card.setAttribute('data-project-id', projectId);
   card.innerHTML = `
     <div class="proj-status live">
       <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
@@ -1589,9 +1600,18 @@ function _addLiveProjectCard(jobNum, jobName, location, markCount, slug, project
         <span class="status-badge badge-live">● Live</span>
       </div>
       <div class="proj-meta">
-        <span class="proj-meta-item">${location || 'Location TBD'}</span>
-        <span class="proj-meta-item">${markCount} marks</span>
-        <span class="proj-meta-item">90 days remaining</span>
+        <span class="proj-meta-item">
+          <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--txt3);stroke-width:2;fill:none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          ${location || 'Location TBD'}
+        </span>
+        <span class="proj-meta-item">
+          <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--txt3);stroke-width:2;fill:none"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="7"/></svg>
+          ${markCount} marks
+        </span>
+        <span class="proj-meta-item">
+          <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--txt3);stroke-width:2;fill:none"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+          90 days remaining
+        </span>
       </div>
     </div>
     <div class="proj-actions">
@@ -1599,15 +1619,15 @@ function _addLiveProjectCard(jobNum, jobName, location, markCount, slug, project
         <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
         Copy Link
       </button>
+      <button class="btn btn-ghost btn-sm" style="color:var(--navy);border-color:var(--navy2)"
+        onclick="showQRModal(event,'${appUrl}','${jobNum}','${jobName}','${location||''}','${markCount}')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>
+        QR Code
+      </button>
       <a class="btn btn-navy btn-sm" href="https://${appUrl}" target="_blank">Open App</a>
     </div>
   `;
   grid.insertBefore(card, grid.firstChild);
-
-  // Update stats
-  const statCards = document.querySelectorAll('.stat-n');
-  if (statCards[0]) statCards[0].textContent = parseInt(statCards[0].textContent || 0) + 1;
-  if (statCards[1]) statCards[1].textContent = parseInt(statCards[1].textContent || 0) + 1;
 }
 
 // ── COPY LINK ─────────────────────────────────────────────
@@ -1634,6 +1654,160 @@ function showToast(msg, green){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>t.classList.remove('show'), 2800);
 }
+
+// ── LOAD REAL PROJECTS FROM API ON PAGE LOAD ─────────────────────────────
+async function loadProjects(){
+  const grid = document.querySelector('.projects-grid');
+  if(!grid) return;
+  try {
+    const res = await fetch(API_BASE + '/api/fabricators/' + FABRICATOR_ID + '/projects');
+    if(!res.ok) return;
+    const data = await res.json();
+    const projects = (data.projects||[]).filter(p=>p.status==='live'||p.status==='processing');
+    if(!projects.length) return;
+
+    grid.innerHTML = '';
+    let live=0, proc=0;
+    projects.forEach(p => {
+      const appUrl = 'steelcaller.com/p/'+(p.slug||p.id);
+      const card = document.createElement('div');
+      card.setAttribute('data-project-id', p.id);
+      if(p.status==='live'){
+        live++;
+        card.className='project-card';
+        card.innerHTML=`
+          <div class="proj-status live"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></div>
+          <div class="proj-info">
+            <div class="proj-top">
+              <span class="proj-num">${p.job_number}</span>
+              <span class="proj-name">${p.job_name}</span>
+              <span class="status-badge badge-live">● Live</span>
+            </div>
+            <div class="proj-meta">
+              <span class="proj-meta-item">${p.job_location||''}</span>
+              <span class="proj-meta-item">${p.mark_count||0} marks</span>
+              <span class="proj-meta-item">Rev ${p.revision||0}</span>
+            </div>
+          </div>
+          <div class="proj-actions">
+            <button class="btn btn-ghost btn-sm" onclick="copyLink(event,'${appUrl}')">
+              <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copy Link
+            </button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--navy);border-color:var(--navy2)"
+              onclick="showQRModal(event,'${appUrl}','${p.job_number}','${p.job_name}','${p.job_location||''}','${p.mark_count||0}')">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>QR Code
+            </button>
+            <a class="btn btn-navy btn-sm" href="https://${appUrl}" target="_blank">Open App</a>
+          </div>`;
+      } else if(p.status==='processing'){
+        proc++;
+        card.className='project-card';
+        card.innerHTML=`
+          <div class="proj-status processing"><svg viewBox="0 0 24 24"><polyline points="23,4 23,11 16,11"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 11"/></svg></div>
+          <div class="proj-info">
+            <div class="proj-top">
+              <span class="proj-num">${p.job_number}</span>
+              <span class="proj-name">${p.job_name}</span>
+              <span class="status-badge badge-processing">⟳ Processing</span>
+            </div>
+            <div class="proj-meta">
+              <span class="proj-meta-item">${p.job_location||''}</span>
+              <span class="proj-meta-item" style="color:var(--amber)">Parsing files...</span>
+            </div>
+          </div>
+          <div class="proj-actions">
+            <button class="btn btn-ghost btn-sm" disabled style="opacity:.4">Copy Link</button>
+            <button class="btn btn-ghost btn-sm" disabled style="opacity:.4">QR Code</button>
+          </div>`;
+      }
+      if(card.innerHTML) grid.appendChild(card);
+    });
+    const ns=document.querySelectorAll('.stat-n');
+    if(ns[0]) ns[0].textContent=projects.length;
+    if(ns[1]) ns[1].textContent=live;
+    if(ns[2]) ns[2].textContent=proc;
+  } catch(e){ console.log('loadProjects:', e.message); }
+}
+document.addEventListener('DOMContentLoaded',()=>setTimeout(loadProjects,600));
+
+// ── QR CODE LIBRARY ───────────────────────────────────────────────────────
+(function loadQRLib(){
+  const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  s.onload=()=>{window._qrLibLoaded=true;};
+  document.head.appendChild(s);
+})();
+
+let _qrInstance=null,_qrTbInstance=null,_currentQRUrl='',_currentQRJob={};
+
+function showQRModal(e,url,jobNum,jobName,location,markCount){
+  e&&e.stopPropagation();
+  _currentQRUrl='https://'+url;
+  _currentQRJob={num:jobNum,name:jobName,loc:location,marks:markCount,url};
+  document.getElementById('qrSheetNum').textContent=jobNum;
+  document.getElementById('qrSheetName').textContent=jobName;
+  document.getElementById('qrSheetMeta').textContent=(location||'')+' · '+(markCount||'')+' marks · steelcaller.com';
+  document.getElementById('qrSheetUrl').textContent=url;
+  document.getElementById('qrTbNum').textContent='JOB '+jobNum;
+  document.getElementById('qrTbName').textContent=jobName;
+  const makeQR=()=>{
+    document.getElementById('qrCodeDiv').innerHTML='';
+    _qrInstance=new QRCode(document.getElementById('qrCodeDiv'),{text:_currentQRUrl,width:200,height:200,colorDark:'#0D1B2A',colorLight:'#FFFFFF',correctLevel:QRCode.CorrectLevel.M});
+    document.getElementById('qrTitleBlockDiv').innerHTML='';
+    _qrTbInstance=new QRCode(document.getElementById('qrTitleBlockDiv'),{text:_currentQRUrl,width:80,height:80,colorDark:'#0D1B2A',colorLight:'#FFFFFF',correctLevel:QRCode.CorrectLevel.M});
+  };
+  if(window._qrLibLoaded) makeQR(); else setTimeout(makeQR,800);
+  document.getElementById('qrOverlay').classList.add('show');
+}
+
+function closeQRModal(e){
+  if(e&&e.target!==document.getElementById('qrOverlay')) return;
+  document.getElementById('qrOverlay').classList.remove('show');
+}
+
+function updateTagline(val){
+  const el=document.getElementById('qrTagline');
+  if(el) el.innerHTML=val.replace(/\n/g,'<br>');
+}
+
+function printQRSheet(){ window.print(); }
+
+function downloadQRPNG(){
+  const qrImg=document.querySelector('#qrCodeDiv img')||document.querySelector('#qrCodeDiv canvas');
+  if(!qrImg){showToast('QR still generating — try again',false);return;}
+  const canvas=document.createElement('canvas');
+  const sc=3;
+  canvas.width=400*sc;canvas.height=480*sc;
+  const ctx=canvas.getContext('2d');
+  ctx.scale(sc,sc);
+  ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,400,480);
+  ctx.fillStyle='#FF6B00';ctx.fillRect(0,0,400,56);
+  ctx.fillStyle='#FFFFFF';ctx.font='bold 22px Arial';ctx.textAlign='center';
+  ctx.fillText('SteelCaller',200,28);
+  ctx.font='11px Arial';ctx.fillText('EVERY MARK. EVERY LOCATION.',200,46);
+  ctx.strokeStyle='#0D1B2A';ctx.lineWidth=2;ctx.strokeRect(1,1,398,478);
+  ctx.fillStyle='#0D1B2A';ctx.font='bold 16px Arial';ctx.textAlign='center';
+  const lines=document.getElementById('taglineEditor').value.split('\n');
+  lines.forEach((ln,i)=>ctx.fillText(ln,200,78+i*22));
+  const drawQR=(img)=>{
+    ctx.drawImage(img,100,110,200,200);
+    ctx.fillStyle='#FF6B00';ctx.font='bold 26px Arial';ctx.fillText(_currentQRJob.num,200,336);
+    ctx.fillStyle='#0D1B2A';ctx.font='bold 18px Arial';ctx.fillText(_currentQRJob.name,200,358);
+    ctx.fillStyle='#6A8098';ctx.font='13px Arial';
+    ctx.fillText((_currentQRJob.loc||'')+' · '+(_currentQRJob.marks||'')+' marks',200,380);
+    ctx.font='12px Arial';ctx.fillStyle='#1A6BAA';ctx.fillText(_currentQRJob.url,200,400);
+    ctx.fillStyle='#F2F5F9';ctx.fillRect(0,420,400,60);
+    ctx.fillStyle='#6A8098';ctx.font='12px Arial';ctx.fillText('Powered by SteelCaller · steelcaller.com',200,454);
+    const link=document.createElement('a');
+    link.download='SteelCaller-QR-'+_currentQRJob.num+'.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    showToast('QR code downloaded!',true);
+  };
+  if(qrImg.tagName==='IMG') drawQR(qrImg);
+  else{const img=new Image();img.onload=()=>drawQR(img);img.src=qrImg.toDataURL();}
+}
+
 </script>
 
 <!-- ══ QR SHEET MODAL ══ -->
