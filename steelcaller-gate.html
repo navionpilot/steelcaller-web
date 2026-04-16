@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0D1B2A">
+<title>SteelCaller — Unlock This Project</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B2A;--navy2:#132236;--navy3:#1A2F47;
+  --orange:#FF6B00;--white:#fff;--off:#F2F5F9;
+  --border:#DDE4ED;--txt:#0D1B2A;--txt2:#3A5068;--txt3:#6A8098;
+  --green:#00A845;--red:#C0392B;
+  --serif:'Barlow Condensed',sans-serif;
+  --sans:'Barlow',sans-serif;
+  --mono:'Share Tech Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;font-family:var(--sans);background:var(--navy)}
+
+/* ── HERO HEADER ── */
+.hero{
+  background:var(--navy);
+  padding:32px 20px 0;
+  text-align:center;
+}
+.hero-logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:24px}
+.hero-icon{
+  width:52px;height:52px;background:var(--orange);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+}
+.hero-brand{font-family:var(--serif);font-size:32px;font-weight:800;color:#fff}
+.hero-brand span{color:var(--orange)}
+.hero-tagline{font-family:var(--serif);font-size:11px;font-weight:700;
+  color:rgba(255,255,255,.4);letter-spacing:3px;text-transform:uppercase}
+
+/* ── ALERT BANNER ── */
+.alert-banner{
+  background:linear-gradient(135deg,#FF6B00,#E55F00);
+  padding:16px 20px;text-align:center;
+}
+.alert-text{
+  font-family:var(--serif);font-size:18px;font-weight:800;color:#fff;
+  letter-spacing:.3px;line-height:1.4;
+}
+.alert-sub{font-size:14px;color:rgba(255,255,255,.8);margin-top:4px}
+
+/* ── MAIN CONTENT ── */
+.main{
+  background:var(--off);
+  border-radius:24px 24px 0 0;
+  min-height:calc(100vh - 160px);
+  padding:28px 20px 40px;
+  margin-top:24px;
+}
+
+/* JOB CARD */
+.job-card{
+  background:var(--white);border:1px solid var(--border);border-radius:16px;
+  padding:24px;margin-bottom:20px;text-align:center;
+}
+.job-num{
+  font-family:var(--mono);font-size:42px;font-weight:700;color:var(--orange);
+  line-height:1;letter-spacing:-1px;margin-bottom:4px;
+}
+.job-name{
+  font-family:var(--serif);font-size:26px;font-weight:900;color:var(--txt);
+  line-height:1.1;margin-bottom:12px;
+}
+.job-meta{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.job-meta-item{
+  display:flex;align-items:center;gap:5px;
+  font-size:14px;color:var(--txt3);
+}
+.job-meta-item svg{width:14px;height:14px;stroke:var(--txt3);stroke-width:2;fill:none}
+.marks-preview{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  background:var(--off);border-radius:10px;padding:14px;margin-top:4px;
+}
+.mark-chip{
+  background:var(--white);border:1px solid var(--border);border-radius:8px;
+  padding:10px 6px;text-align:center;
+}
+.mark-chip-label{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--navy)}
+.mark-chip-sec{font-size:11px;color:var(--txt3);margin-top:2px}
+.marks-more{
+  font-size:13px;color:var(--txt3);text-align:center;margin-top:8px;font-style:italic;
+}
+
+/* WHAT IS THIS */
+.what-card{
+  background:var(--navy);border-radius:16px;padding:24px;margin-bottom:20px;
+}
+.what-title{
+  font-family:var(--serif);font-size:20px;font-weight:800;color:#fff;
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.what-title svg{width:20px;height:20px;stroke:var(--orange);stroke-width:2;fill:none}
+.what-feature{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);
+}
+.what-feature:last-child{border-bottom:none}
+.what-feat-icon{
+  width:32px;height:32px;border-radius:8px;background:rgba(255,107,0,.15);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+}
+.what-feat-icon svg{width:16px;height:16px;stroke:var(--orange);stroke-width:2;fill:none}
+.what-feat-text{}
+.what-feat-title{font-size:15px;font-weight:600;color:#fff;margin-bottom:2px}
+.what-feat-desc{font-size:13px;color:rgba(255,255,255,.55);line-height:1.5}
+
+/* VOICE DEMO */
+.voice-demo{
+  background:rgba(255,107,0,.12);border:1.5px solid rgba(255,107,0,.25);
+  border-radius:12px;padding:16px;margin:16px 0;text-align:center;
+}
+.voice-demo-label{font-size:12px;font-weight:700;color:var(--orange);
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.voice-demo-cmd{
+  font-family:var(--mono);font-size:22px;font-weight:700;color:#fff;
+  letter-spacing:.5px;
+}
+.voice-demo-sub{font-size:13px;color:rgba(255,255,255,.5);margin-top:6px}
+
+/* PRICE CARD */
+.price-card{
+  background:var(--white);border:2px solid var(--orange);border-radius:16px;
+  padding:24px;margin-bottom:20px;text-align:center;
+}
+.price-label{font-family:var(--serif);font-size:13px;font-weight:700;
+  color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.price-amount{
+  font-family:var(--serif);font-size:64px;font-weight:900;color:var(--txt);
+  line-height:1;letter-spacing:-2px;
+}
+.price-period{font-size:16px;color:var(--txt3);font-weight:400}
+.price-features{margin:16px 0;display:flex;flex-direction:column;gap:8px}
+.price-feat{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--txt2)}
+.price-feat svg{width:16px;height:16px;stroke:var(--green);stroke-width:2.5;fill:none;flex-shrink:0}
+.price-note{font-size:13px;color:var(--txt3);margin-top:8px;line-height:1.5}
+
+/* CTA BUTTON */
+.cta-btn{
+  width:100%;padding:18px;border-radius:12px;border:none;
+  background:var(--orange);color:#fff;cursor:pointer;
+  font-family:var(--serif);font-size:20px;font-weight:800;
+  letter-spacing:.5px;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-bottom:12px;transition:all .15s;
+}
+.cta-btn:hover{background:#E55F00;transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,107,0,.35)}
+.cta-btn svg{width:20px;height:20px;stroke:#fff;stroke-width:2.5;fill:none}
+.cta-sub{font-size:13px;color:var(--txt3);text-align:center;margin-bottom:20px}
+
+/* CONTACT FABRICATOR */
+.contact-card{
+  background:var(--white);border:1px solid var(--border);border-radius:14px;
+  padding:20px;margin-bottom:20px;
+}
+.contact-title{font-family:var(--serif);font-size:16px;font-weight:800;color:var(--txt);margin-bottom:4px}
+.contact-sub{font-size:14px;color:var(--txt3);margin-bottom:14px;line-height:1.5}
+.contact-info{display:flex;flex-direction:column;gap:8px}
+.contact-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.contact-row:last-child{border-bottom:none}
+.contact-label{font-size:13px;color:var(--txt3);font-weight:500}
+.contact-val{font-size:14px;font-weight:600;color:var(--txt)}
+
+/* HOW IT WORKS */
+.how-steps{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.how-step{
+  display:flex;align-items:flex-start;gap:14px;
+  background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:16px;
+}
+.how-num{
+  width:32px;height:32px;border-radius:50%;background:var(--orange);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-family:var(--serif);font-size:16px;font-weight:800;color:#fff;
+}
+.how-text{}
+.how-title{font-size:15px;font-weight:600;color:var(--txt);margin-bottom:2px}
+.how-desc{font-size:13px;color:var(--txt3);line-height:1.5}
+
+/* FOOTER */
+.footer{
+  text-align:center;padding:24px 20px;
+  font-size:13px;color:rgba(255,255,255,.35);
+}
+.footer a{color:rgba(255,107,0,.8);text-decoration:none}
+
+/* PRINT STYLES */
+@media print{
+  .no-print{display:none!important}
+  body{background:#fff}
+  .hero{background:#fff}
+  .hero-brand,.alert-text{color:#0D1B2A!important}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero no-print">
+  <div class="hero-logo">
+    <div class="hero-icon">
+      <svg viewBox="0 0 30 30" width="32" height="32">
+        <rect x="2" y="2" width="26" height="7" rx="1.5" fill="white"/>
+        <rect x="11" y="9" width="8" height="12" rx="0.8" fill="white"/>
+        <rect x="2" y="21" width="26" height="7" rx="1.5" fill="white"/>
+      </svg>
+    </div>
+    <div>
+      <div class="hero-brand">Steel<span>Caller</span></div>
+      <div class="hero-tagline">Every Mark. Every Location.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ALERT BANNER -->
+<div class="alert-banner no-print">
+  <div class="alert-text">🔒 This project hasn't been activated yet</div>
+  <div class="alert-sub">Purchase access to unlock all piece marks for this job</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- Job Card -->
+  <div class="job-card">
+    <div class="job-num" id="gateJobNum">5665</div>
+    <div class="job-name" id="gateJobName">Parkway Support</div>
+    <div class="job-meta">
+      <span class="job-meta-item">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span id="gateLocation">Meridian, MS</span>
+      </span>
+      <span class="job-meta-item">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="7"/></svg>
+        <span id="gateMarks">334</span> piece marks
+      </span>
+      <span class="job-meta-item">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <span id="gateFabricator">ABC Steel Fab</span>
+      </span>
+    </div>
+    <!-- Preview of first few marks -->
+    <div class="marks-preview" id="gateMarksPreview">
+      <div class="mark-chip"><div class="mark-chip-label">52B1</div><div class="mark-chip-sec">W18×40</div></div>
+      <div class="mark-chip"><div class="mark-chip-label">7C1</div><div class="mark-chip-sec">HSS12×12</div></div>
+      <div class="mark-chip"><div class="mark-chip-label">22C1</div><div class="mark-chip-sec">HSS12×12</div></div>
+      <div class="mark-chip"><div class="mark-chip-label">41B4</div><div class="mark-chip-sec">W16×26</div></div>
+      <div class="mark-chip"><div class="mark-chip-label">47B3</div><div class="mark-chip-sec">W18×40</div></div>
+      <div class="mark-chip"><div class="mark-chip-label">+329</div><div class="mark-chip-sec">more marks</div></div>
+    </div>
+  </div>
+
+  <!-- What is SteelCaller -->
+  <div class="what-card no-print">
+    <div class="what-title">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      What is SteelCaller?
+    </div>
+    <div class="what-feature">
+      <div class="what-feat-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+      <div class="what-feat-text">
+        <div class="what-feat-title">Every piece mark on your phone</div>
+        <div class="what-feat-desc">Search any piece mark instantly — section size, crane pick weight, elevation, grid location, bolt specs, and revision status. No paper drawings needed.</div>
+      </div>
+    </div>
+    <div class="what-feature">
+      <div class="what-feat-icon"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg></div>
+      <div class="what-feat-text">
+        <div class="what-feat-title">Hands-free voice lookup</div>
+        <div class="what-feat-desc">Say "Call 52B1" and the AI reads back everything about that piece. Gloves on. Both hands on the iron. No touching the screen.</div>
+      </div>
+    </div>
+    <div class="voice-demo">
+      <div class="voice-demo-label">Try saying this on the job</div>
+      <div class="voice-demo-cmd">"Call 52B1"</div>
+      <div class="voice-demo-sub">AI reads back section, weight, elevation, bolt specs, and any revision alerts</div>
+    </div>
+    <div class="what-feature">
+      <div class="what-feat-icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div>
+      <div class="what-feat-text">
+        <div class="what-feat-title">Instant revision alerts</div>
+        <div class="what-feat-desc">When the fabricator issues a revision, every phone on the job site sees a red alert banner on that piece before it gets picked. No more setting wrong iron.</div>
+      </div>
+    </div>
+    <div class="what-feature">
+      <div class="what-feat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      <div class="what-feat-text">
+        <div class="what-feat-title">No app download. No login.</div>
+        <div class="what-feat-desc">Works on any phone. The foreman shares one link — or scans this QR code — and every ironworker on the crew has instant access. Nothing to install.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="no-print">
+    <div style="font-family:var(--serif);font-size:18px;font-weight:800;color:var(--txt);margin-bottom:14px">How it works</div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <div class="how-text">
+          <div class="how-title">Purchase this project — $249</div>
+          <div class="how-desc">One-time payment. No subscription required. Covers 90 days of live field access for your entire crew.</div>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <div class="how-text">
+          <div class="how-title">Get the link instantly</div>
+          <div class="how-desc">After purchase, this page becomes the live field app. Text the link or share this QR code with your foreman and crew.</div>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <div class="how-text">
+          <div class="how-title">Every ironworker has access</div>
+          <div class="how-desc">No accounts, no downloads, no training. Say "Call [piece mark]" and the AI does the rest.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Price Card -->
+  <div class="price-card no-print">
+    <div class="price-label">One-time purchase</div>
+    <div class="price-amount">$249<span class="price-period"> / project</span></div>
+    <div class="price-features">
+      <div class="price-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>All <span id="priceMarks" style="font-weight:700;color:var(--navy);margin:0 3px">334</span> piece marks unlocked</div>
+      <div class="price-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Unlimited crew access — no per-user fees</div>
+      <div class="price-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Voice lookup — "Call [mark]" hands-free</div>
+      <div class="price-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Revision alerts pushed instantly</div>
+      <div class="price-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>90 days live access</div>
+      <div class="price-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>English + Spanish bilingual</div>
+    </div>
+    <div class="price-note">One link. Every phone on the job site. No app download required.</div>
+  </div>
+
+  <!-- CTA -->
+  <button class="cta-btn no-print" onclick="purchaseProject()">
+    <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    Unlock This Project — $249
+  </button>
+  <div class="cta-sub no-print">Secure checkout · Instant access · No subscription required</div>
+
+  <!-- Contact Fabricator -->
+  <div class="contact-card no-print">
+    <div class="contact-title">Fabricated by</div>
+    <div class="contact-sub">Contact your fabricator to request access or ask them to purchase SteelCaller for this project.</div>
+    <div class="contact-info">
+      <div class="contact-row">
+        <span class="contact-label">Fabricator</span>
+        <span class="contact-val" id="contactFab">ABC Steel Fab</span>
+      </div>
+      <div class="contact-row">
+        <span class="contact-label">Job Number</span>
+        <span class="contact-val" id="contactJob">5665</span>
+      </div>
+      <div class="contact-row">
+        <span class="contact-label">Project</span>
+        <span class="contact-val" id="contactProject">Parkway Support</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer no-print">
+  <p>Powered by <a href="https://steelcaller.com">SteelCaller</a> — Field app for structural steel erection</p>
+  <p style="margin-top:6px">steelcaller.com · support@steelcaller.com</p>
+</div>
+
+<script>
+// ── QR Sheet Generator ─────────────────────────────────────────────────
+// This page serves dual purpose:
+// 1. Shown to field crew when project is NOT purchased (gate page)
+// 2. Used to generate the printable QR sheet for title blocks
+
+// Load QR library
+const qrScript = document.createElement('script');
+qrScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+document.head.appendChild(qrScript);
+
+function purchaseProject(){
+  // TODO: Wire to Stripe Checkout
+  // For now show coming soon
+  alert('Stripe checkout coming soon! Contact support@steelcaller.com to purchase access for this project.');
+}
+</script>
+</body>
+</html>
