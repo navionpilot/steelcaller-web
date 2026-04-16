@@ -916,7 +916,7 @@ function launchProject() {
         .then(function() { return proj; });
     })
     .then(function(proj) {
-      btn.innerHTML = '<div class="spinner"></div> Parsing files...';
+      btn.innerHTML = '<div class="spinner"></div> Uploading files...';
       acSaveAll();
       return pollStatus(proj.project_id);
     })
