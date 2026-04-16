@@ -504,9 +504,9 @@ button{cursor:pointer;font-family:var(--sans)}
       <div class="form-card">
         <div class="form-section-title"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Account Details</div>
         <div class="form-grid">
-          <div class="field"><label>First Name</label><input type="text" id="acctFirstName" value="Waylon"></div>
-          <div class="field"><label>Last Name</label><input type="text" id="acctLastName" value="HDD"></div>
-          <div class="field field-full"><label>Company / Fabricator Name</label><input type="text" id="acctCompany" value="ABC Steel Fabricators"></div>
+          <div class="field"><label>First Name</label><input type="text" id="acctFirstName" value=""></div>
+          <div class="field"><label>Last Name</label><input type="text" id="acctLastName" value=""></div>
+          <div class="field field-full"><label>Company / Fabricator Name</label><input type="text" id="acctCompany" value=""></div>
           <div class="field field-full"><label>Email Address</label><input type="text" id="acctEmail" value=""></div>
           <div class="field field-full"><label>Phone (optional)</label><input type="text" id="acctPhone" placeholder="(601) 555-0100"></div>
         </div>
@@ -1483,15 +1483,15 @@ function updateSidebarUser(user) {
   if (emailEl)  emailEl.textContent = email;
   if (avatarEl) avatarEl.textContent = initials || '?';
 
-  // Pre-fill account page
+  // Pre-fill account page — always overwrite with real auth data
   var fn = document.getElementById('acctFirstName');
   var ln = document.getElementById('acctLastName');
   var co = document.getElementById('acctCompany');
   var em = document.getElementById('acctEmail');
-  if (fn && !fn.value) fn.value = firstName;
-  if (ln && !ln.value) ln.value = lastName;
-  if (co && !co.value) co.value = company;
-  if (em && !em.value) em.value = email;
+  if (fn) fn.value = firstName || '';
+  if (ln) ln.value = lastName  || '';
+  if (co) co.value = company   || '';
+  if (em) em.value = email     || '';
 }
 
 // Check auth on load — redirect to login if not signed in
