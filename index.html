@@ -585,6 +585,21 @@ footer{background:#08121D;padding:60px 48px 40px}
   .vt-mark{font-size:28px;top:16px;left:16px}
   .video-play-btn{width:64px;height:64px}
 }
+
+/* ── CUSTOMER TICKER ── */
+.ticker-bar{background:#060F18;border-bottom:1px solid rgba(255,107,0,.2);padding:11px 0;overflow:hidden;position:relative}
+.ticker-bar::before,.ticker-bar::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none}
+.ticker-bar::before{left:0;background:linear-gradient(90deg,#060F18,transparent)}
+.ticker-bar::after{right:0;background:linear-gradient(270deg,#060F18,transparent)}
+.ticker-label{position:absolute;left:0;top:0;bottom:0;z-index:3;background:#FF6B00;display:flex;align-items:center;padding:0 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;color:#fff;letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap;gap:8px}
+.ticker-label svg{width:14px;height:14px;stroke:#fff;stroke-width:2.5;fill:none;flex-shrink:0}
+.ticker-track{display:flex;align-items:center;gap:0;padding-left:200px;animation:ticker-scroll 40s linear infinite}
+.ticker-track:hover{animation-play-state:paused}
+.ticker-item{display:flex;align-items:center;gap:32px;white-space:nowrap;padding-right:32px}
+.ticker-company{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:rgba(255,255,255,.75);letter-spacing:.5px}
+.ticker-dot{width:4px;height:4px;border-radius:50%;background:var(--orange);opacity:.6;flex-shrink:0}
+@keyframes ticker-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
 </style>
 <script>
 // If Supabase redirected here with an access token, send to dashboard
@@ -620,14 +635,51 @@ if (window.location.hash && window.location.hash.indexOf('access_token=') !== -1
   </div>
 </nav>
 
+<!-- ══ CUSTOMER TICKER ══════════════════════════════════════════════════
+     TOGGLE: Change SHOW_TICKER to true when you have customers to display.
+     Add company names to the CUSTOMERS array below.
+══════════════════════════════════════════════════════════════════════════ -->
+<script>
+var SHOW_TICKER = false; // ← Change to true to enable the banner
+
+var CUSTOMERS = [
+  'Harris Detailing & Designs LLC',
+  'ABC Steel Fabricators',
+  'Gulf Coast Structural Steel',
+  'Magnolia Iron Works',
+  'Dixie Steel Fabrication',
+  'Delta Structural Inc.',
+  'Bayou Metal Works',
+  'Heartland Steel Erectors',
+  'Southern Iron & Steel',
+  'Tri-State Fabricators',
+  'Coastal Steel Solutions',
+  'Mid-South Steel Inc.',
+];
+
+if (SHOW_TICKER) {
+  var items = CUSTOMERS.concat(CUSTOMERS); // double for seamless loop
+  var track = items.map(function(c) {
+    return '<span class="ticker-company">' + c + '</span><span class="ticker-dot"></span>';
+  }).join('');
+
+  document.write(
+    '<div class="ticker-bar">' +
+    '<div class="ticker-label">' +
+    '<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>' +
+    'Trusted By' +
+    '</div>' +
+    '<div class="ticker-track">' + track + '</div>' +
+    '</div>'
+  );
+}
+</script>
+
+
 <!-- HERO -->
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-content">
-      <div class="hero-eyebrow">
-        <div class="hero-eyebrow-dot"></div>
-        <span>Built for the Iron</span>
-      </div>
       <h1 class="hero-h1">Your Steel.<em>Field-Ready</em>in Minutes.</h1>
       <p class="hero-sub">Upload your model files and give your field crew instant access to every piece mark, bolt spec, and location — on their phone, no login required.</p>
       <div class="hero-actions">
