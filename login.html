@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SteelCaller — Log In / Create Account</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B2A;--navy2:#132236;
+  --orange:#FF6B00;--orange2:#E55F00;
+  --white:#fff;--off:#F2F5F9;
+  --border:#DDE4ED;--txt:#0D1B2A;--txt2:#3A5068;--txt3:#6A8098;
+  --green:#00A845;--red:#C0392B;
+  --serif:'Barlow Condensed',sans-serif;
+  --sans:'Barlow',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;font-family:var(--sans);background:var(--navy)}
+.page{min-height:100vh;display:flex;flex-direction:column}
+
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid rgba(255,255,255,.08)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-icon{width:38px;height:38px;background:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.nav-name{font-family:var(--serif);font-size:22px;font-weight:800;color:#fff}
+.nav-name span{color:var(--orange)}
+.nav-back{font-size:14px;color:rgba(255,255,255,.5);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .15s}
+.nav-back:hover{color:#fff}
+.nav-back svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none}
+
+/* MAIN */
+.main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.card{background:var(--white);border-radius:20px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.3)}
+
+/* TABS */
+.tabs{display:flex;border-bottom:2px solid var(--border)}
+.tab{flex:1;padding:16px;text-align:center;font-family:var(--serif);font-size:17px;font-weight:700;color:var(--txt3);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;background:var(--off)}
+.tab.on{color:var(--orange);border-bottom-color:var(--orange);background:var(--white)}
+
+/* FORM */
+.form-body{padding:32px}
+.form-title{font-family:var(--serif);font-size:26px;font-weight:900;color:var(--txt);margin-bottom:4px}
+.form-sub{font-size:14px;color:var(--txt3);margin-bottom:24px;line-height:1.5}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field label{font-size:13px;font-weight:600;color:var(--txt2);letter-spacing:.2px}
+.field input{
+  padding:12px 14px;border:1.5px solid var(--border);border-radius:9px;
+  font-size:15px;font-family:var(--sans);color:var(--txt);outline:none;
+  transition:border-color .15s;background:var(--white);
+}
+.field input:focus{border-color:var(--orange)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.submit-btn{
+  width:100%;padding:14px;border-radius:10px;border:none;
+  background:var(--orange);color:#fff;cursor:pointer;
+  font-family:var(--serif);font-size:18px;font-weight:800;
+  letter-spacing:.3px;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-top:8px;transition:all .15s;
+}
+.submit-btn:hover{background:var(--orange2)}
+.submit-btn:disabled{opacity:.7;cursor:not-allowed}
+.submit-btn svg{width:18px;height:18px;stroke:#fff;stroke-width:2.5;fill:none}
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--txt3);font-size:13px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.google-btn{
+  width:100%;padding:12px;border-radius:10px;border:1.5px solid var(--border);
+  background:var(--white);color:var(--txt);cursor:pointer;
+  font-size:15px;font-weight:600;font-family:var(--sans);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all .15s;
+}
+.google-btn:hover{border-color:var(--txt2);background:var(--off)}
+.form-footer{font-size:13px;color:var(--txt3);text-align:center;margin-top:20px;line-height:1.6}
+.form-footer a{color:var(--orange);font-weight:600;text-decoration:none}
+.error-box{background:#FEF0EE;border:1.5px solid #F5C0BB;border-radius:8px;padding:12px 14px;font-size:14px;color:var(--red);margin-bottom:16px;display:none}
+.error-box.show{display:block}
+.success-box{background:#E8F7EE;border:1.5px solid #A5DFB8;border-radius:8px;padding:12px 14px;font-size:14px;color:var(--green);margin-bottom:16px;display:none}
+.success-box.show{display:block}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* HERO SIDE - desktop */
+.hero-side{
+  background:linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+  padding:40px 32px;display:none;
+}
+@media(min-width:900px){
+  .main{align-items:stretch}
+  .card{max-width:900px;display:grid;grid-template-columns:1fr 1fr}
+  .hero-side{display:flex;flex-direction:column;justify-content:center;padding:48px 40px}
+  .form-side{overflow-y:auto}
+}
+.hs-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.hs-icon{width:44px;height:44px;background:var(--orange);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.hs-name{font-family:var(--serif);font-size:26px;font-weight:800;color:#fff}
+.hs-name span{color:var(--orange)}
+.hs-tagline{font-family:var(--serif);font-size:12px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.hs-title{font-family:var(--serif);font-size:32px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:12px}
+.hs-title span{color:var(--orange)}
+.hs-desc{font-size:15px;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:28px}
+.hs-feat{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:14px;color:rgba(255,255,255,.75)}
+.hs-feat svg{width:16px;height:16px;stroke:var(--orange);stroke-width:2.5;fill:none;flex-shrink:0}
+.hs-pricing{background:rgba(255,107,0,.15);border:1px solid rgba(255,107,0,.3);border-radius:12px;padding:16px;margin-top:24px}
+.hs-price{font-family:var(--serif);font-size:32px;font-weight:900;color:#fff;line-height:1}
+.hs-price-sub{font-size:13px;color:rgba(255,255,255,.5);margin-top:3px}
+
+/* FOOTER */
+.footer{padding:20px 32px;text-align:center;font-size:13px;color:rgba(255,255,255,.3)}
+.footer a{color:rgba(255,107,0,.6);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="/" class="nav-logo">
+      <div class="nav-icon">
+        <svg viewBox="0 0 30 30" width="24" height="24"><rect x="2" y="2" width="26" height="7" rx="1.5" fill="white"/><rect x="11" y="9" width="8" height="12" rx="0.8" fill="white"/><rect x="2" y="21" width="26" height="7" rx="1.5" fill="white"/></svg>
+      </div>
+      <div class="nav-name">Steel<span>Caller</span></div>
+    </a>
+    <a href="/" class="nav-back">
+      <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/></svg>
+      Back to steelcaller.com
+    </a>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="card">
+
+      <!-- HERO SIDE (desktop only) -->
+      <div class="hero-side">
+        <div class="hs-logo">
+          <div class="hs-icon"><svg viewBox="0 0 30 30" width="28" height="28"><rect x="2" y="2" width="26" height="7" rx="1.5" fill="white"/><rect x="11" y="9" width="8" height="12" rx="0.8" fill="white"/><rect x="2" y="21" width="26" height="7" rx="1.5" fill="white"/></svg></div>
+          <div>
+            <div class="hs-name">Steel<span>Caller</span></div>
+            <div class="hs-tagline">Fabricator Dashboard</div>
+          </div>
+        </div>
+        <div class="hs-title">Your steel model.<br><span>Field-ready in minutes.</span></div>
+        <div class="hs-desc">Upload your IFC, KSS, and NC1 files once. Your entire field crew has instant access to every piece mark — no app download, no login required for them.</div>
+        <div class="hs-feat"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Every piece mark, bolt spec, and elevation</div>
+        <div class="hs-feat"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>Hands-free voice — "Call 52B1"</div>
+        <div class="hs-feat"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>Live revision alerts to every phone</div>
+        <div class="hs-feat"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>QR codes for every drawing sheet</div>
+        <div class="hs-pricing">
+          <div class="hs-price">$249 <span style="font-size:16px;color:rgba(255,255,255,.5);font-weight:400">/ project</span></div>
+          <div class="hs-price-sub">Or $799/month for unlimited projects — Pro Plan</div>
+        </div>
+      </div>
+
+      <!-- FORM SIDE -->
+      <div class="form-side">
+        <div class="tabs">
+          <div class="tab on" id="tab-login" onclick="switchTab('login')">Log In</div>
+          <div class="tab" id="tab-signup" onclick="switchTab('signup')">Create Account</div>
+        </div>
+
+        <!-- LOG IN FORM -->
+        <div class="form-body" id="form-login">
+          <div class="form-title">Welcome back</div>
+          <div class="form-sub">Log in to your SteelCaller fabricator account.</div>
+          <div class="error-box" id="login-error"></div>
+          <div class="success-box" id="login-success"></div>
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="login-email" placeholder="waylon@steelfab.com" autocomplete="email">
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="password" id="login-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password">
+          </div>
+          <div style="text-align:right;margin-top:-8px;margin-bottom:16px">
+            <a href="#" onclick="showForgotPassword()" style="font-size:13px;color:var(--orange);text-decoration:none;font-weight:600">Forgot password?</a>
+          </div>
+          <button class="submit-btn" id="login-btn" onclick="doLogin()">
+            <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10,17 15,12 10,7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            Log In
+          </button>
+          <div class="form-footer">
+            Don't have an account? <a href="#" onclick="switchTab('signup')">Create one free</a><br>
+            <span style="margin-top:6px;display:block">By logging in you agree to our <a href="#">Terms of Service</a></span>
+          </div>
+        </div>
+
+        <!-- CREATE ACCOUNT FORM -->
+        <div class="form-body" id="form-signup" style="display:none">
+          <div class="form-title">Create your account</div>
+          <div class="form-sub">Start uploading projects in minutes. No credit card required to sign up.</div>
+          <div class="error-box" id="signup-error"></div>
+          <div class="success-box" id="signup-success"></div>
+          <div class="field-row">
+            <div class="field">
+              <label>First Name</label>
+              <input type="text" id="signup-first" placeholder="Waylon" autocomplete="given-name">
+            </div>
+            <div class="field">
+              <label>Last Name</label>
+              <input type="text" id="signup-last" placeholder="HDD" autocomplete="family-name">
+            </div>
+          </div>
+          <div class="field">
+            <label>Company / Fabricator Name</label>
+            <input type="text" id="signup-company" placeholder="ABC Steel Fabricators">
+          </div>
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="signup-email" placeholder="waylon@steelfab.com" autocomplete="email">
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="password" id="signup-password" placeholder="At least 8 characters" autocomplete="new-password">
+          </div>
+          <button class="submit-btn" id="signup-btn" onclick="doSignup()">
+            <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+            Create Account
+          </button>
+          <div class="form-footer">
+            Already have an account? <a href="#" onclick="switchTab('login')">Log in</a><br>
+            <span style="margin-top:6px;display:block;font-size:12px">By creating an account you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a></span>
+          </div>
+        </div>
+
+        <!-- FORGOT PASSWORD FORM -->
+        <div class="form-body" id="form-forgot" style="display:none">
+          <div class="form-title">Reset password</div>
+          <div class="form-sub">Enter your email and we'll send you a reset link.</div>
+          <div class="error-box" id="forgot-error"></div>
+          <div class="success-box" id="forgot-success"></div>
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="forgot-email" placeholder="waylon@steelfab.com">
+          </div>
+          <button class="submit-btn" id="forgot-btn" onclick="doForgot()">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Send Reset Link
+          </button>
+          <div class="form-footer">
+            <a href="#" onclick="switchTab('login')">Back to Log In</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    &copy; 2026 SteelCaller &mdash; <a href="mailto:support@steelcaller.com">support@steelcaller.com</a>
+  </div>
+
+</div>
+
+<!-- Supabase JS client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// ── SUPABASE CONFIG ───────────────────────────────────────────────────────
+var SUPABASE_URL  = 'https://iywmeagdabutcydzjtqf.supabase.co';
+var SUPABASE_ANON = 'YOUR_ANON_KEY_HERE'; // Replace with your anon key from Supabase → Settings → API
+var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ── CHECK IF ALREADY LOGGED IN ────────────────────────────────────────────
+sb.auth.getSession().then(function(res) {
+  if (res.data && res.data.session) {
+    // Already logged in — go straight to dashboard
+    window.location.href = '/dashboard.html';
+  }
+});
+
+// ── TAB SWITCHING ─────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('on', tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('on', tab === 'signup');
+  document.getElementById('form-login').style.display  = tab === 'login'  ? 'block' : 'none';
+  document.getElementById('form-signup').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('form-forgot').style.display = 'none';
+}
+
+function showForgotPassword() {
+  document.getElementById('form-login').style.display  = 'none';
+  document.getElementById('form-signup').style.display = 'none';
+  document.getElementById('form-forgot').style.display = 'block';
+}
+
+// ── LOG IN ────────────────────────────────────────────────────────────────
+async function doLogin() {
+  var email = document.getElementById('login-email').value.trim();
+  var pass  = document.getElementById('login-password').value;
+  var btn   = document.getElementById('login-btn');
+  var errEl = document.getElementById('login-error');
+
+  errEl.classList.remove('show');
+  if (!email || !pass) { showError('login-error', 'Please enter your email and password'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Logging in...';
+
+  var res = await sb.auth.signInWithPassword({ email: email, password: pass });
+
+  if (res.error) {
+    showError('login-error', res.error.message || 'Login failed. Check your email and password.');
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10,17 15,12 10,7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Log In';
+  } else {
+    showSuccess('login-success', 'Logged in! Redirecting to your dashboard...');
+    setTimeout(function() { window.location.href = '/dashboard.html'; }, 1000);
+  }
+}
+
+// ── CREATE ACCOUNT ────────────────────────────────────────────────────────
+async function doSignup() {
+  var first   = document.getElementById('signup-first').value.trim();
+  var last    = document.getElementById('signup-last').value.trim();
+  var company = document.getElementById('signup-company').value.trim();
+  var email   = document.getElementById('signup-email').value.trim();
+  var pass    = document.getElementById('signup-password').value;
+  var btn     = document.getElementById('signup-btn');
+
+  if (!first || !email || !pass) { showError('signup-error', 'First name, email, and password are required'); return; }
+  if (pass.length < 8) { showError('signup-error', 'Password must be at least 8 characters'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Creating account...';
+
+  var res = await sb.auth.signUp({
+    email: email,
+    password: pass,
+    options: {
+      data: {
+        first_name:   first,
+        last_name:    last,
+        company_name: company,
+        full_name:    first + ' ' + last,
+      }
+    }
+  });
+
+  if (res.error) {
+    showError('signup-error', res.error.message || 'Could not create account. Try again.');
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Create Account';
+  } else if (res.data.user && res.data.session) {
+    // Auto-confirmed (email confirmation disabled in Supabase)
+    showSuccess('signup-success', 'Account created! Redirecting to your dashboard...');
+    setTimeout(function() { window.location.href = '/dashboard.html'; }, 1200);
+  } else {
+    // Email confirmation required
+    showSuccess('signup-success', 'Check your email! We sent you a confirmation link. Click it to activate your account.');
+    btn.disabled = false;
+    btn.innerHTML = 'Resend Email';
+  }
+}
+
+// ── FORGOT PASSWORD ───────────────────────────────────────────────────────
+async function doForgot() {
+  var email = document.getElementById('forgot-email').value.trim();
+  var btn   = document.getElementById('forgot-btn');
+  if (!email) { showError('forgot-error', 'Please enter your email address'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Sending...';
+
+  var res = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://steelcaller.com/dashboard.html'
+  });
+
+  if (res.error) {
+    showError('forgot-error', res.error.message);
+    btn.disabled = false;
+    btn.innerHTML = 'Send Reset Link';
+  } else {
+    showSuccess('forgot-success', 'Reset link sent! Check your email and click the link to set a new password.');
+    btn.disabled = false;
+    btn.innerHTML = 'Send Again';
+  }
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function showError(id, msg)   { var el = document.getElementById(id); el.textContent = msg; el.classList.add('show'); }
+function showSuccess(id, msg) { var el = document.getElementById(id); el.textContent = msg; el.classList.add('show'); }
+
+// Enter key submits
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Enter') return;
+  if (document.getElementById('form-login').style.display !== 'none')  doLogin();
+  if (document.getElementById('form-signup').style.display !== 'none') doSignup();
+  if (document.getElementById('form-forgot').style.display !== 'none') doForgot();
+});
+
+// Check for URL params (e.g. ?tab=signup)
+var urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('tab') === 'signup') switchTab('signup');
+</script>
+</body>
+</html>
