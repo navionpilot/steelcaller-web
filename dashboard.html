@@ -819,8 +819,6 @@ function resetForm() {
     if (zone) zone.classList.remove('uploaded');
     if (upl)  { upl.style.display = 'none'; upl.textContent = ''; }
   });
-  var fabEl = document.getElementById('jobFabricator');
-  if (fabEl) { var saved = (acGet('fab_names') || [])[0]; if (saved) fabEl.value = saved; }
 }
 
 // ── FILE UPLOADS ──────────────────────────────────────────────────────────
@@ -1537,8 +1535,6 @@ function logout() {
 document.addEventListener('DOMContentLoaded', function() {
   loadProjects();
   loadAccount();
-  var fabEl = document.getElementById('jobFabricator');
-  if (fabEl) { var saved = acGet('fab_names')[0]; if (saved) fabEl.value = saved; }
 });
 </script>
 </body>
