@@ -1139,21 +1139,36 @@ function confirmDelete() {
   btn.disabled = true;
   btn.textContent = 'Deleting...';
 
-  fetch(API + '/api/projects/' + id, { method: 'DELETE' })
-    .catch(function() {})
-    .finally(function() {
+  // Close modal and animate card out immediately — don't wait for API
+  closeModal('deleteModal');
+  if (_delCard) {
+    _delCard.style.transition = 'opacity .25s, transform .25s';
+    _delCard.style.opacity = '0';
+    _delCard.style.transform = 'scale(.97)';
+    setTimeout(function() {
       if (_delCard) {
-        _delCard.style.transition = 'all .3s';
-        _delCard.style.opacity = '0';
-        _delCard.style.transform = 'scale(.95)';
-        setTimeout(function() { if (_delCard) _delCard.remove(); }, 300);
+        _delCard.remove();
+        _delCard = null;
+        // Update stats
+        var total = document.getElementById('sTotal');
+        var live  = document.getElementById('sLive');
+        var proc  = document.getElementById('sProc');
+        var badge = document.getElementById('sbProjectCount');
+        if (total) total.textContent = Math.max(0, parseInt(total.textContent||0) - 1);
+        if (live)  live.textContent  = Math.max(0, parseInt(live.textContent||0)  - 1);
+        if (proc)  proc.textContent  = Math.max(0, parseInt(proc.textContent||0)  - 1);
+        if (badge) badge.textContent = Math.max(0, parseInt(badge.textContent||0) - 1);
       }
-      closeModal('deleteModal');
-      showToast('Project deleted', false);
-      btn.disabled = false;
-      btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;stroke-width:2;fill:none"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg> Delete Permanently';
-      loadProjects();
-    });
+    }, 280);
+  }
+
+  showToast('Project deleted', false);
+
+  // Fire and forget the API call
+  fetch(API + '/api/projects/' + id, { method: 'DELETE' }).catch(function() {});
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;stroke-width:2;fill:none"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg> Delete Permanently';
 }
 
 // ── QR CODE ───────────────────────────────────────────────────────────────
