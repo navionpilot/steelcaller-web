@@ -625,8 +625,7 @@ button{cursor:pointer;font-family:var(--sans)}
       <div class="qr-job-num" id="qrNum"></div>
       <div class="qr-job-name" id="qrName"></div>
       <div class="qr-job-meta" id="qrMeta"></div>
-      <div class="qr-url" id="qrUrl"></div>
-      <div class="qr-footer-row">
+      <div class="qr-footer-row" style="margin-top:8px">
         <div>Powered by <strong style="color:var(--orange)">SteelCaller</strong></div>
         <div>steelcaller.com</div>
       </div>
@@ -1045,7 +1044,7 @@ function openQR(appUrl, jobNum, jobName, location, marks) {
   document.getElementById('qrNum').textContent  = jobNum;
   document.getElementById('qrName').textContent = jobName;
   document.getElementById('qrMeta').textContent = (location || '') + (location && marks ? ' \u00b7 ' : '') + (marks ? marks + ' marks' : '');
-  document.getElementById('qrUrl').textContent  = appUrl;
+  // URL bar removed from display
   document.getElementById('qrCodeDiv').innerHTML = '';
 
   var makeQR = function() {
@@ -1065,37 +1064,73 @@ function printQR() { window.print(); }
 function downloadQR() {
   var img = document.querySelector('#qrCodeDiv img') || document.querySelector('#qrCodeDiv canvas');
   if (!img) { showToast('QR still generating, try again', false); return; }
+
+  // Clean title-block PNG — no URL bar, no footer
+  // Dimensions: 1200 x 1200 square (clean for title block insert)
   var c = document.createElement('canvas');
-  c.width = 1200; c.height = 1440;
+  c.width = 1200; c.height = 1200;
   var ctx = c.getContext('2d');
-  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,1200,1440);
-  ctx.fillStyle = '#FF6B00'; ctx.fillRect(0,0,1200,168);
-  ctx.fillStyle = '#fff'; ctx.font = 'bold 66px Arial'; ctx.textAlign = 'center';
-  ctx.fillText('SteelCaller', 600, 84);
-  ctx.font = '33px Arial'; ctx.fillText('EVERY MARK. EVERY LOCATION.', 600, 138);
-  ctx.strokeStyle = '#0D1B2A'; ctx.lineWidth = 6; ctx.strokeRect(3,3,1194,1434);
-  ctx.fillStyle = '#0D1B2A'; ctx.font = 'bold 48px Arial'; ctx.textAlign = 'center';
-  ctx.fillText('Having trouble locating a member?', 600, 240);
-  ctx.fillText('Scan this QR Code now.', 600, 300);
+
+  // White background
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, 1200, 1200);
+
+  // Orange header bar
+  ctx.fillStyle = '#FF6B00';
+  ctx.fillRect(0, 0, 1200, 156);
+
+  // SteelCaller brand in header
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = 'bold 72px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('SteelCaller', 600, 86);
+  ctx.font = '30px Arial';
+  ctx.fillText('EVERY MARK. EVERY LOCATION.', 600, 132);
+
+  // Navy border
+  ctx.strokeStyle = '#0D1B2A';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(3, 3, 1194, 1194);
+
+  // Tagline
+  ctx.fillStyle = '#0D1B2A';
+  ctx.font = 'bold 46px Arial';
+  ctx.fillText('Having trouble locating a member?', 600, 228);
+  ctx.fillText('Scan this QR Code now.', 600, 288);
+
   var drawFn = function(src) {
-    ctx.drawImage(src, 300, 330, 600, 600);
-    ctx.fillStyle = '#FF6B00'; ctx.font = 'bold 84px Arial';
-    ctx.fillText(_qrJob.num, 600, 1008);
-    ctx.fillStyle = '#0D1B2A'; ctx.font = 'bold 54px Arial';
-    ctx.fillText(_qrJob.name, 600, 1080);
-    ctx.fillStyle = '#6A8098'; ctx.font = '39px Arial';
-    ctx.fillText((_qrJob.loc||'') + ' \u00b7 ' + (_qrJob.marks||'') + ' marks \u00b7 steelcaller.com', 600, 1140);
-    ctx.font = '36px monospace'; ctx.fillStyle = '#1A6BAA';
-    ctx.fillText(_qrJob.rawUrl, 600, 1200);
-    ctx.fillStyle = '#F2F5F9'; ctx.fillRect(0,1260,1200,180);
-    ctx.fillStyle = '#6A8098'; ctx.font = '36px Arial';
-    ctx.fillText('Powered by SteelCaller \u00b7 steelcaller.com', 600, 1362);
+    // QR code — centered and large
+    ctx.drawImage(src, 270, 318, 660, 660);
+
+    // Job number — large orange
+    ctx.fillStyle = '#FF6B00';
+    ctx.font = 'bold 90px Arial';
+    ctx.fillText(_qrJob.num, 600, 1044);
+
+    // Job name
+    ctx.fillStyle = '#0D1B2A';
+    ctx.font = 'bold 52px Arial';
+    // Truncate long names
+    var nm = _qrJob.name || '';
+    if (nm.length > 30) nm = nm.slice(0,28) + '...';
+    ctx.fillText(nm, 600, 1112);
+
+    // Location + marks — small gray
+    ctx.fillStyle = '#6A8098';
+    ctx.font = '36px Arial';
+    var meta = [];
+    if (_qrJob.loc)   meta.push(_qrJob.loc);
+    if (_qrJob.marks) meta.push(_qrJob.marks + ' marks');
+    ctx.fillText(meta.join(' · '), 600, 1168);
+
+    // Download
     var a = document.createElement('a');
-    a.download = 'SteelCaller-QR-' + _qrJob.num + '.png';
+    a.download = 'SteelCaller-QR-' + (_qrJob.num || 'project') + '.png';
     a.href = c.toDataURL('image/png');
     a.click();
     showToast('QR code downloaded!', true);
   };
+
   if (img.tagName === 'IMG') { drawFn(img); }
   else { var i2 = new Image(); i2.onload = function() { drawFn(i2); }; i2.src = img.toDataURL(); }
 }
