@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Detail Sheets — SteelCaller</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B2A; --navy2:#1B2A3F; --orange:#FF6B00; --off:#F2F5F9;
+  --white:#fff; --txt:#0D1B2A; --txt2:#3A5068; --txt3:#6A8098;
+  --border:#DDE4ED; --border2:#C3CFDC; --green:#00A845; --green-bg:#E6F7EC;
+  --amber:#FF9F0A; --amber-bg:#FFF4E0; --red:#FF3B30; --red-bg:#FFE8E6;
+  --blue:#0066CC; --blue-bg:#E8F2FF;
+  --sf:'Barlow Condensed',sans-serif; --serif:'Barlow',sans-serif;
+  --mo:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--serif);background:var(--off);color:var(--txt);min-height:100vh;line-height:1.45}
+
+.topbar{background:var(--navy);padding:14px 28px;display:flex;align-items:center;gap:18px;color:#fff}
+.back-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:8px 14px;color:#fff;cursor:pointer;font-family:var(--serif);font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;text-decoration:none}
+.back-btn:hover{background:rgba(255,255,255,.14)}
+.back-btn svg{width:14px;height:14px;stroke:#fff;stroke-width:2;fill:none}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:var(--orange);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.logo-name{font-family:var(--sf);font-size:22px;font-weight:800;color:#fff}
+.logo-name span{color:var(--orange)}
+.spacer{flex:1}
+.project-label{font-family:var(--sf);font-size:17px;font-weight:700;color:rgba(255,255,255,.85)}
+.project-label b{color:#fff}
+
+.container{max-width:1100px;margin:0 auto;padding:32px 24px 60px}
+
+.page-title{font-family:var(--sf);font-size:38px;font-weight:900;color:var(--navy);margin-bottom:6px;line-height:1.1}
+.page-sub{font-size:15px;color:var(--txt3);margin-bottom:28px;line-height:1.6}
+
+/* Stats strip */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+.stat-num{font-family:var(--sf);font-size:34px;font-weight:900;line-height:1}
+.stat-lbl{font-size:12px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.stat-sub{font-size:12px;color:var(--txt3);margin-top:4px}
+.stat.ok .stat-num{color:var(--green)}
+.stat.warn .stat-num{color:var(--amber)}
+.stat.info .stat-num{color:var(--orange)}
+.stat.muted .stat-num{color:var(--navy)}
+
+/* Status banner */
+.banner{border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;font-size:14px}
+.banner svg{width:20px;height:20px;stroke-width:2;fill:none;flex-shrink:0}
+.banner.indexing{background:var(--amber-bg);color:#8C5900;border:1px solid #FFE0B2}
+.banner.indexing svg{stroke:var(--amber)}
+.banner.ready{background:var(--green-bg);color:#006B2E;border:1px solid #B8E4C8}
+.banner.ready svg{stroke:var(--green)}
+.banner.partial{background:var(--amber-bg);color:#8C5900;border:1px solid #FFE0B2}
+.banner.partial svg{stroke:var(--amber)}
+.banner.error{background:var(--red-bg);color:#8A2018;border:1px solid #F8C8C4}
+.banner.error svg{stroke:var(--red)}
+.banner-spinner{width:18px;height:18px;border:2.5px solid rgba(255,159,10,.3);border-top-color:var(--amber);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Upload area */
+.section{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px}
+.section-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.section-h{font-family:var(--sf);font-size:22px;font-weight:800;color:var(--navy)}
+.section-sub{font-size:13px;color:var(--txt3);margin-bottom:16px;line-height:1.5}
+
+.dropzone{border:2.5px dashed var(--border2);border-radius:14px;padding:40px 20px;text-align:center;transition:all .15s;cursor:pointer;background:var(--off)}
+.dropzone:hover,.dropzone.dragging{border-color:var(--orange);background:rgba(255,107,0,.03)}
+.dropzone.uploading{border-color:var(--amber);background:var(--amber-bg);cursor:default}
+.dz-icon{width:56px;height:56px;background:rgba(255,107,0,.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.dz-icon svg{width:28px;height:28px;stroke:var(--orange);stroke-width:2;fill:none}
+.dz-title{font-family:var(--sf);font-size:22px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.dz-sub{font-size:14px;color:var(--txt3);margin-bottom:18px;line-height:1.5}
+.dz-btn{background:var(--orange);color:#fff;border:none;border-radius:10px;padding:12px 28px;font-family:var(--sf);font-size:17px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.dz-btn:hover{background:#E85D00}
+.dz-btn svg{width:18px;height:18px;stroke:#fff;stroke-width:2;fill:none}
+.dz-btn:disabled{background:var(--border2);cursor:not-allowed}
+
+/* Upload progress */
+.progress-wrap{margin-top:18px;text-align:left}
+.progress-row{padding:10px 14px;border-radius:8px;margin-bottom:6px;display:flex;align-items:center;gap:10px;font-size:13px;background:var(--off);border:1px solid var(--border)}
+.progress-row.done{background:var(--green-bg);border-color:#B8E4C8;color:#006B2E}
+.progress-row.failed{background:var(--red-bg);border-color:#F8C8C4;color:#8A2018}
+.progress-row.running{background:var(--amber-bg);border-color:#FFE0B2;color:#8C5900}
+.progress-icon{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.progress-icon svg{width:16px;height:16px;stroke-width:2.5;fill:none}
+.progress-spinner{width:14px;height:14px;border:2px solid rgba(140,89,0,.3);border-top-color:var(--amber);border-radius:50%;animation:spin 1s linear infinite}
+.progress-msg{flex:1}
+
+/* File list */
+.file-list{display:flex;flex-direction:column;gap:8px}
+.file-row{background:var(--off);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.file-icon{width:36px;height:36px;background:rgba(0,102,204,.08);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.file-icon svg{width:18px;height:18px;stroke:var(--blue);stroke-width:2;fill:none}
+.file-name{flex:1;font-family:var(--mo);font-size:14px;font-weight:600;color:var(--navy)}
+.file-del{background:none;border:1px solid var(--border);color:var(--txt3);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:12px;font-weight:600}
+.file-del:hover{background:var(--red-bg);color:var(--red);border-color:var(--red)}
+
+/* Unmatched marks */
+.mark-row{padding:10px 0;border-bottom:1px dashed var(--border);display:flex;align-items:center;gap:10px}
+.mark-row:last-child{border-bottom:none}
+.mark-name{min-width:90px;font-family:var(--mo);font-size:14px;font-weight:700;color:var(--navy)}
+.mark-sel{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;background:var(--white)}
+.mark-page{width:60px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;text-align:center;font-family:inherit}
+.mark-save{background:var(--navy);color:#fff;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;font-size:12px;font-weight:700}
+.mark-save:hover{background:var(--navy2)}
+.mark-save:disabled{opacity:.5;cursor:not-allowed}
+.mark-del-btn{background:none;border:1px solid var(--red);color:var(--red);border-radius:6px;padding:7px 10px;cursor:pointer;font-size:12px;font-weight:700}
+
+.empty{text-align:center;padding:30px 20px;color:var(--txt3)}
+
+.toast{position:fixed;top:20px;right:20px;background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;opacity:0;pointer-events:none;transform:translateX(20px);transition:all .2s;max-width:420px;box-shadow:0 8px 24px rgba(13,27,42,.25)}
+.toast.on{opacity:1;pointer-events:all;transform:translateX(0)}
+.toast.ok{background:var(--green)}
+.toast.err{background:var(--red)}
+
+@media (max-width:800px){
+  .stats{grid-template-columns:1fr 1fr}
+  .page-title{font-size:28px}
+  .container{padding:20px 16px 40px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="back-btn" href="/dashboard.html"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>Dashboard</a>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 30 30" width="20" height="20">
+        <rect x="2" y="2" width="26" height="7" rx="1.5" fill="white"/>
+        <rect x="11" y="9" width="8" height="12" rx="0.8" fill="white"/>
+        <rect x="2" y="21" width="26" height="7" rx="1.5" fill="white"/>
+      </svg>
+    </div>
+    <div class="logo-name">Steel<span>Caller</span></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="project-label" id="projLabel">—</div>
+</div>
+
+<div class="container">
+
+  <div class="page-title">Detail Sheets</div>
+  <div class="page-sub">Upload your shop drawing PDFs here. Files can be combined into one PDF or uploaded individually &mdash; works either way. Every piece mark in the field app will get a &ldquo;View Detail Sheet&rdquo; button pointing to the correct drawing.</div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat muted">
+      <div class="stat-num" id="stTotal">0</div>
+      <div class="stat-lbl">Total Marks</div>
+      <div class="stat-sub">From your IFC file</div>
+    </div>
+    <div class="stat ok">
+      <div class="stat-num" id="stMatched">0</div>
+      <div class="stat-lbl">Matched</div>
+      <div class="stat-sub">Have detail sheets</div>
+    </div>
+    <div class="stat warn">
+      <div class="stat-num" id="stUnmatched">0</div>
+      <div class="stat-lbl">Need Sheets</div>
+      <div class="stat-sub">No drawing found</div>
+    </div>
+    <div class="stat info">
+      <div class="stat-num" id="stFiles">0</div>
+      <div class="stat-lbl">PDFs Uploaded</div>
+      <div class="stat-sub">Currently in storage</div>
+    </div>
+  </div>
+
+  <!-- Status banner -->
+  <div id="statusBanner" style="display:none"></div>
+
+  <!-- Upload section -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-h">Upload Drawings</div>
+    </div>
+    <div class="section-sub">Drop in one combined PDF with all your sheets, or select multiple individual PDF files at once. Large batches are uploaded in groups of 10 automatically.</div>
+
+    <input type="file" id="fileInput" accept=".pdf" multiple style="display:none">
+    <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+      <div class="dz-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <div class="dz-title" id="dzTitle">Drop PDFs here or click to browse</div>
+      <div class="dz-sub" id="dzSub">PDF files only</div>
+      <button class="dz-btn" type="button" onclick="event.stopPropagation();document.getElementById('fileInput').click()">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Choose PDFs
+      </button>
+    </div>
+
+    <div class="progress-wrap" id="progressWrap" style="display:none"></div>
+  </div>
+
+  <!-- Uploaded files -->
+  <div class="section" id="filesSection">
+    <div class="section-head">
+      <div class="section-h">Uploaded PDFs</div>
+    </div>
+    <div class="file-list" id="fileList">
+      <div class="empty">No PDFs uploaded yet.</div>
+    </div>
+  </div>
+
+  <!-- Unmatched marks manual mapping -->
+  <div class="section" id="unmatchedSection" style="display:none">
+    <div class="section-head">
+      <div class="section-h">Unmatched Piece Marks</div>
+    </div>
+    <div class="section-sub">These piece marks couldn&rsquo;t be automatically matched to a detail sheet. Pick the right PDF and page number for each, or upload the missing PDF above.</div>
+    <div id="unmatchedList"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────
+var API = 'https://steelcaller-api.onrender.com';
+var BATCH_SIZE = 10;
+
+// ── State ─────────────────────────────────────────────────────────────────
+var PROJECT_ID = new URLSearchParams(location.search).get('project');
+if (!PROJECT_ID) {
+  document.body.innerHTML = '<div style="text-align:center;padding:80px 20px;font-family:sans-serif"><h1>No project specified</h1><p><a href="/dashboard.html">Return to dashboard</a></p></div>';
+  throw new Error('No project id');
+}
+
+var STATE = {
+  files:       [],  // uploaded filenames
+  unmatched:   [],
+  low_conf:    [],
+  available:   [],  // for mapping dropdowns
+  uploading:   false,
+  pollTimer:   null,
+};
+
+// ── Toast ─────────────────────────────────────────────────────────────────
+var TOAST_T = null;
+function toast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast on' + (type ? ' ' + type : '');
+  clearTimeout(TOAST_T);
+  TOAST_T = setTimeout(function(){ el.classList.remove('on'); }, 4000);
+}
+
+// ── API ───────────────────────────────────────────────────────────────────
+function api(path, opts) {
+  return fetch(API + path, opts || {}).then(function(r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  });
+}
+
+// ── Load and render ───────────────────────────────────────────────────────
+function loadAll() {
+  // Summary gives us fast counters
+  api('/api/projects/' + encodeURIComponent(PROJECT_ID) + '/details/summary')
+    .then(function(data) { renderSummary(data); })
+    .catch(function(err) {
+      toast('Could not load project: ' + err.message, 'err');
+    });
+
+  // Review gives us unmatched marks + available PDFs for mapping
+  api('/api/projects/' + encodeURIComponent(PROJECT_ID) + '/details/review')
+    .then(function(data) { renderReview(data); })
+    .catch(function(err) {
+      console.warn('Review load failed:', err);
+    });
+}
+
+function renderSummary(data) {
+  document.getElementById('projLabel').innerHTML =
+    'Job <b>' + escapeHtml(data.job_number || '') + '</b> &middot; ' + escapeHtml(data.job_name || '');
+
+  document.getElementById('stTotal').textContent    = data.total_marks || 0;
+  document.getElementById('stMatched').textContent  = data.matched_count || 0;
+  document.getElementById('stUnmatched').textContent = Math.max(0, (data.total_marks || 0) - (data.matched_count || 0));
+  document.getElementById('stFiles').textContent    = data.file_count || 0;
+
+  STATE.files = data.files || [];
+  renderFileList();
+  renderBanner(data);
+}
+
+function renderReview(data) {
+  STATE.unmatched = data.unmatched_marks || [];
+  STATE.low_conf  = data.low_confidence || [];
+  STATE.available = data.available_pdfs || [];
+  renderUnmatched();
+}
+
+function renderBanner(data) {
+  var banner = document.getElementById('statusBanner');
+  var status = data.status || 'none';
+  var unmatchedCount = Math.max(0, (data.total_marks || 0) - (data.matched_count || 0));
+
+  if (status === 'indexing') {
+    banner.className = 'banner indexing';
+    banner.innerHTML = '<div class="banner-spinner"></div><div><strong>Indexing PDFs in background.</strong> This usually takes 1&ndash;3 minutes per batch. You can close this tab &mdash; it will keep going.</div>';
+    banner.style.display = 'flex';
+    startPolling();
+  } else if (status === 'ready') {
+    banner.className = 'banner ready';
+    banner.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg><div><strong>All piece marks matched to detail sheets.</strong> The field app is fully set up &mdash; every piece shows a View Detail Sheet button.</div>';
+    banner.style.display = 'flex';
+    stopPolling();
+  } else if (status === 'partial') {
+    banner.className = 'banner partial';
+    banner.innerHTML = '<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg><div><strong>' + unmatchedCount + ' piece mark' + (unmatchedCount === 1 ? '' : 's') + ' still need' + (unmatchedCount === 1 ? 's' : '') + ' a detail sheet.</strong> Upload more PDFs above, or manually map them in the section below.</div>';
+    banner.style.display = 'flex';
+    stopPolling();
+  } else if (status === 'error') {
+    banner.className = 'banner error';
+    banner.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div><strong>Indexing ran into an error.</strong> Try uploading again, or contact support if it keeps failing.</div>';
+    banner.style.display = 'flex';
+    stopPolling();
+  } else {
+    banner.style.display = 'none';
+    stopPolling();
+  }
+}
+
+function renderFileList() {
+  var el = document.getElementById('fileList');
+  if (!STATE.files.length) {
+    el.innerHTML = '<div class="empty">No PDFs uploaded yet.</div>';
+    return;
+  }
+  var html = '';
+  STATE.files.forEach(function(fn) {
+    html += '<div class="file-row">'
+      + '<div class="file-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div>'
+      + '<div class="file-name">' + escapeHtml(fn) + '</div>'
+      + '<button class="file-del" onclick="deleteFile(' + JSON.stringify(fn).replace(/"/g,'&quot;') + ')">Remove</button>'
+      + '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function renderUnmatched() {
+  var section = document.getElementById('unmatchedSection');
+  var list = document.getElementById('unmatchedList');
+
+  if (!STATE.unmatched.length && !STATE.low_conf.length) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = 'block';
+
+  var pdfOptions = '<option value="">&mdash; Pick a PDF &mdash;</option>';
+  STATE.available.forEach(function(p) {
+    pdfOptions += '<option value="' + escapeAttr(p.filename) + '">' + escapeHtml(p.filename) + '</option>';
+  });
+
+  var html = '';
+
+  // Unmatched (hard)
+  if (STATE.unmatched.length) {
+    html += '<div style="font-weight:700;font-size:13px;color:var(--amber);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Unmatched &mdash; need to pick a PDF</div>';
+    STATE.unmatched.slice(0, 100).forEach(function(mark) {
+      html += makeMarkRow(mark, '', 1, pdfOptions, false);
+    });
+    if (STATE.unmatched.length > 100) {
+      html += '<div style="font-size:12px;color:var(--txt3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">&hellip; and ' + (STATE.unmatched.length - 100) + ' more. Map these first, then the rest will appear.</div>';
+    }
+  }
+
+  // Low confidence (auto-matched via filename or fuzzy — review suggested)
+  if (STATE.low_conf.length) {
+    html += '<div style="font-weight:700;font-size:13px;color:var(--txt2);margin:14px 0 8px;text-transform:uppercase;letter-spacing:.5px">Low confidence &mdash; review if you want</div>';
+    STATE.low_conf.slice(0, 50).forEach(function(entry) {
+      html += makeMarkRow(entry.mark, entry.pdf, entry.page, pdfOptions, true);
+    });
+  }
+
+  list.innerHTML = html;
+
+  // Wire up the save/delete buttons via event delegation
+  list.onclick = onUnmatchedClick;
+}
+
+function makeMarkRow(mark, currentPdf, currentPage, pdfOptions, canDelete) {
+  var sel = pdfOptions;
+  if (currentPdf) {
+    sel = sel.replace('value="' + escapeAttr(currentPdf) + '"',
+                       'value="' + escapeAttr(currentPdf) + '" selected');
+  }
+  var delBtn = canDelete
+    ? '<button class="mark-del-btn" data-action="del" data-mark="' + escapeAttr(mark) + '">Remove</button>'
+    : '';
+  return '<div class="mark-row" data-mark="' + escapeAttr(mark) + '">'
+    + '<div class="mark-name">' + escapeHtml(mark) + '</div>'
+    + '<select class="mark-sel">' + sel + '</select>'
+    + '<input type="number" class="mark-page" value="' + (currentPage || 1) + '" min="1" title="Page">'
+    + '<button class="mark-save" data-action="save" data-mark="' + escapeAttr(mark) + '">Save</button>'
+    + delBtn
+    + '</div>';
+}
+
+function onUnmatchedClick(e) {
+  var btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  var action = btn.dataset.action;
+  var mark   = btn.dataset.mark;
+  var row    = btn.closest('.mark-row');
+  if (!row) return;
+
+  if (action === 'save') {
+    var pdf  = row.querySelector('.mark-sel').value;
+    var page = parseInt(row.querySelector('.mark-page').value, 10) || 1;
+    if (!pdf) { toast('Pick a PDF first', 'err'); return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    var fd = new FormData();
+    fd.append('mark', mark);
+    fd.append('pdf_filename', pdf);
+    fd.append('page', page);
+    fetch(API + '/api/projects/' + encodeURIComponent(PROJECT_ID) + '/details/map', {
+      method: 'POST', body: fd
+    }).then(function(r){ return r.json(); })
+      .then(function(data) {
+        if (data && data.ok) {
+          toast(mark + ' → ' + pdf + ' p.' + page, 'ok');
+          loadAll();
+        } else {
+          toast('Save failed', 'err');
+          btn.disabled = false;
+          btn.textContent = 'Save';
+        }
+      }).catch(function() {
+        toast('Save failed', 'err');
+        btn.disabled = false;
+        btn.textContent = 'Save';
+      });
+  } else if (action === 'del') {
+    if (!confirm('Remove mapping for ' + mark + '?')) return;
+    fetch(API + '/api/projects/' + encodeURIComponent(PROJECT_ID) + '/details/map/' + encodeURIComponent(mark), {
+      method: 'DELETE'
+    }).then(function(r){ return r.json(); })
+      .then(function() {
+        toast(mark + ' mapping removed', 'ok');
+        loadAll();
+      });
+  }
+}
+
+// ── Upload ────────────────────────────────────────────────────────────────
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  handleFiles(Array.from(e.target.files || []));
+  e.target.value = '';  // reset so same file can be re-selected
+});
+
+var dz = document.getElementById('dropzone');
+['dragenter','dragover'].forEach(function(ev) {
+  dz.addEventListener(ev, function(e) {
+    e.preventDefault(); e.stopPropagation();
+    dz.classList.add('dragging');
+  });
+});
+['dragleave','drop'].forEach(function(ev) {
+  dz.addEventListener(ev, function(e) {
+    e.preventDefault(); e.stopPropagation();
+    dz.classList.remove('dragging');
+  });
+});
+dz.addEventListener('drop', function(e) {
+  var files = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
+  files = files.filter(function(f) { return f.name.toLowerCase().endsWith('.pdf'); });
+  handleFiles(files);
+});
+
+function handleFiles(files) {
+  if (STATE.uploading) {
+    toast('Already uploading — wait for the current batch to finish', 'err');
+    return;
+  }
+  if (!files.length) return;
+
+  // Group into batches
+  var batches = [];
+  for (var i = 0; i < files.length; i += BATCH_SIZE) {
+    batches.push(files.slice(i, i + BATCH_SIZE));
+  }
+
+  STATE.uploading = true;
+  dz.classList.add('uploading');
+  document.getElementById('dzTitle').textContent = 'Uploading — keep this tab open';
+  document.getElementById('dzSub').textContent = '0 of ' + batches.length + ' batches done';
+
+  // Render progress list
+  var wrap = document.getElementById('progressWrap');
+  wrap.style.display = 'block';
+  wrap.innerHTML = '';
+  batches.forEach(function(b, idx) {
+    var row = document.createElement('div');
+    row.className = 'progress-row';
+    row.id = 'prog-' + idx;
+    row.innerHTML = '<div class="progress-icon"><svg viewBox="0 0 24 24" style="stroke:var(--txt3);stroke-width:2;fill:none"><circle cx="12" cy="12" r="10"/></svg></div>'
+      + '<div class="progress-msg">Batch ' + (idx+1) + ' of ' + batches.length + ' — ' + b.length + ' file' + (b.length === 1 ? '' : 's') + ' queued</div>';
+    wrap.appendChild(row);
+  });
+
+  // Run batches sequentially
+  var done = 0, failed = 0;
+  var chain = Promise.resolve();
+  batches.forEach(function(batch, idx) {
+    chain = chain.then(function() {
+      return uploadBatch(batch, idx, batches.length);
+    }).then(function(ok) {
+      if (ok) done++; else failed++;
+      document.getElementById('dzSub').textContent = (done + failed) + ' of ' + batches.length + ' batches done';
+    });
+  });
+
+  chain.then(function() {
+    STATE.uploading = false;
+    dz.classList.remove('uploading');
+    document.getElementById('dzTitle').textContent = 'Drop PDFs here or click to browse';
+    document.getElementById('dzSub').textContent = 'PDF files only';
+
+    if (failed) {
+      toast(done + ' batch' + (done === 1 ? '' : 'es') + ' succeeded, ' + failed + ' failed. Try the failed ones again.', 'err');
+    } else {
+      toast('All ' + done + ' batch' + (done === 1 ? '' : 'es') + ' uploaded. Indexing is running in the background.', 'ok');
+    }
+
+    // Refresh the page state
+    startPolling();
+    loadAll();
+  });
+}
+
+function uploadBatch(batch, idx, total) {
+  var row = document.getElementById('prog-' + idx);
+  row.className = 'progress-row running';
+  row.innerHTML = '<div class="progress-icon"><div class="progress-spinner"></div></div>'
+    + '<div class="progress-msg">Batch ' + (idx+1) + ' of ' + total + ' — uploading ' + batch.length + ' file' + (batch.length === 1 ? '' : 's') + '…</div>';
+
+  var fd = new FormData();
+  batch.forEach(function(f) { fd.append('files', f); });
+
+  return fetch(API + '/api/projects/' + encodeURIComponent(PROJECT_ID) + '/details', {
+    method: 'POST', body: fd
+  }).then(function(r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    row.className = 'progress-row done';
+    row.innerHTML = '<div class="progress-icon"><svg viewBox="0 0 24 24" style="stroke:var(--green);stroke-width:2.5;fill:none"><polyline points="20,6 9,17 4,12"/></svg></div>'
+      + '<div class="progress-msg">Batch ' + (idx+1) + ' of ' + total + ' — uploaded, indexing…</div>';
+    return true;
+  }).catch(function(err) {
+    row.className = 'progress-row failed';
+    row.innerHTML = '<div class="progress-icon"><svg viewBox="0 0 24 24" style="stroke:var(--red);stroke-width:2.5;fill:none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>'
+      + '<div class="progress-msg">Batch ' + (idx+1) + ' of ' + total + ' — failed (' + (err.message || err) + ')</div>';
+    return false;
+  });
+}
+
+// ── Delete file ───────────────────────────────────────────────────────────
+function deleteFile(filename) {
+  if (!confirm('Remove ' + filename + ' and all its mark mappings?')) return;
+  fetch(API + '/api/projects/' + encodeURIComponent(PROJECT_ID) + '/details/file/' + encodeURIComponent(filename), {
+    method: 'DELETE'
+  }).then(function(r){ return r.json(); })
+    .then(function(data) {
+      toast(filename + ' removed', 'ok');
+      loadAll();
+    }).catch(function() {
+      toast('Delete failed', 'err');
+    });
+}
+
+// ── Polling ───────────────────────────────────────────────────────────────
+function startPolling() {
+  if (STATE.pollTimer) return;
+  STATE.pollTimer = setInterval(loadAll, 5000);
+}
+function stopPolling() {
+  if (STATE.pollTimer) { clearInterval(STATE.pollTimer); STATE.pollTimer = null; }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, function(c) {
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function escapeAttr(s) {
+  return String(s || '').replace(/["&<>]/g, function(c) {
+    return {'"':'&quot;','&':'&amp;','<':'&lt;','>':'&gt;'}[c];
+  });
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+loadAll();
+</script>
+
+</body>
+</html>
