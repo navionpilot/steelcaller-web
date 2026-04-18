@@ -961,16 +961,40 @@ function launchProject() {
       return fetch(API + '/api/projects/' + proj.project_id + '/process', { method: 'POST', body: f2 })
         .then(function() {
           // Kick off detail-sheet upload if files were provided.
-          // Runs in parallel with status polling; indexing completes in
-          // the background and doesn't block the field app going live.
+          // Upload in batches of 10 PDFs per request so we don't hit
+          // browser / edge / server request-size limits on large projects.
+          // Runs sequentially in the background — indexing completes after
+          // the field app is already live.
           if (selectedFiles.details && selectedFiles.details.length) {
-            var f3 = new FormData();
-            selectedFiles.details.forEach(function(f) { f3.append('files', f); });
-            fetch(API + '/api/projects/' + proj.project_id + '/details',
-                  { method: 'POST', body: f3 })
-              .catch(function(err) {
-                console.warn('Detail upload failed:', err);
+            var BATCH_SIZE = 10;
+            var files = selectedFiles.details;
+            var batches = [];
+            for (var i = 0; i < files.length; i += BATCH_SIZE) {
+              batches.push(files.slice(i, i + BATCH_SIZE));
+            }
+            // Chain the batches — each request waits for the previous one
+            var chain = Promise.resolve();
+            batches.forEach(function(batch, idx) {
+              chain = chain.then(function() {
+                var fd = new FormData();
+                batch.forEach(function(f) { fd.append('files', f); });
+                console.log('Uploading detail batch ' + (idx+1) + ' of ' +
+                            batches.length + ' (' + batch.length + ' files)');
+                return fetch(API + '/api/projects/' + proj.project_id + '/details',
+                             { method: 'POST', body: fd })
+                  .then(function(r) {
+                    if (!r.ok) {
+                      console.warn('Detail batch ' + (idx+1) + ' failed: HTTP ' + r.status);
+                    }
+                  })
+                  .catch(function(err) {
+                    console.warn('Detail batch ' + (idx+1) + ' failed:', err);
+                  });
               });
+            });
+            chain.then(function() {
+              console.log('All detail batches dispatched');
+            });
           }
           return proj;
         });
