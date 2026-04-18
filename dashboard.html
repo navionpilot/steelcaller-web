@@ -159,9 +159,8 @@ button{cursor:pointer;font-family:var(--sans)}
 .ac-empty{padding:12px;font-size:13px;color:var(--txt3);text-align:center;font-style:italic}
 
 /* UPLOAD */
-.upload-zones{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-@media (max-width:1100px){.upload-zones{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:600px){.upload-zones{grid-template-columns:1fr}}
+.upload-zones{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media (max-width:800px){.upload-zones{grid-template-columns:1fr}}
 .upload-zone{border:2px dashed var(--border2);border-radius:12px;padding:24px 16px;text-align:center;transition:all .2s;cursor:pointer;background:var(--off)}
 .upload-zone:hover{border-color:var(--orange);background:rgba(255,107,0,.03)}
 .upload-zone.uploaded{border-color:var(--green);background:var(--green-bg);border-style:solid}
@@ -430,15 +429,6 @@ button{cursor:pointer;font-family:var(--sans)}
             <button class="uz-btn" onclick="event.stopPropagation();document.getElementById('fi-nc1').click()">Choose ZIP</button>
             <div class="uz-uploaded" id="upl-nc1"></div>
           </div>
-          <input type="file" id="fi-details" accept=".pdf" multiple style="display:none" onchange="onFileSelected('details',this)">
-          <div class="upload-zone" id="uz-details" onclick="document.getElementById('fi-details').click()">
-            <div class="uz-label">Detail Sheets</div>
-            <div class="uz-ext">.pdf</div>
-            <div class="uz-badge rec">Recommended</div>
-            <div class="uz-desc">Shop drawings. One combined PDF, or select multiple files to upload a batch</div>
-            <button class="uz-btn" onclick="event.stopPropagation();document.getElementById('fi-details').click()">Choose PDFs</button>
-            <div class="uz-uploaded" id="upl-details"></div>
-          </div>
         </div>
       </div>
       <div style="font-size:13px;color:var(--txt3);background:var(--off);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:20px">
@@ -471,7 +461,6 @@ button{cursor:pointer;font-family:var(--sans)}
               <div class="review-row"><span class="review-label">IFC File</span><span id="rev-ifc" class="file-missing">Not selected</span></div>
               <div class="review-row"><span class="review-label">KSS File</span><span id="rev-kss" class="file-missing">Not uploaded</span></div>
               <div class="review-row"><span class="review-label">NC1 Files</span><span id="rev-nc1" class="file-missing">Not uploaded</span></div>
-              <div class="review-row"><span class="review-label">Detail Sheets</span><span id="rev-details" class="file-missing">Not uploaded</span></div>
             </div>
           </div>
           <div class="review-card">
@@ -824,8 +813,8 @@ function resetForm() {
     var el = document.getElementById(id);
     if (el) el.value = '';
   });
-  selectedFiles = { ifc: null, kss: null, nc1: null, details: null };
-  ['ifc','kss','nc1','details'].forEach(function(t) {
+  selectedFiles = { ifc: null, kss: null, nc1: null };
+  ['ifc','kss','nc1'].forEach(function(t) {
     var zone = document.getElementById('uz-' + t);
     var upl  = document.getElementById('upl-' + t);
     if (zone) zone.classList.remove('uploaded');
@@ -834,26 +823,9 @@ function resetForm() {
 }
 
 // ── FILE UPLOADS ──────────────────────────────────────────────────────────
-var selectedFiles = { ifc: null, kss: null, nc1: null, details: null };
+var selectedFiles = { ifc: null, kss: null, nc1: null };
 
 function onFileSelected(type, input) {
-  if (type === 'details') {
-    // Details accepts multiple files — store as an array
-    var files = Array.from(input.files || []);
-    if (!files.length) return;
-    selectedFiles.details = files;
-    var zone = document.getElementById('uz-details');
-    var upl  = document.getElementById('upl-details');
-    zone.classList.add('uploaded');
-    var totalBytes = files.reduce(function(s,f){ return s + f.size; }, 0);
-    var label = files.length === 1
-      ? files[0].name + ' (' + fmtSize(files[0].size) + ')'
-      : files.length + ' PDFs selected (' + fmtSize(totalBytes) + ')';
-    upl.textContent = '\u2713 ' + label;
-    upl.style.display = 'block';
-    showToast(files.length + ' detail PDF' + (files.length > 1 ? 's' : '') + ' ready', true);
-    return;
-  }
   var file = input.files[0];
   if (!file) return;
   selectedFiles[type] = file;
@@ -888,7 +860,6 @@ function populateReview() {
   setFile('rev-ifc', selectedFiles.ifc, 'Not selected — IFC is required');
   setFile('rev-kss', selectedFiles.kss, 'Not uploaded');
   setFile('rev-nc1', selectedFiles.nc1, 'Not uploaded');
-  setFileMulti('rev-details', selectedFiles.details, 'Not uploaded');
 
   var slug = (num + '-' + name).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,50);
   setText('rev-url', 'steelcaller.com/p/' + slug);
@@ -902,22 +873,6 @@ function setFile(id, file, empty) {
   if (file) {
     el.className = 'review-file';
     el.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg> ' + file.name + ' <span style="color:var(--txt3);font-weight:400">(' + fmtSize(file.size) + ')</span>';
-  } else {
-    el.className = 'file-missing';
-    el.textContent = empty;
-  }
-}
-
-function setFileMulti(id, files, empty) {
-  var el = document.getElementById(id);
-  if (!el) return;
-  if (files && files.length) {
-    var totalBytes = files.reduce(function(s,f){ return s + f.size; }, 0);
-    var label = files.length === 1
-      ? files[0].name
-      : files.length + ' PDFs';
-    el.className = 'review-file';
-    el.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg> ' + label + ' <span style="color:var(--txt3);font-weight:400">(' + fmtSize(totalBytes) + ')</span>';
   } else {
     el.className = 'file-missing';
     el.textContent = empty;
@@ -960,42 +915,6 @@ function launchProject() {
       if (selectedFiles.nc1) f2.append('nc1_file', selectedFiles.nc1);
       return fetch(API + '/api/projects/' + proj.project_id + '/process', { method: 'POST', body: f2 })
         .then(function() {
-          // Kick off detail-sheet upload if files were provided.
-          // Upload in batches of 10 PDFs per request so we don't hit
-          // browser / edge / server request-size limits on large projects.
-          // Runs sequentially in the background — indexing completes after
-          // the field app is already live.
-          if (selectedFiles.details && selectedFiles.details.length) {
-            var BATCH_SIZE = 10;
-            var files = selectedFiles.details;
-            var batches = [];
-            for (var i = 0; i < files.length; i += BATCH_SIZE) {
-              batches.push(files.slice(i, i + BATCH_SIZE));
-            }
-            // Chain the batches — each request waits for the previous one
-            var chain = Promise.resolve();
-            batches.forEach(function(batch, idx) {
-              chain = chain.then(function() {
-                var fd = new FormData();
-                batch.forEach(function(f) { fd.append('files', f); });
-                console.log('Uploading detail batch ' + (idx+1) + ' of ' +
-                            batches.length + ' (' + batch.length + ' files)');
-                return fetch(API + '/api/projects/' + proj.project_id + '/details',
-                             { method: 'POST', body: fd })
-                  .then(function(r) {
-                    if (!r.ok) {
-                      console.warn('Detail batch ' + (idx+1) + ' failed: HTTP ' + r.status);
-                    }
-                  })
-                  .catch(function(err) {
-                    console.warn('Detail batch ' + (idx+1) + ' failed:', err);
-                  });
-              });
-            });
-            chain.then(function() {
-              console.log('All detail batches dispatched');
-            });
-          }
           return proj;
         });
     })
@@ -1086,14 +1005,22 @@ function makeCard(p) {
 
   var actions;
   if (p.status === 'live') {
-    var detailBtn = '';
-    if (p.detail_status === 'partial') {
-      detailBtn = '<button class="btn btn-sm js-review-details" style="background:var(--amber);color:#fff;border:none" title="Some marks need manual matching"><svg viewBox="0 0 24 24" style="stroke:#fff;stroke-width:2;fill:none;width:14px;height:14px"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>Review Details</button>';
+    // Single "Detail Sheets" button — always navigates to dedicated page.
+    // Colour-coded by current status so the fabricator knows at a glance
+    // whether attention is needed.
+    var detailStyle = 'background:var(--off);color:var(--txt2);border:1px solid var(--border)';
+    var detailIcon  = '<svg viewBox="0 0 24 24" style="stroke:var(--txt2);stroke-width:2;fill:none;width:14px;height:14px"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>';
+    if (p.detail_status === 'ready') {
+      detailStyle = 'background:var(--green-bg);color:var(--green);border:1px solid var(--green)';
+      detailIcon  = '<svg viewBox="0 0 24 24" style="stroke:var(--green);stroke-width:2;fill:none;width:14px;height:14px"><polyline points="20,6 9,17 4,12"/></svg>';
+    } else if (p.detail_status === 'partial') {
+      detailStyle = 'background:var(--amber);color:#fff;border:none';
+      detailIcon  = '<svg viewBox="0 0 24 24" style="stroke:#fff;stroke-width:2;fill:none;width:14px;height:14px"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>';
     } else if (p.detail_status === 'indexing') {
-      detailBtn = '<button class="btn btn-sm" disabled style="background:var(--amber-bg);color:var(--amber);border:none;opacity:.7">Indexing PDFs…</button>';
-    } else if (p.detail_status === 'ready') {
-      detailBtn = '<button class="btn btn-sm js-review-details" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green)"><svg viewBox="0 0 24 24" style="stroke:var(--green);stroke-width:2;fill:none;width:14px;height:14px"><polyline points="20,6 9,17 4,12"/></svg>Details Ready</button>';
+      detailStyle = 'background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber)';
+      detailIcon  = '<div class="spinner" style="width:12px;height:12px;border-width:2px;border-top-color:var(--amber)"></div>';
     }
+    var detailBtn = '<a class="btn btn-sm js-details" href="/details.html?project=' + encodeURIComponent(p.id) + '" style="' + detailStyle + ';text-decoration:none;display:inline-flex;align-items:center;gap:6px">' + detailIcon + 'Detail Sheets</a>';
     actions = '<div class="proj-actions">'
       + detailBtn
       + '<button class="btn btn-ghost btn-sm js-copy"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copy Link</button>'
@@ -1134,8 +1061,6 @@ document.addEventListener('click', function(e) {
     openEdit(card);
   } else if (e.target.closest('.js-del')) {
     openDelete(card);
-  } else if (e.target.closest('.js-review-details')) {
-    openDetailReview(d.id, d.jobNum, d.jobName);
   }
 });
 
@@ -1377,7 +1302,7 @@ function openModal(id)  { document.getElementById(id).classList.add('show'); }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
 document.addEventListener('click', function(e) {
-  ['editModal','deleteModal','qrModal','detailReviewModal'].forEach(function(id) {
+  ['editModal','deleteModal','qrModal'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el && e.target === el) closeModal(id);
   });
@@ -1645,156 +1570,6 @@ function logout() {
   }
 }
 
-// ── DETAIL REVIEW ─────────────────────────────────────────────────────────
-var REVIEW_STATE = { projectId: null, availablePdfs: [] };
-
-function openDetailReview(projectId, jobNum, jobName) {
-  REVIEW_STATE.projectId = projectId;
-  var titleEl = document.getElementById('drTitle');
-  if (titleEl) titleEl.textContent = jobNum + ' — ' + jobName;
-
-  var body = document.getElementById('drBody');
-  body.innerHTML = '<div style="padding:40px;text-align:center;color:var(--txt3)">Loading…</div>';
-  openModal('detailReviewModal');
-
-  fetch(API + '/api/projects/' + encodeURIComponent(projectId) + '/details/review')
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      REVIEW_STATE.availablePdfs = data.available_pdfs || [];
-      renderDetailReview(data);
-    })
-    .catch(function(err) {
-      body.innerHTML = '<div style="padding:30px;text-align:center;color:var(--red)">Could not load review data.<br><span style="font-size:13px;color:var(--txt3)">' + (err.message || err) + '</span></div>';
-    });
-}
-
-function renderDetailReview(data) {
-  var body = document.getElementById('drBody');
-  var pdfs = data.available_pdfs || [];
-  var unmatched = data.unmatched_marks || [];
-  var lowConf = data.low_confidence || [];
-
-  if (!pdfs.length) {
-    body.innerHTML = '<div style="padding:24px;text-align:center"><div style="font-size:15px;color:var(--txt2);margin-bottom:12px">No detail PDFs uploaded yet for this project.</div><div style="font-size:13px;color:var(--txt3)">Upload them when creating a new project, or edit this project to add them.</div></div>';
-    return;
-  }
-
-  var pdfSelect = '<option value="">— Pick a PDF —</option>';
-  pdfs.forEach(function(p) {
-    pdfSelect += '<option value="' + encodeURIComponent(p.filename) + '">' + escapeHtml(p.filename) + '</option>';
-  });
-
-  var summary = '<div style="padding:14px 22px;background:var(--off);border-bottom:1px solid var(--border);font-size:14px">'
-    + '<strong>' + data.matched_count + '</strong> of <strong>' + data.total_marks + '</strong> marks matched to detail sheets.'
-    + (unmatched.length ? ' <span style="color:var(--amber)">' + unmatched.length + ' unmatched.</span>' : ' <span style="color:var(--green)">All matched ✓</span>')
-    + (lowConf.length ? '<br><span style="color:var(--txt3);font-size:12px">' + lowConf.length + ' low-confidence matches — review if desired.</span>' : '')
-    + '</div>';
-
-  var unmatchedHtml = '';
-  if (unmatched.length) {
-    unmatchedHtml = '<div style="padding:14px 22px"><div style="font-weight:700;font-size:14px;margin-bottom:8px;color:var(--amber)">Unmatched marks</div>';
-    unmatched.slice(0, 50).forEach(function(mark) {
-      unmatchedHtml += makeMappingRow(mark, '', 1, pdfSelect, false);
-    });
-    if (unmatched.length > 50) {
-      unmatchedHtml += '<div style="font-size:12px;color:var(--txt3);margin-top:8px">… and ' + (unmatched.length - 50) + ' more. Map the visible ones first then reopen for the rest.</div>';
-    }
-    unmatchedHtml += '</div>';
-  }
-
-  var lowConfHtml = '';
-  if (lowConf.length) {
-    lowConfHtml = '<div style="padding:14px 22px;border-top:1px solid var(--border)"><div style="font-weight:700;font-size:14px;margin-bottom:8px;color:var(--txt2)">Low-confidence matches (review if needed)</div>';
-    lowConf.forEach(function(entry) {
-      lowConfHtml += makeMappingRow(entry.mark, entry.pdf, entry.page, pdfSelect, true);
-    });
-    lowConfHtml += '</div>';
-  }
-
-  body.innerHTML = summary + unmatchedHtml + lowConfHtml;
-
-  // Wire save/delete buttons
-  body.addEventListener('click', onReviewRowClick);
-}
-
-function makeMappingRow(mark, currentPdf, currentPage, pdfSelectHtml, canDelete) {
-  // Fill-in current PDF if any
-  var sel = pdfSelectHtml;
-  if (currentPdf) {
-    sel = sel.replace(
-      'value="' + encodeURIComponent(currentPdf) + '"',
-      'value="' + encodeURIComponent(currentPdf) + '" selected'
-    );
-  }
-  var delBtn = canDelete
-    ? '<button class="dr-del" data-mark="' + escapeHtml(mark) + '" title="Remove mapping" style="background:none;border:1px solid var(--red);color:var(--red);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:12px">Remove</button>'
-    : '';
-  return '<div class="dr-row" data-mark="' + escapeHtml(mark) + '" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed var(--border)">'
-    + '<div style="min-width:80px;font-family:monospace;font-weight:700;font-size:14px">' + escapeHtml(mark) + '</div>'
-    + '<select class="dr-pdf" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px">' + sel + '</select>'
-    + '<input type="number" class="dr-page" value="' + (currentPage || 1) + '" min="1" style="width:60px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px" title="Page number">'
-    + '<button class="dr-save" style="background:var(--navy);color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:600">Save</button>'
-    + delBtn
-    + '</div>';
-}
-
-function onReviewRowClick(e) {
-  var row = e.target.closest('.dr-row');
-  if (!row) return;
-  var mark = row.dataset.mark;
-
-  if (e.target.classList.contains('dr-save')) {
-    var pdf = decodeURIComponent(row.querySelector('.dr-pdf').value || '');
-    var page = parseInt(row.querySelector('.dr-page').value, 10) || 1;
-    if (!pdf) { showToast('Pick a PDF first', false); return; }
-
-    var fd = new FormData();
-    fd.append('mark', mark);
-    fd.append('pdf_filename', pdf);
-    fd.append('page', page);
-    e.target.disabled = true;
-    e.target.textContent = 'Saving…';
-
-    fetch(API + '/api/projects/' + encodeURIComponent(REVIEW_STATE.projectId) + '/details/map', {
-      method: 'POST', body: fd
-    })
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (data && data.ok) {
-          showToast(mark + ' → ' + pdf.split('/').pop() + ' p.' + page, true);
-          row.style.opacity = 0.5;
-          e.target.textContent = 'Saved ✓';
-          setTimeout(function(){ openDetailReview(REVIEW_STATE.projectId, '', ''); }, 800);
-        } else {
-          showToast('Save failed', false);
-          e.target.disabled = false;
-          e.target.textContent = 'Save';
-        }
-      })
-      .catch(function() {
-        showToast('Save failed', false);
-        e.target.disabled = false;
-        e.target.textContent = 'Save';
-      });
-  } else if (e.target.classList.contains('dr-del')) {
-    if (!confirm('Remove detail mapping for ' + mark + '?')) return;
-    fetch(API + '/api/projects/' + encodeURIComponent(REVIEW_STATE.projectId) + '/details/map/' + encodeURIComponent(mark), {
-      method: 'DELETE'
-    })
-      .then(function(r) { return r.json(); })
-      .then(function() {
-        showToast(mark + ' mapping removed', true);
-        setTimeout(function(){ openDetailReview(REVIEW_STATE.projectId, '', ''); }, 500);
-      });
-  }
-}
-
-function escapeHtml(s) {
-  return String(s || '').replace(/[&<>"']/g, function(c) {
-    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
-  });
-}
-
 // ── INIT (overridden by auth above) ─────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
   loadProjects();
@@ -1802,17 +1577,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- Detail Review Modal -->
-<div class="modal-overlay" id="detailReviewModal">
-  <div class="modal-box" style="width:720px;max-width:95%">
-    <div class="modal-head">
-      <div class="modal-title"><svg viewBox="0 0 24 24" style="stroke:var(--orange)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>Review Detail Sheets<span id="drTitle" style="font-weight:400;color:var(--txt3);font-size:14px;margin-left:10px"></span></div>
-      <button class="modal-x" onclick="closeModal('detailReviewModal')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
-    <div class="modal-body" id="drBody" style="padding:0;max-height:70vh;overflow:auto"></div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="closeModal('detailReviewModal')">Close</button>
-    </div>
   </div>
 </div>
 </body>
