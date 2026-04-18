@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<!-- BUILD MARKER: revision-system-v5  (search for js-revision to confirm) -->
-<!-- Added: Upload Revision modal, Regenerate Field App button, revision label shown in meta row -->
+<!-- BUILD MARKER: auth-fix-v1  (search for 'session.user.id' to confirm) -->
+<!-- Dashboard now uses Supabase auth user ID as fabricator_id, not a random localStorage value. -->
+<!-- Also includes: revision-system-v5 (Upload Revision modal, Regenerate button) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -820,11 +821,19 @@ button{cursor:pointer;font-family:var(--sans)}
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────
 var API = 'https://steelcaller-api.onrender.com';
-var FAB_ID = (function() {
-  var id = localStorage.getItem('sc_fab_id');
-  if (!id) { id = 'fab-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,7); localStorage.setItem('sc_fab_id', id); }
-  return id;
-})();
+// ── FABRICATOR ID ────────────────────────────────────────────────────────
+// Set by the Supabase auth handler below once the session loads. The
+// auth user's UUID is used as the fabricator_id so projects follow the
+// account across devices. Projects created before this file shipped
+// were tied to a random per-browser localStorage id — those will no
+// longer be visible once you re-log in (expected, per migration plan).
+//
+// loadProjects() is guarded on this being set.
+var FAB_ID = null;
+
+// One-time cleanup: kill the old per-browser random ID if present. We
+// don't use it anymore. Harmless if already absent.
+try { localStorage.removeItem('sc_fab_id'); } catch(e) {}
 
 // ── NAVIGATION ────────────────────────────────────────────────────────────
 var views = { projects: 'v-projects', 'new-project': 'v-new-project', account: 'v-account', help: 'v-help', 'export-guides': 'v-export-guides', contact: 'v-contact' };
@@ -1009,6 +1018,11 @@ function pollStatus(id, attempts) {
 function loadProjects() {
   var grid = document.getElementById('projectsGrid');
   if (!grid) return;
+
+  // Auth session sets FAB_ID. If it's not set yet, don't hit the API with
+  // "null" as a fabricator_id — just wait. The auth handler re-calls
+  // loadProjects() once the session is available.
+  if (!FAB_ID) return;
 
   fetch(API + '/api/fabricators/' + FAB_ID + '/projects')
     .then(function(r) { return r.json(); })
@@ -1752,23 +1766,34 @@ function updateSidebarUser(user) {
   if (em) em.value = email     || '';
 }
 
-// Check auth on load — redirect to login if not signed in
+// Check auth on load — redirect to login if not signed in. Sets FAB_ID
+// from the session user so projects are scoped to the account, not the
+// browser.
 document.addEventListener('DOMContentLoaded', function() {
-  if (!sbClient) return;
+  if (!sbClient) {
+    // Supabase client failed to load — send them to login to sort it out
+    window.location.href = '/login.html';
+    return;
+  }
   sbClient.auth.getSession().then(function(res) {
     var session = res.data && res.data.session;
-    if (!session) {
+    if (!session || !session.user) {
       // Not logged in — redirect to login
       window.location.href = '/login.html';
       return;
     }
+    // Use the auth user's stable UUID as the fabricator_id. This is the
+    // same on every device because it lives in Supabase, not localStorage.
+    FAB_ID = session.user.id;
     updateSidebarUser(session.user);
     loadProjects();
+    loadAccount();
   });
 
   // Listen for auth changes (logout etc.)
   sbClient.auth.onAuthStateChange(function(event, session) {
     if (event === 'SIGNED_OUT' || !session) {
+      FAB_ID = null;
       window.location.href = '/login.html';
     }
   });
@@ -1776,6 +1801,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ── LOGOUT ────────────────────────────────────────────────────────────────
 function logout() {
+  // Clean up any legacy per-browser ID and local caches
+  try {
+    localStorage.removeItem('sc_fab_id');
+    localStorage.removeItem('sc_account');
+  } catch(e) {}
   if (sbClient) {
     sbClient.auth.signOut().then(function() {
       window.location.href = '/login.html';
@@ -1784,12 +1814,6 @@ function logout() {
     window.location.href = '/login.html';
   }
 }
-
-// ── INIT (overridden by auth above) ─────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
-  loadProjects();
-  loadAccount();
-});
 </script>
 
   </div>
