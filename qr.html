@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<!-- BUILD MARKER: qr-landing-v1 -->
+<!--
+  SteelCaller QR Code Landing Page
+  ─────────────────────────────────────────────────────────────────────────
+  This is what someone sees when they scan a QR code on a shop/erection
+  drawing. Mobile-first, single-screen, no scrolling required on a phone.
+  Goal: explain in 10 seconds what the app is, then route to the main site.
+
+  URL to encode into QR codes:
+      https://steelcaller.com/qr.html
+
+  Deploy: drop this file into /steelcaller-web-main/ as qr.html. Vercel
+  will serve it at steelcaller.com/qr.html automatically.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0B1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>SteelCaller — Field app for structural steel</title>
+<meta name="description" content="The field app every ironworker, fabricator, and GC wants on every steel job. Every piece mark, bolt spec, and revision on every phone.">
+
+<!-- Open Graph / link preview when someone texts this link -->
+<meta property="og:title" content="SteelCaller — Every piece mark on every phone">
+<meta property="og:description" content="Field app for structural steel. Voice lookup, revision alerts, bilingual EN/ES. $249 per project.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://steelcaller.com/qr">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #0B1220;
+  color: #fff;
+  font-family: 'Inter Tight', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 20px 22px calc(20px + env(safe-area-inset-bottom, 0));
+  background:
+    radial-gradient(1200px 600px at 50% -200px, rgba(255,107,0,0.15), transparent 60%),
+    #0B1220;
+}
+
+/* ─── TOP: LOGO ─── */
+.top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.logo-mark {
+  width: 48px;
+  height: 48px;
+  background: #FF6B00;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 6px 20px rgba(255,107,0,0.35);
+}
+.logo-mark svg {
+  width: 28px;
+  height: 28px;
+}
+.logo-text {
+  font-family: 'Archivo', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.logo-text span { color: #FF6B00; }
+.logo-sub {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+/* ─── HERO HEADLINE ─── */
+.hero {
+  margin-bottom: 18px;
+}
+.hero-label {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 800;
+  color: #FF6B00;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border: 1.5px solid rgba(255,107,0,0.35);
+  border-radius: 6px;
+  background: rgba(255,107,0,0.08);
+  margin-bottom: 12px;
+}
+.hero h1 {
+  font-family: 'Archivo', sans-serif;
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.hero h1 .orange { color: #FF6B00; }
+.hero-sub {
+  font-size: 15px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+/* ─── BULLETS ─── */
+.bullets {
+  margin: 18px 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.bullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.bullet-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255,107,0,0.12);
+  border: 1.5px solid rgba(255,107,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.bullet-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke: #FF6B00;
+  stroke-width: 2.4;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.bullet-text {
+  flex: 1;
+  padding-top: 4px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: rgba(255,255,255,0.92);
+  font-weight: 500;
+}
+.bullet-text strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ─── CTA BUTTON ─── */
+.cta-wrap {
+  margin-top: auto;
+  padding-top: 20px;
+}
+.cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 18px 24px;
+  background: #FF6B00;
+  color: #fff;
+  font-family: 'Archivo', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(255,107,0,0.4);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.cta:active {
+  transform: scale(0.97);
+  box-shadow: 0 4px 14px rgba(255,107,0,0.3);
+}
+.cta svg {
+  width: 20px;
+  height: 20px;
+  stroke: #fff;
+  stroke-width: 2.5;
+  fill: none;
+}
+.cta-note {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 14px;
+  line-height: 1.4;
+}
+.cta-note a {
+  color: rgba(255,107,0,0.8);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* ─── TABLET / DESKTOP (if someone scans on an iPad / laptop) ─── */
+@media (min-width: 640px) {
+  body {
+    padding: 40px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .hero h1 { font-size: 38px; }
+}
+
+/* Prevent pull-to-refresh on mobile */
+html { overscroll-behavior-y: contain; }
+</style>
+</head>
+
+<body>
+
+  <!-- ═══ LOGO LOCKUP ═══ -->
+  <div class="top">
+    <div class="logo-mark">
+      <svg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2"  y="2"  width="26" height="7"  rx="1.5" fill="white"/>
+        <rect x="11" y="9"  width="8"  height="12" rx=".8"  fill="white"/>
+        <rect x="2"  y="21" width="26" height="7"  rx="1.5" fill="white"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">Steel<span>Caller</span></div>
+      <div class="logo-sub">Every Mark · Every Location</div>
+    </div>
+  </div>
+
+  <!-- ═══ HEADLINE ═══ -->
+  <div class="hero">
+    <h1>Every piece mark, <span class="orange">in every pocket.</span></h1>
+    <div class="hero-sub">The field app your steel crew wants on every job.</div>
+  </div>
+
+  <!-- ═══ BULLET POINTS ═══ -->
+  <div class="bullets">
+
+    <div class="bullet">
+      <div class="bullet-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+      </div>
+      <div class="bullet-text">
+        <strong>Look up any piece mark by text or voice.</strong> Type or say "Call" then the mark &mdash; see and hear section size, crane pick weight, bolt type and sizes, and piece location.
+      </div>
+    </div>
+
+    <div class="bullet">
+      <div class="bullet-icon">
+        <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="bullet-text">
+        <strong>Revisions uploaded, alerts sent out.</strong> The fabricator drops in the new files &mdash; every phone on the job sees what changed.
+      </div>
+    </div>
+
+    <div class="bullet">
+      <div class="bullet-icon">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+      </div>
+      <div class="bullet-text">
+        <strong>Every detail and erection sheet on the phone.</strong> Tap a piece, pinch-zoom the drawing. No paper.
+      </div>
+    </div>
+
+    <div class="bullet">
+      <div class="bullet-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg>
+      </div>
+      <div class="bullet-text">
+        <strong>English &amp; Spanish, one tap.</strong> Every label, every voice response. For every crew.
+      </div>
+    </div>
+
+    <div class="bullet">
+      <div class="bullet-icon">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      </div>
+      <div class="bullet-text">
+        <strong>$249 per project.</strong> Unlimited users. No per-seat fees. No software to install.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ SINGLE CTA ═══ -->
+  <div class="cta-wrap">
+    <a href="https://steelcaller.com" class="cta">
+      Learn More
+      <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+    </a>
+    <div class="cta-note">
+      steelcaller.com · <a href="mailto:support@steelcaller.com">support@steelcaller.com</a>
+    </div>
+  </div>
+
+</body>
+</html>
