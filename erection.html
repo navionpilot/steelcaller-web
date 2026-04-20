@@ -117,12 +117,39 @@ body{font-family:var(--serif);background:var(--off);color:var(--txt);min-height:
 .toast.ok{background:var(--green)}
 .toast.err{background:var(--red)}
 
+/* Sequence picker — above the dropzone */
+.seq-picker{display:flex;align-items:center;gap:12px;margin:0 0 14px 0;padding:12px 14px;background:var(--off);border:1px solid var(--border);border-radius:10px;flex-wrap:wrap}
+.seq-picker-lbl{font-family:var(--sf);font-size:15px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.3px}
+.seq-picker-select{flex:0 1 220px;padding:9px 12px;border:1.5px solid var(--border2);border-radius:8px;font-size:14px;font-family:inherit;background:var(--white);color:var(--navy);font-weight:600}
+.seq-picker-input{flex:0 1 180px;padding:9px 12px;border:1.5px solid var(--border2);border-radius:8px;font-size:14px;font-family:var(--mo);background:var(--white);color:var(--navy);display:none}
+.seq-picker-input.on{display:block}
+.seq-picker-hint{font-size:12px;color:var(--txt3);font-weight:500}
+
+/* Filter pills — above the sheet list */
+.seq-filter{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.seq-pill{padding:6px 14px;border:1.5px solid var(--border);background:var(--white);color:var(--txt2);border-radius:18px;font-family:var(--sf);font-size:13px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.3px;transition:all .1s}
+.seq-pill:hover{background:var(--off);border-color:var(--border2)}
+.seq-pill.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.seq-pill-count{font-family:var(--mo);font-size:11px;margin-left:5px;color:inherit;opacity:.7}
+
+/* Group headers when "All" is selected */
+.seq-group-head{font-family:var(--sf);font-size:17px;font-weight:800;color:var(--navy);margin:18px 0 8px;padding:4px 10px;background:var(--blue-bg);border-left:3px solid var(--blue);border-radius:4px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+.seq-group-head:first-child{margin-top:0}
+.seq-group-head .c{font-family:var(--mo);font-size:13px;color:var(--blue);font-weight:600}
+.seq-group-head.unassigned{background:var(--off);border-left-color:var(--txt3)}
+.seq-group-head.unassigned .c{color:var(--txt3)}
+
+/* Small "Seq X" badge on each sheet card */
+.sheet-seq-badge{display:inline-flex;align-items:center;gap:4px;background:var(--blue-bg);color:var(--blue);font-family:var(--mo);font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:8px;text-transform:uppercase;letter-spacing:.3px}
+
 @media (max-width:800px){
   .stats{grid-template-columns:1fr 1fr}
   .page-title{font-size:28px}
   .container{padding:20px 16px 40px}
   .sheet-meta{padding-left:0}
   .sheet-err-msg{padding-left:0}
+  .seq-picker{flex-direction:column;align-items:stretch}
+  .seq-picker-select,.seq-picker-input{flex:1}
 }
 </style>
 </head>
@@ -183,6 +210,16 @@ body{font-family:var(--serif);background:var(--off);color:var(--txt);min-height:
     </div>
     <div class="section-sub">Drop in one combined PDF, or select multiple individual PDF files at once. Each sheet is processed with OpenCV for grid bubble detection + the vision API for label assignment (~3&cent; per sheet).</div>
 
+    <!-- Sequence picker (optional) -->
+    <div class="seq-picker">
+      <div class="seq-picker-lbl">Sequence</div>
+      <select class="seq-picker-select" id="seqSelect" onchange="onSeqChange()">
+        <option value="">Unassigned</option>
+      </select>
+      <input type="text" class="seq-picker-input" id="seqInput" placeholder="Type sequence name" maxlength="20">
+      <div class="seq-picker-hint">Optional &mdash; tag these uploads so you can filter by sequence later.</div>
+    </div>
+
     <input type="file" id="fileInput" accept=".pdf" multiple style="display:none">
     <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
       <div class="dz-icon">
@@ -201,9 +238,17 @@ body{font-family:var(--serif);background:var(--off);color:var(--txt);min-height:
 
   <!-- Uploaded sheets -->
   <div class="section" id="sheetsSection">
-    <div class="section-head">
+    <div class="section-head" style="display:flex;justify-content:space-between;align-items:center">
       <div class="section-h">Uploaded Sheets</div>
+      <button id="deleteAllBtn" onclick="deleteAllSheets()" style="display:none;background:#fff;border:1.5px solid var(--red);color:var(--red);border-radius:8px;padding:8px 14px;font-family:var(--serif);font-size:13px;font-weight:700;cursor:pointer;align-items:center;gap:6px">
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6"/></svg>
+        Delete All
+      </button>
     </div>
+
+    <!-- Filter pills — hidden until sequences exist -->
+    <div class="seq-filter" id="seqFilter" style="display:none"></div>
+
     <div class="sheet-list" id="sheetList">
       <div class="empty">No erection sheets uploaded yet.</div>
     </div>
@@ -226,10 +271,12 @@ if (!PROJECT_ID) {
 }
 
 var STATE = {
-  sheets:     [],
-  stats:      null,
-  uploading:  false,
-  pollTimer:  null,
+  sheets:         [],
+  stats:          null,
+  uploading:      false,
+  pollTimer:      null,
+  sequences:      [],    // [{sequence, piece_count}] from IFC + custom
+  currentFilter:  'all', // 'all' or a specific sequence string, or '__unassigned__'
 };
 
 // ── Toast ─────────────────────────────────────────────────────────────────
@@ -240,6 +287,61 @@ function toast(msg, type) {
   el.className = 'toast on' + (type ? ' ' + type : '');
   clearTimeout(TOAST_T);
   TOAST_T = setTimeout(function(){ el.classList.remove('on'); }, 4000);
+}
+
+// ── Sequences ─────────────────────────────────────────────────────────────
+function loadSequences() {
+  return fetch(API + '/api/projects/' + PROJECT_ID + '/sequences')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if (!d) return;
+      var list = (d.ifc_sequences || []).concat(d.custom_sequences || []);
+      // Dedupe by sequence label
+      var seen = {};
+      STATE.sequences = list.filter(function(s){
+        if (seen[s.sequence]) return false;
+        seen[s.sequence] = 1;
+        return true;
+      });
+      renderSeqSelect();
+    })
+    .catch(function(){});
+}
+
+function renderSeqSelect() {
+  var sel = document.getElementById('seqSelect');
+  if (!sel) return;
+  var html = '<option value="">Unassigned</option>';
+  STATE.sequences.forEach(function(s){
+    var pc = s.piece_count ? (' — ' + s.piece_count + ' pieces') : '';
+    html += '<option value="' + escapeAttr(s.sequence) + '">Seq ' + escapeHtml(s.sequence) + pc + '</option>';
+  });
+  html += '<option value="__other__">Other (type custom)...</option>';
+  sel.innerHTML = html;
+}
+
+function onSeqChange() {
+  var sel = document.getElementById('seqSelect');
+  var inp = document.getElementById('seqInput');
+  if (!sel || !inp) return;
+  if (sel.value === '__other__') {
+    inp.classList.add('on');
+    inp.focus();
+  } else {
+    inp.classList.remove('on');
+    inp.value = '';
+  }
+}
+
+// Returns the sequence string the user currently has selected (may be "").
+function currentUploadSequence() {
+  var sel = document.getElementById('seqSelect');
+  var inp = document.getElementById('seqInput');
+  if (!sel) return '';
+  if (sel.value === '__other__') {
+    return (inp && inp.value ? inp.value.trim() : '');
+  }
+  return sel.value || '';
 }
 
 // ── Fetch project info for label ──────────────────────────────────────────
@@ -309,58 +411,207 @@ function renderStatsBasic(d) {
   document.getElementById('stErrors').textContent = d.error_count || 0;
 }
 
+// ── Render filter pills ───────────────────────────────────────────────────
+// Pills reflect the sequences actually present in uploaded sheets, plus
+// an "All" pill and (if any sheets are untagged) an "Unassigned" pill.
+function renderSeqFilter() {
+  var el = document.getElementById('seqFilter');
+  if (!el) return;
+  if (!STATE.sheets.length) { el.style.display = 'none'; return; }
+
+  // Count sheets per sequence
+  var counts = {};
+  var unassigned = 0;
+  STATE.sheets.forEach(function(s){
+    var seq = (s.user_sequence || '').trim();
+    if (seq) counts[seq] = (counts[seq] || 0) + 1;
+    else unassigned++;
+  });
+  var seqs = Object.keys(counts).sort(seqSortCmp);
+
+  // Only show filter bar if at least one sheet has a sequence tag
+  if (!seqs.length && !unassigned) { el.style.display = 'none'; return; }
+  if (!seqs.length) { el.style.display = 'none'; return; }
+
+  el.style.display = 'flex';
+  var html = '';
+  var all = STATE.sheets.length;
+  html += pillHtml('all', 'All', all);
+  seqs.forEach(function(s){ html += pillHtml(s, 'Seq ' + s, counts[s]); });
+  if (unassigned) html += pillHtml('__unassigned__', 'Unassigned', unassigned);
+  el.innerHTML = html;
+
+  // Wire click handlers
+  el.querySelectorAll('.seq-pill').forEach(function(p){
+    p.addEventListener('click', function(){
+      STATE.currentFilter = this.getAttribute('data-f');
+      renderSeqFilter();
+      renderSheets();
+    });
+  });
+}
+
+function pillHtml(value, label, count) {
+  var on = (STATE.currentFilter === value) ? ' on' : '';
+  return '<button class="seq-pill' + on + '" data-f="' + escapeAttr(value) + '">'
+       + escapeHtml(label)
+       + '<span class="seq-pill-count">' + count + '</span>'
+       + '</button>';
+}
+
+function seqSortCmp(a, b) {
+  // Numeric sort first, then lexical
+  var an = parseFloat(a), bn = parseFloat(b);
+  if (!isNaN(an) && !isNaN(bn)) return an - bn;
+  if (!isNaN(an)) return -1;
+  if (!isNaN(bn)) return 1;
+  return a.localeCompare(b);
+}
+
 // ── Render sheet list ─────────────────────────────────────────────────────
 function renderSheets() {
   var container = document.getElementById('sheetList');
+  var daBtn = document.getElementById('deleteAllBtn');
   if (!STATE.sheets.length) {
     container.innerHTML = '<div class="empty">No erection sheets uploaded yet.</div>';
+    if (daBtn) daBtn.style.display = 'none';
+    renderSeqFilter();
     return;
   }
+  if (daBtn) daBtn.style.display = 'inline-flex';
+  renderSeqFilter();
+
+  // Filter sheets based on currentFilter
+  var filtered;
+  if (STATE.currentFilter === 'all' || !STATE.currentFilter) {
+    filtered = STATE.sheets;
+  } else if (STATE.currentFilter === '__unassigned__') {
+    filtered = STATE.sheets.filter(function(s){ return !(s.user_sequence||'').trim(); });
+  } else {
+    filtered = STATE.sheets.filter(function(s){ return (s.user_sequence||'').trim() === STATE.currentFilter; });
+  }
+
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty">No sheets match this filter.</div>';
+    return;
+  }
+
+  // Group by sequence ONLY when "All" is selected and there's variety
+  var useGroups = (STATE.currentFilter === 'all' || !STATE.currentFilter);
   var html = '';
-  STATE.sheets.forEach(function(s) {
-    var errCls = s.error ? ' err' : '';
-    var ttl = '';
-    if (s.sheet_title) {
-      ttl = escapeHtml(s.sheet_title);
-      if (s.segment) ttl += ' <span class="seg">&middot; SEG ' + escapeHtml(s.segment) + '</span>';
-    } else if (s.error) {
-      ttl = '<span style="color:var(--red)">Extraction failed</span>';
-    } else {
-      ttl = '<span style="color:var(--txt3)">No title extracted</span>';
-    }
 
-    html += '<div class="sheet-card' + errCls + '">';
-    html +=   '<div class="sheet-head">';
-    html +=     '<div class="sheet-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div>';
-    html +=     '<div class="sheet-title-block">';
-    html +=       '<div class="sheet-name">' + escapeHtml(s.filename) + '</div>';
-    html +=       '<div class="sheet-ttl">' + ttl + '</div>';
-    html +=     '</div>';
-    html +=     '<div class="sheet-actions">';
-    if (s.url) {
-      html +=     '<a class="act-btn" href="' + escapeAttr(s.url) + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>View PDF</a>';
-    }
-    html +=       '<button class="act-btn" onclick="reextract(\'' + escapeAttr(s.filename) + '\')"><svg viewBox="0 0 24 24"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Re-extract</button>';
-    html +=       '<button class="act-btn del" onclick="deleteSheet(\'' + escapeAttr(s.filename) + '\')"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6"/></svg>Delete</button>';
-    html +=     '</div>';
-    html +=   '</div>';
+  if (useGroups) {
+    // Bucket by sequence
+    var buckets = {}; // seq -> [sheets]
+    filtered.forEach(function(s){
+      var k = (s.user_sequence || '').trim() || '__unassigned__';
+      (buckets[k] = buckets[k] || []).push(s);
+    });
+    var keys = Object.keys(buckets).filter(function(k){ return k !== '__unassigned__'; });
+    keys.sort(seqSortCmp);
+    if (buckets['__unassigned__']) keys.push('__unassigned__');
 
-    if (!s.error) {
-      html += '<div class="sheet-meta">';
-      if (s.primary_elevation) {
-        html += '<div class="meta-item">El.&nbsp;<b>' + escapeHtml(s.primary_elevation) + '</b></div>';
-      }
-      html += '<div class="meta-item">Grids&nbsp;<span class="pill">' + (s.col_count||0) + ' col &middot; ' + (s.row_count||0) + ' row</span></div>';
-      if (s.match_line_count) {
-        html += '<div class="meta-item">Match lines&nbsp;<b>' + s.match_line_count + '</b></div>';
-      }
-      html += '</div>';
+    // If only one group, skip headers
+    if (keys.length <= 1) {
+      filtered.forEach(function(s){ html += sheetCardHtml(s); });
     } else {
-      html += '<div class="sheet-err-msg">' + escapeHtml(s.error) + '</div>';
+      keys.forEach(function(k){
+        var isUnassigned = (k === '__unassigned__');
+        var lbl = isUnassigned ? 'Unassigned' : ('Sequence ' + k);
+        var cls = isUnassigned ? ' unassigned' : '';
+        html += '<div class="seq-group-head' + cls + '">'
+             + escapeHtml(lbl)
+             + ' <span class="c">(' + buckets[k].length + ')</span>'
+             + '</div>';
+        buckets[k].forEach(function(s){ html += sheetCardHtml(s); });
+      });
+    }
+  } else {
+    // Flat list, filtered to one sequence
+    filtered.forEach(function(s){ html += sheetCardHtml(s); });
+  }
+
+  container.innerHTML = html;
+}
+
+// Build one sheet card's HTML (extracted from old renderSheets)
+function sheetCardHtml(s) {
+  var errCls = s.error ? ' err' : '';
+  var ttl = '';
+  if (s.sheet_title) {
+    ttl = escapeHtml(s.sheet_title);
+    if (s.segment) ttl += ' <span class="seg">&middot; SEG ' + escapeHtml(s.segment) + '</span>';
+  } else if (s.error) {
+    ttl = '<span style="color:var(--red)">Extraction failed</span>';
+  } else {
+    ttl = '<span style="color:var(--txt3)">No title extracted</span>';
+  }
+  var seqBadge = '';
+  if (s.user_sequence) {
+    seqBadge = '<span class="sheet-seq-badge">Seq ' + escapeHtml(s.user_sequence) + '</span>';
+  }
+
+  var html = '<div class="sheet-card' + errCls + '">';
+  html +=   '<div class="sheet-head">';
+  html +=     '<div class="sheet-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div>';
+  html +=     '<div class="sheet-title-block">';
+  html +=       '<div class="sheet-name">' + escapeHtml(s.filename) + seqBadge + '</div>';
+  html +=       '<div class="sheet-ttl">' + ttl + '</div>';
+  html +=     '</div>';
+  html +=     '<div class="sheet-actions">';
+  if (s.url) {
+    html +=     '<a class="act-btn" href="' + escapeAttr(s.url) + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>View PDF</a>';
+  }
+  html +=       '<button class="act-btn" onclick="retagSheet(\'' + escapeAttr(s.filename) + '\')" title="Change sequence tag"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Seq</button>';
+  html +=       '<button class="act-btn" onclick="reextract(\'' + escapeAttr(s.filename) + '\')"><svg viewBox="0 0 24 24"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Re-extract</button>';
+  html +=       '<button class="act-btn del" onclick="deleteSheet(\'' + escapeAttr(s.filename) + '\')"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6"/></svg>Delete</button>';
+  html +=     '</div>';
+  html +=   '</div>';
+
+  if (!s.error) {
+    html += '<div class="sheet-meta">';
+    if (s.primary_elevation) {
+      html += '<div class="meta-item">El.&nbsp;<b>' + escapeHtml(s.primary_elevation) + '</b></div>';
+    }
+    html += '<div class="meta-item">Grids&nbsp;<span class="pill">' + (s.col_count||0) + ' col &middot; ' + (s.row_count||0) + ' row</span></div>';
+    if (s.match_line_count) {
+      html += '<div class="meta-item">Match lines&nbsp;<b>' + s.match_line_count + '</b></div>';
     }
     html += '</div>';
-  });
-  container.innerHTML = html;
+  } else {
+    html += '<div class="sheet-err-msg">' + escapeHtml(s.error) + '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+// Change a single sheet's sequence tag
+function retagSheet(filename) {
+  var current = '';
+  for (var i = 0; i < STATE.sheets.length; i++) {
+    if (STATE.sheets[i].filename === filename) {
+      current = STATE.sheets[i].user_sequence || '';
+      break;
+    }
+  }
+  var newSeq = prompt(
+    'Set sequence for ' + filename + '\n\nLeave empty to mark as Unassigned.',
+    current
+  );
+  if (newSeq === null) return;  // user cancelled
+  newSeq = newSeq.trim();
+
+  var fd = new FormData();
+  fd.append('sequence', newSeq);
+  fetch(API + '/api/projects/' + PROJECT_ID + '/erection/' + encodeURIComponent(filename) + '/sequence', {
+    method: 'POST', body: fd,
+  })
+    .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(){
+      toast(newSeq ? ('Tagged as Seq ' + newSeq) : 'Sequence cleared', 'ok');
+      loadSheets();
+    })
+    .catch(function(e){ toast('Retag failed: ' + e.message, 'err'); });
 }
 
 // ── Utility ───────────────────────────────────────────────────────────────
@@ -420,6 +671,8 @@ function uploadBatches(batches, i, done) {
 
   var fd = new FormData();
   batch.forEach(function(f) { fd.append('files', f); });
+  var seq = currentUploadSequence();
+  if (seq) fd.append('sequence', seq);
 
   fetch(API + '/api/projects/' + PROJECT_ID + '/erection/upload', {
     method: 'POST', body: fd,
@@ -484,6 +737,37 @@ function deleteSheet(filename) {
     .catch(function(e){ toast('Delete failed: ' + e.message, 'err'); });
 }
 
+function deleteAllSheets() {
+  var n = STATE.sheets.length;
+  if (!n) return;
+  var msg = 'Delete all ' + n + ' erection sheet' + (n === 1 ? '' : 's') + '?'
+          + '\n\nThis will remove every PDF and all extraction data for this project. Cannot be undone.';
+  if (!confirm(msg)) return;
+
+  var btn = document.getElementById('deleteAllBtn');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+
+  fetch(API + '/api/projects/' + PROJECT_ID + '/erection', {
+    method: 'DELETE',
+  })
+    .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(d){
+      var deleted = (d && d.deleted_count) || 0;
+      var total   = (d && d.total_files)   || n;
+      if (deleted === total) {
+        toast('Deleted all ' + deleted + ' sheets', 'ok');
+      } else {
+        toast('Deleted ' + deleted + ' of ' + total + ' sheets (some failed)', 'err');
+      }
+      loadSheets();
+      loadStats();
+    })
+    .catch(function(e){ toast('Delete all failed: ' + e.message, 'err'); })
+    .finally(function(){
+      if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    });
+}
+
 // ── Wire up dropzone + input ──────────────────────────────────────────────
 (function(){
   var dz = document.getElementById('dropzone');
@@ -502,6 +786,7 @@ function deleteSheet(filename) {
 
 // ── Initial load ──────────────────────────────────────────────────────────
 loadProjectLabel();
+loadSequences();
 loadSheets().then(function(){
   if (STATE.status === 'processing') startPolling();
 });
