@@ -54,6 +54,17 @@ body{font-family:var(--serif);background:var(--off);color:var(--txt);min-height:
 .banner.error{background:var(--red-bg);color:#8A2018;border:1px solid #F8C8C4}
 .banner.error svg{stroke:var(--red)}
 .banner-spinner{width:18px;height:18px;border:2.5px solid rgba(255,159,10,.3);border-top-color:var(--amber);border-radius:50%;animation:spin 1s linear infinite}
+
+/* In-banner action buttons (Stop, Resume). Primary = amber/green outline. */
+.banner-btn{flex-shrink:0;background:#fff;border:1.5px solid currentColor;color:inherit;border-radius:8px;padding:8px 14px;font-family:var(--sf);font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.banner-btn:hover{background:rgba(255,255,255,0.6)}
+.banner-btn:disabled{opacity:0.5;cursor:not-allowed}
+.banner-btn svg{width:14px;height:14px;stroke-width:2.5;fill:none;stroke:currentColor}
+
+/* Small destructive escape-hatch link shown under the banner subtext.
+   For when the worker is stuck and graceful cancel can't reach it. */
+.banner-reset-link{display:inline-block;margin-top:8px;font-size:12px;color:var(--red);text-decoration:underline;cursor:pointer;font-weight:600;background:none;border:none;padding:0;font-family:var(--serif)}
+.banner-reset-link:hover{color:#8A2018}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 .section{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px}
@@ -429,6 +440,20 @@ function loadStats() {
 function renderBanner(status) {
   var el = document.getElementById('statusBanner');
 
+  // The number of sheets still waiting to extract. Drives the Resume banner
+  // when status=ready but pending is non-empty (i.e. user stopped partway).
+  var pendingCount = 0;
+  (STATE.sheets || []).forEach(function(s){
+    if (s.pending && !s.sheet_type && !s.error) pendingCount++;
+  });
+
+  // Reusable snippet for the force-reset escape hatch. Shown during
+  // processing/canceling so the user always has a way out if the worker
+  // dies or graceful cancel can't reach it.
+  var resetLinkHtml =
+    '<div><button class="banner-reset-link" onclick="forceResetExtraction()">' +
+    'Force reset (use if stuck)</button></div>';
+
   // Server-unreachable overlay — takes priority over any other state.
   // Indicates the backend is flapping (e.g. OOM restart, deploy in progress).
   if (STATE.pollFailStreak >= POLL_FAIL_THRESHOLD) {
@@ -438,9 +463,12 @@ function renderBanner(status) {
       '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/>' +
       '<line x1="12" y1="8" x2="12" y2="12"/>' +
       '<line x1="12" y1="16" x2="12" y2="16"/></svg>' +
-      '<span>Server not responding (' + STATE.pollFailStreak + ' failed checks). ' +
-      'Extraction may have stalled &mdash; check the API logs. ' +
-      'This page will resume automatically when the server is reachable again.</span>';
+      '<div style="flex:1;min-width:0">' +
+        '<div>Server not responding (' + STATE.pollFailStreak + ' failed checks). ' +
+        'Extraction may have stalled &mdash; check the API logs. ' +
+        'This page will resume automatically when the server is reachable again.</div>' +
+        resetLinkHtml +
+      '</div>';
     return;
   }
 
@@ -475,7 +503,29 @@ function renderBanner(status) {
           'Processing one sheet at a time, roughly 15-20 seconds per sheet. ' +
           'You can leave this page and come back &mdash; extraction continues in the background.' +
         '</div>' +
-      '</div>';
+        resetLinkHtml +
+      '</div>' +
+      '<button class="banner-btn" onclick="stopExtraction()" title="Stop after the current sheet finishes">' +
+        '<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>' +
+        'Stop' +
+      '</button>';
+  } else if (status === 'canceling') {
+    // Brief window between user clicking Stop and the worker reaching its
+    // next checkpoint. Shown as amber/processing style but without progress
+    // bar; reset link stays visible in case the worker is truly dead.
+    el.className = 'banner processing';
+    el.style.display = 'flex';
+    el.innerHTML =
+      '<div class="banner-spinner"></div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-weight:600;margin-bottom:4px">Stopping extraction&hellip;</div>' +
+        '<div style="font-size:12px;color:var(--txt3)">' +
+          'The current sheet will finish, then extraction will halt. Unfinished ' +
+          'sheets stay in the queue so you can resume later.' +
+        '</div>' +
+        resetLinkHtml +
+      '</div>' +
+      '<button class="banner-btn" disabled>Stopping&hellip;</button>';
   } else if (status === 'uploading') {
     el.className = 'banner processing';
     el.style.display = 'flex';
@@ -483,7 +533,37 @@ function renderBanner(status) {
   } else if (status === 'error') {
     el.className = 'banner error';
     el.style.display = 'flex';
-    el.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg><span>Some sheets failed to process. See details below and use Re-extract on the affected sheets.</span>';
+    el.innerHTML =
+      '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/>' +
+      '<line x1="12" y1="8" x2="12" y2="12"/>' +
+      '<line x1="12" y1="16" x2="12" y2="16"/></svg>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div>Some sheets failed to process. See details below and use ' +
+        'Re-extract on the affected sheets.</div>' +
+        (pendingCount > 0 ? resetLinkHtml : '') +
+      '</div>';
+  } else if (status === 'ready' && pendingCount > 0) {
+    // Paused state — user stopped mid-extraction and there are still sheets
+    // in the pending queue. Offer Resume + the force reset escape hatch.
+    el.className = 'banner processing';
+    el.style.display = 'flex';
+    el.innerHTML =
+      '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/>' +
+      '<line x1="12" y1="12" x2="12" y2="8"/>' +
+      '<line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-weight:600;margin-bottom:4px">Extraction paused</div>' +
+        '<div style="font-size:12px;color:var(--txt3)">' +
+          pendingCount + ' sheet' + (pendingCount === 1 ? '' : 's') +
+          ' still in the queue. Click Resume to continue, or Force reset ' +
+          'to clear the queue and keep only the sheets already extracted.' +
+        '</div>' +
+        resetLinkHtml +
+      '</div>' +
+      '<button class="banner-btn" onclick="resumeExtraction()" title="Resume extracting pending sheets">' +
+        '<svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>' +
+        'Resume' +
+      '</button>';
   } else {
     el.style.display = 'none';
   }
@@ -893,15 +973,80 @@ function startPolling() {
   if (STATE.pollTimer) clearInterval(STATE.pollTimer);
   // 2s during active extraction = smooth progress bar without hammering the
   // server. When status flips to 'ready' or 'error', we stop polling.
+  // 'canceling' is an active-ish state (worker is winding down) so we keep
+  // polling to catch the transition to 'ready'.
   STATE.pollTimer = setInterval(function(){
     loadSheets().then(function(){
-      if (STATE.status !== 'processing' && STATE.status !== 'uploading') {
+      var s = STATE.status;
+      if (s !== 'processing' && s !== 'uploading' && s !== 'canceling') {
         clearInterval(STATE.pollTimer);
         STATE.pollTimer = null;
         loadStats();  // refresh placed count now extraction is done
       }
     });
   }, 2000);
+}
+
+// ── Extraction lifecycle controls (stop / resume / force reset) ───────────
+// These three buttons let the user manage a running extraction from the UI
+// instead of needing SQL or a Render restart.
+function stopExtraction() {
+  if (!confirm('Stop extraction?\n\nThe current sheet will finish, then ' +
+               'extraction will halt. Unfinished sheets stay in the queue ' +
+               'so you can resume later.')) return;
+  fetch(API + '/api/projects/' + PROJECT_ID + '/erection/cancel', {
+    method: 'POST',
+  })
+    .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(d){
+      if (d.cancelled) {
+        toast('Stopping — current sheet will finish first', 'ok');
+      } else {
+        // e.g. status wasn't "processing" anymore
+        toast(d.message || 'Nothing to stop', 'err');
+      }
+      // Refresh immediately so the banner flips to "Stopping..." without
+      // waiting for the next poll tick.
+      loadSheets();
+    })
+    .catch(function(e){ toast('Stop failed: ' + e.message, 'err'); });
+}
+
+function resumeExtraction() {
+  fetch(API + '/api/projects/' + PROJECT_ID + '/erection/start-extraction', {
+    method: 'POST',
+  })
+    .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(d){
+      toast('Resuming extraction — ' + (d.pending_count || 0) + ' sheet(s) left', 'ok');
+      startPolling();
+      loadSheets();
+    })
+    .catch(function(e){ toast('Resume failed: ' + e.message, 'err'); });
+}
+
+function forceResetExtraction() {
+  // Destructive escape hatch — only use when the worker is actually stuck.
+  // Make the confirm stern so users don't mash it by accident.
+  if (!confirm('Force reset extraction state?\n\n' +
+               'This clears the pending queue and flips the project status ' +
+               'back to "ready" regardless of what the backend worker is doing. ' +
+               'Use this ONLY if Stop is not working (e.g. the server crashed).\n\n' +
+               'Sheets that already extracted will be kept. Pending (un-extracted) ' +
+               'sheets will be removed from the queue.')) return;
+  fetch(API + '/api/projects/' + PROJECT_ID + '/erection/reset', {
+    method: 'POST',
+  })
+    .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(d){
+      toast('Reset done. ' + (d.pending_cleared || 0) + ' pending sheet(s) cleared.', 'ok');
+      // Stop any active polling — the extraction is no longer running.
+      if (STATE.pollTimer) { clearInterval(STATE.pollTimer); STATE.pollTimer = null; }
+      STATE.pollFailStreak = 0;  // user is taking action; drop any stale "server down" state
+      loadSheets();
+      loadStats();
+    })
+    .catch(function(e){ toast('Reset failed: ' + e.message, 'err'); });
 }
 
 // ── Actions on individual sheets ──────────────────────────────────────────
@@ -983,7 +1128,7 @@ function deleteAllSheets() {
 loadProjectLabel();
 loadSequences();
 loadSheets().then(function(){
-  if (STATE.status === 'processing' || STATE.status === 'uploading') startPolling();
+  if (STATE.status === 'processing' || STATE.status === 'uploading' || STATE.status === 'canceling') startPolling();
 });
 loadStats();
 </script>
