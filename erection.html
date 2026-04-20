@@ -261,7 +261,9 @@ body{font-family:var(--serif);background:var(--off);color:var(--txt);min-height:
 <script>
 // ── Config ────────────────────────────────────────────────────────────────
 var API = 'https://steelcaller-api.onrender.com';
-var BATCH_SIZE = 10;
+var BATCH_SIZE = 3;           // Smaller batches = more resilient to slow/spotty uploads
+var UPLOAD_TIMEOUT_MS = 120000; // 2 min timeout per batch
+var MAX_RETRIES = 2;          // Retry a failed batch up to 2 more times
 
 // ── State ─────────────────────────────────────────────────────────────────
 var PROJECT_ID = new URLSearchParams(location.search).get('project');
@@ -396,6 +398,10 @@ function renderBanner(status) {
     el.className = 'banner processing';
     el.style.display = 'flex';
     el.innerHTML = '<div class="banner-spinner"></div><span>Extracting metadata from uploaded sheets&hellip; this usually takes 5-15 seconds per sheet.</span>';
+  } else if (status === 'uploading') {
+    el.className = 'banner processing';
+    el.style.display = 'flex';
+    el.innerHTML = '<div class="banner-spinner"></div><span>Uploading\u2026 extraction will start automatically when all files are uploaded.</span>';
   } else if (status === 'error') {
     el.className = 'banner error';
     el.style.display = 'flex';
@@ -653,8 +659,27 @@ function handleFiles(files) {
     dz.classList.remove('uploading');
     document.getElementById('dzTitle').textContent = 'Drop erection PDFs here or click to browse';
     document.getElementById('dzSub').textContent = 'PDF files only';
-    toast('Upload complete — extracting in background', 'ok');
-    startPolling();
+
+    // All upload batches are done. Now kick off the extraction phase.
+    // Upload and extraction are intentionally decoupled so the Render
+    // worker isn't juggling both at once (previously caused batch 3+
+    // uploads to hang on 512 MB tier).
+    toast('Upload complete — starting extraction\u2026', 'ok');
+    fetch(API + '/api/projects/' + PROJECT_ID + '/erection/start-extraction', {
+      method: 'POST'
+    })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        if (d && d.pending_count) {
+          toast('Extracting ' + d.pending_count + ' sheet' + (d.pending_count === 1 ? '' : 's') + '\u2026', 'ok');
+        }
+        startPolling();
+      })
+      .catch(function(e){
+        console.error('Failed to start extraction:', e);
+        toast('Upload complete but extraction failed to start. Try refreshing.', 'err');
+        startPolling();
+      });
   });
 }
 
@@ -669,29 +694,64 @@ function uploadBatches(batches, i, done) {
                + ' (' + batch.length + ' file' + (batch.length>1?'s':'') + ')…</div>';
   wrap.appendChild(row);
 
+  uploadOneBatchWithRetry(batch, row, i+1, batches.length, 0, function(ok, data, err){
+    if (ok) {
+      row.className = 'progress-row done';
+      row.innerHTML = '<div class="progress-icon"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><polyline points="20,6 9,17 4,12"/></svg></div>'
+                   + '<div class="progress-msg">Batch ' + (i+1) + ' uploaded (' + (data.file_count || batch.length) + ' files)</div>';
+    } else {
+      row.className = 'progress-row failed';
+      row.innerHTML = '<div class="progress-icon"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div>'
+                   + '<div class="progress-msg">Batch ' + (i+1) + ' failed after retries: ' + (err && err.message ? err.message : 'unknown error') + '</div>';
+    }
+    // Continue to next batch regardless of success
+    uploadBatches(batches, i+1, done);
+  });
+}
+
+// Upload one batch with timeout + automatic retry on failure.
+function uploadOneBatchWithRetry(batch, row, batchNum, totalBatches, attempt, cb) {
   var fd = new FormData();
   batch.forEach(function(f) { fd.append('files', f); });
   var seq = currentUploadSequence();
   if (seq) fd.append('sequence', seq);
 
+  // AbortController lets us cancel a hanging upload after UPLOAD_TIMEOUT_MS.
+  // Without this, a stalled connection sits forever waiting on the browser.
+  var ctl = new AbortController();
+  var timeoutId = setTimeout(function(){ ctl.abort(); }, UPLOAD_TIMEOUT_MS);
+
+  if (attempt > 0) {
+    row.innerHTML = '<div class="progress-icon"><div class="progress-spinner"></div></div>'
+                 + '<div class="progress-msg">Retrying batch ' + batchNum + ' of ' + totalBatches
+                 + ' (attempt ' + (attempt+1) + ' of ' + (MAX_RETRIES+1) + ')…</div>';
+  }
+
   fetch(API + '/api/projects/' + PROJECT_ID + '/erection/upload', {
-    method: 'POST', body: fd,
+    method: 'POST',
+    body: fd,
+    signal: ctl.signal,
   })
     .then(function(r){
+      clearTimeout(timeoutId);
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
     })
-    .then(function(d){
-      row.className = 'progress-row done';
-      row.innerHTML = '<div class="progress-icon"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><polyline points="20,6 9,17 4,12"/></svg></div>'
-                   + '<div class="progress-msg">Batch ' + (i+1) + ' uploaded (' + d.file_count + ' files)</div>';
-      uploadBatches(batches, i+1, done);
-    })
-    .catch(function(e){
-      row.className = 'progress-row failed';
-      row.innerHTML = '<div class="progress-icon"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div>'
-                   + '<div class="progress-msg">Batch ' + (i+1) + ' failed: ' + e.message + '</div>';
-      uploadBatches(batches, i+1, done);
+    .then(function(d){ cb(true, d, null); })
+    .catch(function(err){
+      clearTimeout(timeoutId);
+      var isTimeout = err.name === 'AbortError';
+      var msg = isTimeout ? 'timeout after ' + (UPLOAD_TIMEOUT_MS/1000) + 's' : err.message;
+      console.warn('Batch ' + batchNum + ' attempt ' + (attempt+1) + ' failed: ' + msg);
+      if (attempt < MAX_RETRIES) {
+        // Retry after a short delay (backoff)
+        var delay = 1500 * (attempt + 1);
+        setTimeout(function(){
+          uploadOneBatchWithRetry(batch, row, batchNum, totalBatches, attempt+1, cb);
+        }, delay);
+      } else {
+        cb(false, null, new Error(msg));
+      }
     });
 }
 
@@ -788,7 +848,7 @@ function deleteAllSheets() {
 loadProjectLabel();
 loadSequences();
 loadSheets().then(function(){
-  if (STATE.status === 'processing') startPolling();
+  if (STATE.status === 'processing' || STATE.status === 'uploading') startPolling();
 });
 loadStats();
 </script>
