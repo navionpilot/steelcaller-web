@@ -278,87 +278,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 @media (max-width: 640px) { .section { padding: 72px 20px; } }
 
-/* ═══════════════════ VIDEO SECTION ═══════════════════ */
-.video-section {
-  background: var(--bg);
-  padding: 80px 28px 20px;
-}
-.video-inner {
-  max-width: 1080px; margin: 0 auto;
-  text-align: center;
-}
-.video-label {
-  display: inline-block;
-  font-family: var(--font-headline);
-  font-size: 12px; font-weight: 700;
-  color: var(--orange);
-  letter-spacing: .14em; text-transform: uppercase;
-  margin-bottom: 12px;
-}
-.video-h2 {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: clamp(30px, 3.5vw, 44px);
-  line-height: 1.08;
-  letter-spacing: -.025em;
-  color: var(--ink);
-  margin-bottom: 36px;
-}
-.video-h2 em { color: var(--orange); font-style: normal; }
-.video-wrap {
-  position: relative;
-  max-width: 960px; margin: 0 auto;
-  aspect-ratio: 16 / 9;
-  background: var(--navy-0);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 30px 80px rgba(11, 18, 32, .18), 0 0 0 1px rgba(0, 0, 0, .04);
-}
-.video-wrap video,
-.video-wrap iframe {
-  width: 100%; height: 100%;
-  border: none; display: block;
-}
-.video-poster {
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, var(--navy-0) 0%, var(--navy-2) 100%);
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column; gap: 20px;
-  cursor: pointer;
-  transition: opacity .3s;
-  z-index: 2;
-}
-.video-poster.hidden { opacity: 0; pointer-events: none; }
-.video-poster::before {
-  content: '';
-  position: absolute; inset: 0;
-  background-image:
-    radial-gradient(ellipse 600px 300px at 30% 30%, rgba(255, 107, 0, .16), transparent 70%),
-    radial-gradient(ellipse 600px 300px at 70% 70%, rgba(41, 182, 246, .08), transparent 70%);
-  pointer-events: none;
-}
-.video-play-btn {
-  width: 92px; height: 92px; border-radius: 50%;
-  background: var(--orange);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 10px 40px rgba(255, 107, 0, .5);
-  transition: transform .2s;
-  position: relative; z-index: 1;
-}
-.video-poster:hover .video-play-btn { transform: scale(1.08); }
-.video-play-btn svg { width: 36px; height: 36px; stroke: #fff; fill: #fff; margin-left: 4px; }
-.video-caption {
-  color: #fff; font-family: var(--font-display);
-  font-weight: 700; font-size: 18px;
-  letter-spacing: -.01em;
-  position: relative; z-index: 1;
-}
-.video-caption-sub {
-  color: rgba(255, 255, 255, .6);
-  font-size: 14px; font-weight: 500;
-  position: relative; z-index: 1;
-  margin-top: -14px;
-}
 
 
 .built-for { background: var(--navy-0); color: #fff; position: relative; overflow: hidden; }
@@ -585,14 +504,14 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   font-size: 15px; line-height: 1.6; color: var(--ink-2);
 }
 .feat-b strong { color: var(--ink); font-weight: 600; }
-.feat-wide { grid-column: span 2; background: linear-gradient(135deg, #fff 0%, #FFF8F2 100%); border-color: rgba(255, 107, 0, .3); }
+.feat-wide { grid-column: 1 / -1; background: linear-gradient(135deg, #fff 0%, #FFF8F2 100%); border-color: rgba(255, 107, 0, .3); }
 @media (max-width: 920px) {
   .features-grid { grid-template-columns: 1fr 1fr; }
-  .feat-wide { grid-column: span 2; }
+  .feat-wide { grid-column: 1 / -1; }
 }
 @media (max-width: 640px) {
   .features-grid { grid-template-columns: 1fr; }
-  .feat-wide { grid-column: span 1; }
+  .feat-wide { grid-column: 1 / -1; }
 }
 
 /* ═══════════════════ GALLERY ═══════════════════ */
@@ -1016,46 +935,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   </div>
 </section>
 
-<!-- ═══════════════════ DEMO VIDEO ═══════════════════ -->
-<section class="video-section">
-  <div class="video-inner">
-    <div class="video-label">See It In Action</div>
-    <h2 class="video-h2">60 seconds to understand <em>exactly what SteelCaller does.</em></h2>
-    <div class="video-wrap">
-      <!--
-        When your demo video is ready, drop the MP4 file in the same folder
-        as this HTML and uncomment the <video> tag below. Delete the .video-poster
-        div or leave it as a poster fallback.
-
-        <video controls preload="metadata" poster="demo-poster.jpg">
-          <source src="demo.mp4" type="video/mp4">
-          Your browser does not support video.
-        </video>
-      -->
-      <div class="video-poster" onclick="playDemo(this)">
-        <div class="video-play-btn">
-          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
-        </div>
-        <div class="video-caption">Watch the 60-second demo</div>
-        <div class="video-caption-sub">Upload &rarr; Field app &rarr; Revision flow</div>
-      </div>
-    </div>
-  </div>
-</section>
-<script>
-  // When the real demo.mp4 is present, clicking the poster hides it and
-  // starts the video. Until the file is deployed, clicking is a no-op.
-  function playDemo(poster) {
-    var wrap = poster.parentElement;
-    var video = wrap.querySelector('video');
-    if (video) {
-      poster.classList.add('hidden');
-      video.play();
-    }
-    // else: video not yet uploaded — leave poster as placeholder
-  }
-</script>
-
 <!-- ═══════════════════ BUILT FOR ═══════════════════ -->
 <section class="section built-for" id="built-for">
   <div class="section-inner">
@@ -1327,8 +1206,27 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
           and the matching detail sheet opens in a zoomable viewer. No
           more paper drawings on the deck, no more digging through a
           tablet full of PDFs.
+        </div>
+      </div>
+
+      <div class="feat feat-wide">
+        <div class="feat-ico">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/></svg>
+        </div>
+        <div class="feat-t">Erection Drawings With Location Finder</div>
+        <div class="feat-b">
+          Upload your erection sheets &mdash; framing plans AND brace
+          elevations. SteelCaller reads the grid system automatically and
+          maps every piece mark to its exact location. Search
+          <strong>"130B4"</strong> in the field and the roof framing plan
+          opens with a red ring showing the beam between grids 7 and F.
+          Search a vertical brace and the brace elevation opens with the
+          piece highlighted between the correct columns.
           <br><br>
-          <strong style="color:var(--orange)">Erection drawings coming soon.</strong>
+          <strong>Plans AND elevations</strong> &mdash; vertical braces get
+          routed to elevation sheets, not just plan views where they'd be
+          invisible. No more walking back to the trailer to check which
+          sheet a piece is on.
         </div>
       </div>
 
