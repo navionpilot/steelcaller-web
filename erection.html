@@ -547,6 +547,10 @@ function sheetCardHtml(s) {
   if (s.sheet_title) {
     ttl = escapeHtml(s.sheet_title);
     if (s.segment) ttl += ' <span class="seg">&middot; SEG ' + escapeHtml(s.segment) + '</span>';
+  } else if (s.sheet_type === 'elevation' && (s.elevation_view_count || 0) > 0) {
+    ttl = '<span style="color:var(--txt3)">Elevation sheet</span>';
+  } else if (s.non_plan) {
+    ttl = '<span style="color:var(--txt3)">Section / detail sheet</span>';
   } else if (s.error) {
     ttl = '<span style="color:var(--red)">Extraction failed</span>';
   } else {
@@ -574,7 +578,29 @@ function sheetCardHtml(s) {
   html +=     '</div>';
   html +=   '</div>';
 
-  if (!s.error) {
+  if (s.sheet_type === 'elevation' && (s.elevation_view_count || 0) > 0) {
+    // Elevation sheet with views — show view count + columns served.
+    // These sheets route vertical bracing and columns via elevation lookup.
+    html += '<div class="sheet-meta">';
+    var viewCount = s.elevation_view_count || 0;
+    html += '<div class="meta-item">Elevation views&nbsp;<span class="pill">' + viewCount + '</span></div>';
+    // Show column pairs for each view, e.g. "D↔E · 7↔7.6"
+    var colPairs = (s.elevation_view_columns || [])
+      .map(function(cols) {
+        if (!cols || cols.length === 0) return null;
+        return cols.map(escapeHtml).join('&harr;');
+      })
+      .filter(function(x){ return x; });
+    if (colPairs.length) {
+      html += '<div class="meta-item">Columns&nbsp;<span class="pill">' + colPairs.join(' &middot; ') + '</span></div>';
+    }
+    html += '</div>';
+  } else if (s.non_plan) {
+    // Section, connection detail, or general notes sheet. No routing.
+    html += '<div class="sheet-meta">';
+    html += '<div class="meta-item" style="color:var(--txt3)">Section/detail sheet &mdash; not used for piece-mark routing</div>';
+    html += '</div>';
+  } else if (!s.error) {
     html += '<div class="sheet-meta">';
     if (s.primary_elevation) {
       html += '<div class="meta-item">El.&nbsp;<b>' + escapeHtml(s.primary_elevation) + '</b></div>';
@@ -696,9 +722,20 @@ function uploadBatches(batches, i, done) {
 
   uploadOneBatchWithRetry(batch, row, i+1, batches.length, 0, function(ok, data, err){
     if (ok) {
-      row.className = 'progress-row done';
-      row.innerHTML = '<div class="progress-icon"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><polyline points="20,6 9,17 4,12"/></svg></div>'
-                   + '<div class="progress-msg">Batch ' + (i+1) + ' uploaded (' + (data.file_count || batch.length) + ' files)</div>';
+      var failed = (data && data.failed_files) || [];
+      var submitted = (data && data.total_submitted) || batch.length;
+      var uploaded = (data && data.file_count) || batch.length;
+      if (failed.length) {
+        // Some files in this batch failed to save. Show which ones.
+        row.className = 'progress-row failed';
+        var failList = failed.map(function(fn){ return escapeHtml(fn); }).join(', ');
+        row.innerHTML = '<div class="progress-icon"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div>'
+                     + '<div class="progress-msg">Batch ' + (i+1) + ' partial: ' + uploaded + ' of ' + submitted + ' uploaded. <b>Failed:</b> ' + failList + '</div>';
+      } else {
+        row.className = 'progress-row done';
+        row.innerHTML = '<div class="progress-icon"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><polyline points="20,6 9,17 4,12"/></svg></div>'
+                     + '<div class="progress-msg">Batch ' + (i+1) + ' uploaded (' + uploaded + ' files)</div>';
+      }
     } else {
       row.className = 'progress-row failed';
       row.innerHTML = '<div class="progress-icon"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div>'
