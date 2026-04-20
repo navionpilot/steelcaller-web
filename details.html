@@ -115,10 +115,38 @@ body{font-family:var(--serif);background:var(--off);color:var(--txt);min-height:
 .toast.ok{background:var(--green)}
 .toast.err{background:var(--red)}
 
+/* Sequence picker — above the dropzone */
+.seq-picker{display:flex;align-items:center;gap:12px;margin:0 0 14px 0;padding:12px 14px;background:var(--off);border:1px solid var(--border);border-radius:10px;flex-wrap:wrap}
+.seq-picker-lbl{font-family:var(--sf);font-size:15px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.3px}
+.seq-picker-select{flex:0 1 220px;padding:9px 12px;border:1.5px solid var(--border2);border-radius:8px;font-size:14px;font-family:inherit;background:var(--white);color:var(--navy);font-weight:600}
+.seq-picker-input{flex:0 1 180px;padding:9px 12px;border:1.5px solid var(--border2);border-radius:8px;font-size:14px;font-family:var(--mo);background:var(--white);color:var(--navy);display:none}
+.seq-picker-input.on{display:block}
+.seq-picker-hint{font-size:12px;color:var(--txt3);font-weight:500}
+
+/* Filter pills — above the file list */
+.seq-filter{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.seq-pill{padding:6px 14px;border:1.5px solid var(--border);background:var(--white);color:var(--txt2);border-radius:18px;font-family:var(--sf);font-size:13px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.3px;transition:all .1s}
+.seq-pill:hover{background:var(--off);border-color:var(--border2)}
+.seq-pill.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.seq-pill-count{font-family:var(--mo);font-size:11px;margin-left:5px;color:inherit;opacity:.7}
+
+/* Group headers when "All" is selected */
+.seq-group-head{font-family:var(--sf);font-size:17px;font-weight:800;color:var(--navy);margin:18px 0 8px;padding:4px 10px;background:var(--blue-bg);border-left:3px solid var(--blue);border-radius:4px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+.seq-group-head:first-child{margin-top:0}
+.seq-group-head .c{font-family:var(--mo);font-size:13px;color:var(--blue);font-weight:600}
+.seq-group-head.unassigned{background:var(--off);border-left-color:var(--txt3)}
+.seq-group-head.unassigned .c{color:var(--txt3)}
+
+/* Small "Seq X" badge on each file row */
+.file-seq-badge{display:inline-flex;align-items:center;gap:4px;background:var(--blue-bg);color:var(--blue);font-family:var(--mo);font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:8px;text-transform:uppercase;letter-spacing:.3px}
+.file-seq-btn{background:none;border:1px solid var(--border);color:var(--txt3);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:12px;font-weight:600;margin-left:6px}
+.file-seq-btn:hover{background:var(--off);color:var(--navy);border-color:var(--border2)}
+
 @media (max-width:800px){
   .stats{grid-template-columns:1fr 1fr}
   .page-title{font-size:28px}
   .container{padding:20px 16px 40px}
+  .seq-picker{flex-direction:column;align-items:stretch}
 }
 </style>
 </head>
@@ -179,6 +207,16 @@ body{font-family:var(--serif);background:var(--off);color:var(--txt);min-height:
     </div>
     <div class="section-sub">Drop in one combined PDF with all your sheets, or select multiple individual PDF files at once. Large batches are uploaded in groups of 10 automatically.</div>
 
+    <!-- Sequence picker (optional) -->
+    <div class="seq-picker">
+      <div class="seq-picker-lbl">Sequence</div>
+      <select class="seq-picker-select" id="seqSelect" onchange="onSeqChange()">
+        <option value="">Unassigned</option>
+      </select>
+      <input type="text" class="seq-picker-input" id="seqInput" placeholder="Type sequence name" maxlength="20">
+      <div class="seq-picker-hint">Optional &mdash; tag these uploads so you can filter by sequence later.</div>
+    </div>
+
     <input type="file" id="fileInput" accept=".pdf" multiple style="display:none">
     <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
       <div class="dz-icon">
@@ -197,9 +235,17 @@ body{font-family:var(--serif);background:var(--off);color:var(--txt);min-height:
 
   <!-- Uploaded files -->
   <div class="section" id="filesSection">
-    <div class="section-head">
+    <div class="section-head" style="display:flex;justify-content:space-between;align-items:center">
       <div class="section-h">Uploaded PDFs</div>
+      <button id="deleteAllBtn" onclick="deleteAllFiles()" style="display:none;background:#fff;border:1.5px solid var(--red);color:var(--red);border-radius:8px;padding:8px 14px;font-family:var(--serif);font-size:13px;font-weight:700;cursor:pointer;align-items:center;gap:6px">
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6"/></svg>
+        Delete All
+      </button>
     </div>
+
+    <!-- Filter pills — hidden until sequences exist -->
+    <div class="seq-filter" id="seqFilter" style="display:none"></div>
+
     <div class="file-list" id="fileList">
       <div class="empty">No PDFs uploaded yet.</div>
     </div>
@@ -231,12 +277,14 @@ if (!PROJECT_ID) {
 }
 
 var STATE = {
-  files:       [],  // uploaded filenames
-  unmatched:   [],
-  low_conf:    [],
-  available:   [],  // for mapping dropdowns
-  uploading:   false,
-  pollTimer:   null,
+  files:          [],  // [{filename, user_sequence, url?}] from /review's available_pdfs
+  unmatched:      [],
+  low_conf:       [],
+  available:      [],  // for mapping dropdowns (same as files but kept for existing code)
+  uploading:      false,
+  pollTimer:      null,
+  sequences:      [],    // [{sequence, piece_count}] from /sequences endpoint
+  currentFilter:  'all', // 'all' or sequence name or '__unassigned__'
 };
 
 // ── Toast ─────────────────────────────────────────────────────────────────
@@ -255,6 +303,108 @@ function api(path, opts) {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
   });
+}
+
+// ── Sequences ─────────────────────────────────────────────────────────────
+function loadSequences() {
+  return fetch(API + '/api/projects/' + PROJECT_ID + '/sequences')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if (!d) return;
+      var list = (d.ifc_sequences || []).concat(d.custom_sequences || []);
+      var seen = {};
+      STATE.sequences = list.filter(function(s){
+        if (seen[s.sequence]) return false;
+        seen[s.sequence] = 1;
+        return true;
+      });
+      renderSeqSelect();
+    })
+    .catch(function(){});
+}
+
+function renderSeqSelect() {
+  var sel = document.getElementById('seqSelect');
+  if (!sel) return;
+  var html = '<option value="">Unassigned</option>';
+  STATE.sequences.forEach(function(s){
+    var pc = s.piece_count ? (' — ' + s.piece_count + ' pieces') : '';
+    html += '<option value="' + escapeAttr(s.sequence) + '">Seq ' + escapeHtml(s.sequence) + pc + '</option>';
+  });
+  html += '<option value="__other__">Other (type custom)...</option>';
+  sel.innerHTML = html;
+}
+
+function onSeqChange() {
+  var sel = document.getElementById('seqSelect');
+  var inp = document.getElementById('seqInput');
+  if (!sel || !inp) return;
+  if (sel.value === '__other__') {
+    inp.classList.add('on');
+    inp.focus();
+  } else {
+    inp.classList.remove('on');
+    inp.value = '';
+  }
+}
+
+function currentUploadSequence() {
+  var sel = document.getElementById('seqSelect');
+  var inp = document.getElementById('seqInput');
+  if (!sel) return '';
+  if (sel.value === '__other__') {
+    return (inp && inp.value ? inp.value.trim() : '');
+  }
+  return sel.value || '';
+}
+
+// ── Filter pills ──────────────────────────────────────────────────────────
+function renderSeqFilter() {
+  var el = document.getElementById('seqFilter');
+  if (!el) return;
+  if (!STATE.files.length) { el.style.display = 'none'; return; }
+
+  var counts = {};
+  var unassigned = 0;
+  STATE.files.forEach(function(f){
+    var seq = fileSeq(f);
+    if (seq) counts[seq] = (counts[seq] || 0) + 1;
+    else unassigned++;
+  });
+  var seqs = Object.keys(counts).sort(seqSortCmp);
+
+  if (!seqs.length) { el.style.display = 'none'; return; }
+
+  el.style.display = 'flex';
+  var html = '';
+  html += pillHtml('all', 'All', STATE.files.length);
+  seqs.forEach(function(s){ html += pillHtml(s, 'Seq ' + s, counts[s]); });
+  if (unassigned) html += pillHtml('__unassigned__', 'Unassigned', unassigned);
+  el.innerHTML = html;
+
+  el.querySelectorAll('.seq-pill').forEach(function(p){
+    p.addEventListener('click', function(){
+      STATE.currentFilter = this.getAttribute('data-f');
+      renderSeqFilter();
+      renderFileList();
+    });
+  });
+}
+
+function pillHtml(value, label, count) {
+  var on = (STATE.currentFilter === value) ? ' on' : '';
+  return '<button class="seq-pill' + on + '" data-f="' + escapeAttr(value) + '">'
+       + escapeHtml(label)
+       + '<span class="seq-pill-count">' + count + '</span>'
+       + '</button>';
+}
+
+function seqSortCmp(a, b) {
+  var an = parseFloat(a), bn = parseFloat(b);
+  if (!isNaN(an) && !isNaN(bn)) return an - bn;
+  if (!isNaN(an)) return -1;
+  if (!isNaN(bn)) return 1;
+  return a.localeCompare(b);
 }
 
 // ── Load and render ───────────────────────────────────────────────────────
@@ -283,8 +433,9 @@ function renderSummary(data) {
   document.getElementById('stUnmatched').textContent = Math.max(0, (data.total_marks || 0) - (data.matched_count || 0));
   document.getElementById('stFiles').textContent    = data.file_count || 0;
 
-  STATE.files = data.files || [];
-  renderFileList();
+  // NOTE: We do NOT set STATE.files here anymore. STATE.files is populated
+  // from /details/review's available_pdfs (which has user_sequence per file).
+  // Summary only provides counts/status.
   renderBanner(data);
 }
 
@@ -292,6 +443,9 @@ function renderReview(data) {
   STATE.unmatched = data.unmatched_marks || [];
   STATE.low_conf  = data.low_confidence || [];
   STATE.available = data.available_pdfs || [];
+  // available_pdfs is now the source of truth for files + their sequence tags
+  STATE.files     = data.available_pdfs || [];
+  renderFileList();
   renderUnmatched();
 }
 
@@ -328,19 +482,116 @@ function renderBanner(data) {
 
 function renderFileList() {
   var el = document.getElementById('fileList');
+  var daBtn = document.getElementById('deleteAllBtn');
   if (!STATE.files.length) {
     el.innerHTML = '<div class="empty">No PDFs uploaded yet.</div>';
+    if (daBtn) daBtn.style.display = 'none';
+    renderSeqFilter();
     return;
   }
+  if (daBtn) daBtn.style.display = 'inline-flex';
+  renderSeqFilter();
+
+  // Filter
+  var filtered;
+  if (STATE.currentFilter === 'all' || !STATE.currentFilter) {
+    filtered = STATE.files;
+  } else if (STATE.currentFilter === '__unassigned__') {
+    filtered = STATE.files.filter(function(f){ return !(fileSeq(f)); });
+  } else {
+    filtered = STATE.files.filter(function(f){ return fileSeq(f) === STATE.currentFilter; });
+  }
+
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty">No PDFs match this filter.</div>';
+    return;
+  }
+
+  // Group by sequence ONLY when "All" is selected
+  var useGroups = (STATE.currentFilter === 'all' || !STATE.currentFilter);
   var html = '';
-  STATE.files.forEach(function(fn) {
-    html += '<div class="file-row">'
-      + '<div class="file-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div>'
-      + '<div class="file-name">' + escapeHtml(fn) + '</div>'
-      + '<button class="file-del" onclick="deleteFile(' + JSON.stringify(fn).replace(/"/g,'&quot;') + ')">Remove</button>'
-      + '</div>';
-  });
+
+  if (useGroups) {
+    var buckets = {};
+    filtered.forEach(function(f){
+      var k = fileSeq(f) || '__unassigned__';
+      (buckets[k] = buckets[k] || []).push(f);
+    });
+    var keys = Object.keys(buckets).filter(function(k){ return k !== '__unassigned__'; });
+    keys.sort(seqSortCmp);
+    if (buckets['__unassigned__']) keys.push('__unassigned__');
+
+    if (keys.length <= 1) {
+      filtered.forEach(function(f){ html += fileRowHtml(f); });
+    } else {
+      keys.forEach(function(k){
+        var isUnassigned = (k === '__unassigned__');
+        var lbl = isUnassigned ? 'Unassigned' : ('Sequence ' + k);
+        var cls = isUnassigned ? ' unassigned' : '';
+        html += '<div class="seq-group-head' + cls + '">'
+             + escapeHtml(lbl)
+             + ' <span class="c">(' + buckets[k].length + ')</span>'
+             + '</div>';
+        buckets[k].forEach(function(f){ html += fileRowHtml(f); });
+      });
+    }
+  } else {
+    filtered.forEach(function(f){ html += fileRowHtml(f); });
+  }
+
   el.innerHTML = html;
+}
+
+// Normalize: STATE.files may have been set by either legacy code (strings)
+// or the new available_pdfs objects. fileName() + fileSeq() handle both.
+function fileName(f) {
+  return (typeof f === 'string') ? f : (f.filename || '');
+}
+function fileSeq(f) {
+  if (typeof f === 'string') return '';
+  return (f.user_sequence || '').trim();
+}
+
+function fileRowHtml(f) {
+  var fn  = fileName(f);
+  var seq = fileSeq(f);
+  var seqBadge = seq ? ('<span class="file-seq-badge">Seq ' + escapeHtml(seq) + '</span>') : '';
+  var fnEsc = JSON.stringify(fn).replace(/"/g,'&quot;');
+  return '<div class="file-row">'
+    + '<div class="file-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div>'
+    + '<div class="file-name">' + escapeHtml(fn) + seqBadge + '</div>'
+    + '<button class="file-seq-btn" onclick="retagFile(' + fnEsc + ')" title="Change sequence tag">Seq</button>'
+    + '<button class="file-del" onclick="deleteFile(' + fnEsc + ')">Remove</button>'
+    + '</div>';
+}
+
+// Change a file's sequence tag (updates all marks mapped to this PDF)
+function retagFile(filename) {
+  var current = '';
+  for (var i = 0; i < STATE.files.length; i++) {
+    if (fileName(STATE.files[i]) === filename) {
+      current = fileSeq(STATE.files[i]);
+      break;
+    }
+  }
+  var newSeq = prompt(
+    'Set sequence for ' + filename + '\n\nLeave empty to mark as Unassigned.',
+    current
+  );
+  if (newSeq === null) return;
+  newSeq = newSeq.trim();
+
+  var fd = new FormData();
+  fd.append('sequence', newSeq);
+  fetch(API + '/api/projects/' + encodeURIComponent(PROJECT_ID) + '/details/file/' + encodeURIComponent(filename) + '/sequence', {
+    method: 'POST', body: fd,
+  })
+    .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(){
+      toast(newSeq ? ('Tagged as Seq ' + newSeq) : 'Sequence cleared', 'ok');
+      loadAll();
+    })
+    .catch(function(e){ toast('Retag failed: ' + e.message, 'err'); });
 }
 
 function renderUnmatched() {
@@ -545,6 +796,8 @@ function uploadBatch(batch, idx, total) {
 
   var fd = new FormData();
   batch.forEach(function(f) { fd.append('files', f); });
+  var seq = currentUploadSequence();
+  if (seq) fd.append('sequence', seq);
 
   return fetch(API + '/api/projects/' + encodeURIComponent(PROJECT_ID) + '/details', {
     method: 'POST', body: fd
@@ -576,6 +829,37 @@ function deleteFile(filename) {
     });
 }
 
+// ── Delete ALL detail sheets ──────────────────────────────────────────────
+function deleteAllFiles() {
+  var n = STATE.files.length;
+  if (!n) return;
+  var msg = 'Delete all ' + n + ' detail sheet PDF' + (n === 1 ? '' : 's') + '?'
+          + '\n\nThis will also clear the piece-mark index and any manual mappings. Cannot be undone.';
+  if (!confirm(msg)) return;
+
+  var btn = document.getElementById('deleteAllBtn');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+
+  fetch(API + '/api/projects/' + encodeURIComponent(PROJECT_ID) + '/details', {
+    method: 'DELETE'
+  })
+    .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(d){
+      var deleted = (d && d.deleted_count) || 0;
+      var total   = (d && d.total_files)   || n;
+      if (deleted === total) {
+        toast('Deleted all ' + deleted + ' detail sheets', 'ok');
+      } else {
+        toast('Deleted ' + deleted + ' of ' + total + ' sheets (some failed)', 'err');
+      }
+      loadAll();
+    })
+    .catch(function(e){ toast('Delete all failed: ' + (e && e.message ? e.message : ''), 'err'); })
+    .finally(function(){
+      if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    });
+}
+
 // ── Polling ───────────────────────────────────────────────────────────────
 function startPolling() {
   if (STATE.pollTimer) return;
@@ -598,6 +882,7 @@ function escapeAttr(s) {
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────
+loadSequences();
 loadAll();
 </script>
 
