@@ -292,7 +292,16 @@ var STATE = {
   pollTimer:      null,
   sequences:      [],    // [{sequence, piece_count}] from IFC + custom
   currentFilter:  'all', // 'all' or a specific sequence string, or '__unassigned__'
+  pollFailStreak: 0,     // consecutive /erection fetch failures; surfaces the
+                         // "server not responding" banner when the backend
+                         // dies mid-extraction (e.g. OOM restart) so the UI
+                         // stops lying about "Extracting..." forever
 };
+
+// Threshold for "server is down": 4 failed polls in a row at 2s interval = 8s
+// of unreachability, which is longer than any single transient 502 but short
+// enough that the user sees the truth quickly.
+var POLL_FAIL_THRESHOLD = 4;
 
 // ── Toast ─────────────────────────────────────────────────────────────────
 var TOAST_T = null;
@@ -380,6 +389,7 @@ function loadSheets() {
       return r.json();
     })
     .then(function(d){
+      STATE.pollFailStreak = 0;   // reachable — reset any prior streak
       STATE.sheets = d.sheets || [];
       STATE.status = d.status;
       renderBanner(d.status);
@@ -388,7 +398,18 @@ function loadSheets() {
       return d;
     })
     .catch(function(e){
-      toast('Failed to load sheets: ' + e.message, 'err');
+      STATE.pollFailStreak += 1;
+      // Don't toast on every poll failure during active extraction — that
+      // would spam the user during a transient restart. Just increment.
+      // Once the streak crosses threshold, renderBanner handles the UI.
+      if (STATE.pollFailStreak >= POLL_FAIL_THRESHOLD) {
+        renderBanner(STATE.status);   // re-render w/ stalled overlay
+      }
+      // If we're NOT in the middle of extraction, the user triggered this
+      // manually; surface it loudly.
+      if (STATE.status !== 'processing' && STATE.status !== 'uploading') {
+        toast('Failed to load sheets: ' + e.message, 'err');
+      }
     });
 }
 
@@ -407,6 +428,22 @@ function loadStats() {
 // ── Render status banner ──────────────────────────────────────────────────
 function renderBanner(status) {
   var el = document.getElementById('statusBanner');
+
+  // Server-unreachable overlay — takes priority over any other state.
+  // Indicates the backend is flapping (e.g. OOM restart, deploy in progress).
+  if (STATE.pollFailStreak >= POLL_FAIL_THRESHOLD) {
+    el.className = 'banner error';
+    el.style.display = 'flex';
+    el.innerHTML =
+      '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/>' +
+      '<line x1="12" y1="8" x2="12" y2="12"/>' +
+      '<line x1="12" y1="16" x2="12" y2="16"/></svg>' +
+      '<span>Server not responding (' + STATE.pollFailStreak + ' failed checks). ' +
+      'Extraction may have stalled &mdash; check the API logs. ' +
+      'This page will resume automatically when the server is reachable again.</span>';
+    return;
+  }
+
   if (status === 'processing') {
     // Count how many sheets have been extracted so far vs total pending.
     // "Total pending" = total sheets in project (we only know the live count).
@@ -435,7 +472,7 @@ function renderBanner(status) {
           '<div style="background:var(--accent);height:100%;width:' + pct + '%;transition:width 0.4s"></div>' +
         '</div>' +
         '<div style="font-size:12px;color:var(--txt3);margin-top:6px">' +
-          'Processing 3 sheets at a time, roughly 15-20 seconds per sheet. ' +
+          'Processing one sheet at a time, roughly 15-20 seconds per sheet. ' +
           'You can leave this page and come back &mdash; extraction continues in the background.' +
         '</div>' +
       '</div>';
