@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Erection Sheets — SteelCaller</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B2A; --navy2:#1B2A3F; --orange:#FF6B00; --off:#F2F5F9;
+  --white:#fff; --txt:#0D1B2A; --txt2:#3A5068; --txt3:#6A8098;
+  --border:#DDE4ED; --border2:#C3CFDC; --green:#00A845; --green-bg:#E6F7EC;
+  --amber:#FF9F0A; --amber-bg:#FFF4E0; --red:#FF3B30; --red-bg:#FFE8E6;
+  --blue:#0066CC; --blue-bg:#E8F2FF;
+  --sf:'Barlow Condensed',sans-serif; --serif:'Barlow',sans-serif;
+  --mo:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--serif);background:var(--off);color:var(--txt);min-height:100vh;line-height:1.45}
+
+.topbar{background:var(--navy);padding:14px 28px;display:flex;align-items:center;gap:18px;color:#fff}
+.back-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:8px 14px;color:#fff;cursor:pointer;font-family:var(--serif);font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;text-decoration:none}
+.back-btn:hover{background:rgba(255,255,255,.14)}
+.back-btn svg{width:14px;height:14px;stroke:#fff;stroke-width:2;fill:none}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:var(--orange);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.logo-name{font-family:var(--sf);font-size:22px;font-weight:800;color:#fff}
+.logo-name span{color:var(--orange)}
+.spacer{flex:1}
+.project-label{font-family:var(--sf);font-size:17px;font-weight:700;color:rgba(255,255,255,.85)}
+.project-label b{color:#fff}
+
+.container{max-width:1100px;margin:0 auto;padding:32px 28px 60px}
+.page-title{font-family:var(--sf);font-size:36px;font-weight:900;color:var(--navy);margin-bottom:6px}
+.page-sub{color:var(--txt2);font-size:15px;margin-bottom:24px;line-height:1.55;max-width:780px}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.stat-num{font-family:var(--sf);font-size:32px;font-weight:900;color:var(--navy);line-height:1}
+.stat.ok .stat-num{color:var(--green)}
+.stat.warn .stat-num{color:var(--amber)}
+.stat.info .stat-num{color:var(--blue)}
+.stat.muted .stat-num{color:var(--txt3)}
+.stat-lbl{font-family:var(--sf);font-size:15px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.5px;margin-top:6px}
+.stat-sub{font-size:12px;color:var(--txt3);margin-top:3px}
+
+/* Banner */
+.banner{border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600}
+.banner svg{width:20px;height:20px;stroke-width:2;fill:none;flex-shrink:0}
+.banner.processing{background:var(--amber-bg);color:#8C5900;border:1px solid #FFE0B2}
+.banner.processing svg{stroke:var(--amber)}
+.banner.ok{background:var(--green-bg);color:#006B2E;border:1px solid #B8E4C8}
+.banner.ok svg{stroke:var(--green)}
+.banner.error{background:var(--red-bg);color:#8A2018;border:1px solid #F8C8C4}
+.banner.error svg{stroke:var(--red)}
+.banner-spinner{width:18px;height:18px;border:2.5px solid rgba(255,159,10,.3);border-top-color:var(--amber);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.section{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px}
+.section-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.section-h{font-family:var(--sf);font-size:22px;font-weight:800;color:var(--navy)}
+.section-sub{font-size:13px;color:var(--txt3);margin-bottom:16px;line-height:1.5}
+
+/* Dropzone */
+.dropzone{border:2.5px dashed var(--border2);border-radius:14px;padding:40px 20px;text-align:center;transition:all .15s;cursor:pointer;background:var(--off)}
+.dropzone:hover,.dropzone.dragging{border-color:var(--orange);background:rgba(255,107,0,.03)}
+.dropzone.uploading{border-color:var(--amber);background:var(--amber-bg);cursor:default}
+.dz-icon{width:56px;height:56px;background:rgba(255,107,0,.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.dz-icon svg{width:28px;height:28px;stroke:var(--orange);stroke-width:2;fill:none}
+.dz-title{font-family:var(--sf);font-size:22px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.dz-sub{font-size:14px;color:var(--txt3);margin-bottom:18px;line-height:1.5}
+.dz-btn{background:var(--orange);color:#fff;border:none;border-radius:10px;padding:12px 28px;font-family:var(--sf);font-size:17px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.dz-btn:hover{background:#E85D00}
+.dz-btn svg{width:18px;height:18px;stroke:#fff;stroke-width:2;fill:none}
+.dz-btn:disabled{background:var(--border2);cursor:not-allowed}
+
+.progress-wrap{margin-top:18px;text-align:left}
+.progress-row{padding:10px 14px;border-radius:8px;margin-bottom:6px;display:flex;align-items:center;gap:10px;font-size:13px;background:var(--off);border:1px solid var(--border)}
+.progress-row.done{background:var(--green-bg);border-color:#B8E4C8;color:#006B2E}
+.progress-row.failed{background:var(--red-bg);border-color:#F8C8C4;color:#8A2018}
+.progress-row.running{background:var(--amber-bg);border-color:#FFE0B2;color:#8C5900}
+.progress-icon{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.progress-icon svg{width:16px;height:16px;stroke-width:2.5;fill:none}
+.progress-spinner{width:14px;height:14px;border:2px solid rgba(140,89,0,.3);border-top-color:var(--amber);border-radius:50%;animation:spin 1s linear infinite}
+.progress-msg{flex:1}
+
+/* Sheet cards */
+.sheet-list{display:flex;flex-direction:column;gap:10px}
+.sheet-card{background:var(--off);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.sheet-card.err{background:var(--red-bg);border-color:#F8C8C4}
+.sheet-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.sheet-icon{width:38px;height:38px;background:rgba(0,102,204,.08);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sheet-icon svg{width:20px;height:20px;stroke:var(--blue);stroke-width:2;fill:none}
+.sheet-card.err .sheet-icon{background:rgba(255,59,48,.12)}
+.sheet-card.err .sheet-icon svg{stroke:var(--red)}
+.sheet-title-block{flex:1;min-width:0}
+.sheet-name{font-family:var(--mo);font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:2px}
+.sheet-ttl{font-family:var(--sf);font-size:18px;font-weight:800;color:var(--navy);line-height:1.15}
+.sheet-ttl .seg{color:var(--orange)}
+.sheet-actions{display:flex;gap:8px;flex-shrink:0}
+.act-btn{background:none;border:1px solid var(--border);color:var(--txt2);border-radius:7px;padding:7px 12px;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--serif);display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.act-btn:hover{background:var(--white);color:var(--navy);border-color:var(--border2)}
+.act-btn.del:hover{background:var(--red-bg);color:var(--red);border-color:var(--red)}
+.act-btn svg{width:13px;height:13px;stroke-width:2;fill:none}
+
+.sheet-meta{display:flex;flex-wrap:wrap;gap:14px 22px;padding-left:50px;font-size:13px;color:var(--txt2)}
+.meta-item{display:flex;align-items:center;gap:6px}
+.meta-item b{color:var(--navy);font-family:var(--mo);font-size:13px}
+.meta-item .pill{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:2px 9px;font-family:var(--mo);font-size:12px;color:var(--navy);font-weight:600}
+
+.sheet-err-msg{padding-left:50px;margin-top:6px;font-size:12px;color:#8A2018;font-family:var(--mo)}
+
+.empty{text-align:center;padding:30px 20px;color:var(--txt3)}
+
+.toast{position:fixed;top:20px;right:20px;background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;opacity:0;pointer-events:none;transform:translateX(20px);transition:all .2s;max-width:420px;box-shadow:0 8px 24px rgba(13,27,42,.25)}
+.toast.on{opacity:1;pointer-events:all;transform:translateX(0)}
+.toast.ok{background:var(--green)}
+.toast.err{background:var(--red)}
+
+@media (max-width:800px){
+  .stats{grid-template-columns:1fr 1fr}
+  .page-title{font-size:28px}
+  .container{padding:20px 16px 40px}
+  .sheet-meta{padding-left:0}
+  .sheet-err-msg{padding-left:0}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="back-btn" href="/dashboard.html"><svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>Dashboard</a>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 30 30" width="20" height="20">
+        <rect x="2" y="2" width="26" height="7" rx="1.5" fill="white"/>
+        <rect x="11" y="9" width="8" height="12" rx="0.8" fill="white"/>
+        <rect x="2" y="21" width="26" height="7" rx="1.5" fill="white"/>
+      </svg>
+    </div>
+    <div class="logo-name">Steel<span>Caller</span></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="project-label" id="projLabel">—</div>
+</div>
+
+<div class="container">
+
+  <div class="page-title">Erection Sheets</div>
+  <div class="page-sub">Upload your erection/framing plan PDFs here. The system auto-detects grid bubbles on each sheet and reads the title, elevation, and dimensions so the field app can show a red ring directly on any piece mark when the ironworker asks &ldquo;show erection sheet for 130B4.&rdquo;</div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat muted">
+      <div class="stat-num" id="stSheets">0</div>
+      <div class="stat-lbl">Sheets Uploaded</div>
+      <div class="stat-sub">Total PDFs</div>
+    </div>
+    <div class="stat ok">
+      <div class="stat-num" id="stReady">0</div>
+      <div class="stat-lbl">Extracted</div>
+      <div class="stat-sub">Ready to route pieces</div>
+    </div>
+    <div class="stat info">
+      <div class="stat-num" id="stPlaced">0</div>
+      <div class="stat-lbl">Pieces Routed</div>
+      <div class="stat-sub">Locatable on a sheet</div>
+    </div>
+    <div class="stat warn">
+      <div class="stat-num" id="stErrors">0</div>
+      <div class="stat-lbl">Errors</div>
+      <div class="stat-sub">Need re-extraction</div>
+    </div>
+  </div>
+
+  <!-- Status banner -->
+  <div id="statusBanner" style="display:none"></div>
+
+  <!-- Upload section -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-h">Upload Erection Sheets</div>
+    </div>
+    <div class="section-sub">Drop in one combined PDF, or select multiple individual PDF files at once. Each sheet is processed with OpenCV for grid bubble detection + the vision API for label assignment (~3&cent; per sheet).</div>
+
+    <input type="file" id="fileInput" accept=".pdf" multiple style="display:none">
+    <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+      <div class="dz-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <div class="dz-title" id="dzTitle">Drop erection PDFs here or click to browse</div>
+      <div class="dz-sub" id="dzSub">PDF files only</div>
+      <button class="dz-btn" type="button" onclick="event.stopPropagation();document.getElementById('fileInput').click()">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Choose PDFs
+      </button>
+    </div>
+
+    <div class="progress-wrap" id="progressWrap" style="display:none"></div>
+  </div>
+
+  <!-- Uploaded sheets -->
+  <div class="section" id="sheetsSection">
+    <div class="section-head">
+      <div class="section-h">Uploaded Sheets</div>
+    </div>
+    <div class="sheet-list" id="sheetList">
+      <div class="empty">No erection sheets uploaded yet.</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────
+var API = 'https://steelcaller-api.onrender.com';
+var BATCH_SIZE = 10;
+
+// ── State ─────────────────────────────────────────────────────────────────
+var PROJECT_ID = new URLSearchParams(location.search).get('project');
+if (!PROJECT_ID) {
+  document.body.innerHTML = '<div style="text-align:center;padding:80px 20px;font-family:sans-serif"><h1>No project specified</h1><p><a href="/dashboard.html">Return to dashboard</a></p></div>';
+  throw new Error('No project id');
+}
+
+var STATE = {
+  sheets:     [],
+  stats:      null,
+  uploading:  false,
+  pollTimer:  null,
+};
+
+// ── Toast ─────────────────────────────────────────────────────────────────
+var TOAST_T = null;
+function toast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast on' + (type ? ' ' + type : '');
+  clearTimeout(TOAST_T);
+  TOAST_T = setTimeout(function(){ el.classList.remove('on'); }, 4000);
+}
+
+// ── Fetch project info for label ──────────────────────────────────────────
+function loadProjectLabel() {
+  fetch(API + '/api/projects/' + PROJECT_ID)
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(p){
+      if (!p) return;
+      var lbl = document.getElementById('projLabel');
+      lbl.innerHTML = (p.job_number ? '<b>' + p.job_number + '</b> &middot; ' : '')
+                    + (p.job_name || '');
+    })
+    .catch(function(){});
+}
+
+// ── Fetch erection sheet list ─────────────────────────────────────────────
+function loadSheets() {
+  return fetch(API + '/api/projects/' + PROJECT_ID + '/erection')
+    .then(function(r){
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(d){
+      STATE.sheets = d.sheets || [];
+      STATE.status = d.status;
+      renderBanner(d.status);
+      renderSheets();
+      renderStatsBasic(d);
+      return d;
+    })
+    .catch(function(e){
+      toast('Failed to load sheets: ' + e.message, 'err');
+    });
+}
+
+// ── Fetch stats (placed count etc) ────────────────────────────────────────
+function loadStats() {
+  fetch(API + '/api/projects/' + PROJECT_ID + '/erection/stats')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if (!d) return;
+      STATE.stats = d;
+      document.getElementById('stPlaced').textContent = d.placed_count || 0;
+    })
+    .catch(function(){});
+}
+
+// ── Render status banner ──────────────────────────────────────────────────
+function renderBanner(status) {
+  var el = document.getElementById('statusBanner');
+  if (status === 'processing') {
+    el.className = 'banner processing';
+    el.style.display = 'flex';
+    el.innerHTML = '<div class="banner-spinner"></div><span>Extracting metadata from uploaded sheets&hellip; this usually takes 5-15 seconds per sheet.</span>';
+  } else if (status === 'error') {
+    el.className = 'banner error';
+    el.style.display = 'flex';
+    el.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg><span>Some sheets failed to process. See details below and use Re-extract on the affected sheets.</span>';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function renderStatsBasic(d) {
+  document.getElementById('stSheets').textContent = d.total_sheets || 0;
+  document.getElementById('stReady').textContent  = d.ready_count || 0;
+  document.getElementById('stErrors').textContent = d.error_count || 0;
+}
+
+// ── Render sheet list ─────────────────────────────────────────────────────
+function renderSheets() {
+  var container = document.getElementById('sheetList');
+  if (!STATE.sheets.length) {
+    container.innerHTML = '<div class="empty">No erection sheets uploaded yet.</div>';
+    return;
+  }
+  var html = '';
+  STATE.sheets.forEach(function(s) {
+    var errCls = s.error ? ' err' : '';
+    var ttl = '';
+    if (s.sheet_title) {
+      ttl = escapeHtml(s.sheet_title);
+      if (s.segment) ttl += ' <span class="seg">&middot; SEG ' + escapeHtml(s.segment) + '</span>';
+    } else if (s.error) {
+      ttl = '<span style="color:var(--red)">Extraction failed</span>';
+    } else {
+      ttl = '<span style="color:var(--txt3)">No title extracted</span>';
+    }
+
+    html += '<div class="sheet-card' + errCls + '">';
+    html +=   '<div class="sheet-head">';
+    html +=     '<div class="sheet-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div>';
+    html +=     '<div class="sheet-title-block">';
+    html +=       '<div class="sheet-name">' + escapeHtml(s.filename) + '</div>';
+    html +=       '<div class="sheet-ttl">' + ttl + '</div>';
+    html +=     '</div>';
+    html +=     '<div class="sheet-actions">';
+    if (s.url) {
+      html +=     '<a class="act-btn" href="' + escapeAttr(s.url) + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>View PDF</a>';
+    }
+    html +=       '<button class="act-btn" onclick="reextract(\'' + escapeAttr(s.filename) + '\')"><svg viewBox="0 0 24 24"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Re-extract</button>';
+    html +=       '<button class="act-btn del" onclick="deleteSheet(\'' + escapeAttr(s.filename) + '\')"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6"/></svg>Delete</button>';
+    html +=     '</div>';
+    html +=   '</div>';
+
+    if (!s.error) {
+      html += '<div class="sheet-meta">';
+      if (s.primary_elevation) {
+        html += '<div class="meta-item">El.&nbsp;<b>' + escapeHtml(s.primary_elevation) + '</b></div>';
+      }
+      html += '<div class="meta-item">Grids&nbsp;<span class="pill">' + (s.col_count||0) + ' col &middot; ' + (s.row_count||0) + ' row</span></div>';
+      if (s.match_line_count) {
+        html += '<div class="meta-item">Match lines&nbsp;<b>' + s.match_line_count + '</b></div>';
+      }
+      html += '</div>';
+    } else {
+      html += '<div class="sheet-err-msg">' + escapeHtml(s.error) + '</div>';
+    }
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+// ── Utility ───────────────────────────────────────────────────────────────
+function escapeHtml(s) {
+  s = s == null ? '' : String(s);
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escapeAttr(s) {
+  return escapeHtml(s).replace(/'/g, '&#39;');
+}
+
+// ── Upload ────────────────────────────────────────────────────────────────
+function handleFiles(files) {
+  if (STATE.uploading) { toast('Already uploading', 'err'); return; }
+  var pdfs = [];
+  for (var i = 0; i < files.length; i++) {
+    if (files[i].name.toLowerCase().endsWith('.pdf')) pdfs.push(files[i]);
+  }
+  if (!pdfs.length) { toast('No PDF files selected', 'err'); return; }
+
+  STATE.uploading = true;
+  var dz = document.getElementById('dropzone');
+  dz.classList.add('uploading');
+  document.getElementById('dzTitle').textContent = 'Uploading…';
+  document.getElementById('dzSub').textContent = pdfs.length + ' file' + (pdfs.length > 1 ? 's' : '');
+
+  var wrap = document.getElementById('progressWrap');
+  wrap.style.display = 'block';
+  wrap.innerHTML = '';
+
+  // Split into batches
+  var batches = [];
+  for (var i = 0; i < pdfs.length; i += BATCH_SIZE) {
+    batches.push(pdfs.slice(i, i + BATCH_SIZE));
+  }
+
+  uploadBatches(batches, 0, function() {
+    STATE.uploading = false;
+    dz.classList.remove('uploading');
+    document.getElementById('dzTitle').textContent = 'Drop erection PDFs here or click to browse';
+    document.getElementById('dzSub').textContent = 'PDF files only';
+    toast('Upload complete — extracting in background', 'ok');
+    startPolling();
+  });
+}
+
+function uploadBatches(batches, i, done) {
+  if (i >= batches.length) { done(); return; }
+  var batch = batches[i];
+  var wrap = document.getElementById('progressWrap');
+  var row = document.createElement('div');
+  row.className = 'progress-row running';
+  row.innerHTML = '<div class="progress-icon"><div class="progress-spinner"></div></div>'
+               + '<div class="progress-msg">Uploading batch ' + (i+1) + ' of ' + batches.length
+               + ' (' + batch.length + ' file' + (batch.length>1?'s':'') + ')…</div>';
+  wrap.appendChild(row);
+
+  var fd = new FormData();
+  batch.forEach(function(f) { fd.append('files', f); });
+
+  fetch(API + '/api/projects/' + PROJECT_ID + '/erection/upload', {
+    method: 'POST', body: fd,
+  })
+    .then(function(r){
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(d){
+      row.className = 'progress-row done';
+      row.innerHTML = '<div class="progress-icon"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><polyline points="20,6 9,17 4,12"/></svg></div>'
+                   + '<div class="progress-msg">Batch ' + (i+1) + ' uploaded (' + d.file_count + ' files)</div>';
+      uploadBatches(batches, i+1, done);
+    })
+    .catch(function(e){
+      row.className = 'progress-row failed';
+      row.innerHTML = '<div class="progress-icon"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div>'
+                   + '<div class="progress-msg">Batch ' + (i+1) + ' failed: ' + e.message + '</div>';
+      uploadBatches(batches, i+1, done);
+    });
+}
+
+// ── Poll for extraction completion ────────────────────────────────────────
+function startPolling() {
+  if (STATE.pollTimer) clearInterval(STATE.pollTimer);
+  STATE.pollTimer = setInterval(function(){
+    loadSheets().then(function(){
+      if (STATE.status !== 'processing') {
+        clearInterval(STATE.pollTimer);
+        STATE.pollTimer = null;
+        loadStats();  // refresh placed count now extraction is done
+      }
+    });
+  }, 3500);
+}
+
+// ── Actions on individual sheets ──────────────────────────────────────────
+function reextract(filename) {
+  if (!confirm('Re-run extraction on ' + filename + '?')) return;
+  fetch(API + '/api/projects/' + PROJECT_ID + '/erection/' + encodeURIComponent(filename) + '/review', {
+    method: 'POST',
+  })
+    .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(){
+      toast('Re-extracting ' + filename, 'ok');
+      startPolling();
+    })
+    .catch(function(e){ toast('Re-extract failed: ' + e.message, 'err'); });
+}
+
+function deleteSheet(filename) {
+  if (!confirm('Delete ' + filename + '? This removes the PDF and its extraction data.')) return;
+  fetch(API + '/api/projects/' + PROJECT_ID + '/erection/' + encodeURIComponent(filename), {
+    method: 'DELETE',
+  })
+    .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(){
+      toast('Deleted ' + filename, 'ok');
+      loadSheets();
+      loadStats();
+    })
+    .catch(function(e){ toast('Delete failed: ' + e.message, 'err'); });
+}
+
+// ── Wire up dropzone + input ──────────────────────────────────────────────
+(function(){
+  var dz = document.getElementById('dropzone');
+  dz.addEventListener('dragover', function(e){ e.preventDefault(); dz.classList.add('dragging'); });
+  dz.addEventListener('dragleave', function(){ dz.classList.remove('dragging'); });
+  dz.addEventListener('drop', function(e){
+    e.preventDefault();
+    dz.classList.remove('dragging');
+    handleFiles(e.dataTransfer.files);
+  });
+  document.getElementById('fileInput').addEventListener('change', function(e){
+    handleFiles(e.target.files);
+    e.target.value = '';
+  });
+})();
+
+// ── Initial load ──────────────────────────────────────────────────────────
+loadProjectLabel();
+loadSheets().then(function(){
+  if (STATE.status === 'processing') startPolling();
+});
+loadStats();
+</script>
+</body></html>
