@@ -1091,8 +1091,26 @@ function makeCard(p) {
       detailIcon  = '<div class="spinner" style="width:12px;height:12px;border-width:2px;border-top-color:var(--amber)"></div>';
     }
     var detailBtn = '<a class="btn btn-sm js-details" href="/details.html?project=' + encodeURIComponent(p.id) + '" style="' + detailStyle + ';text-decoration:none;display:inline-flex;align-items:center;gap:6px">' + detailIcon + 'Detail Sheets</a>';
+
+    // Erection Sheets button — mirrors the Detail Sheets button pattern but
+    // routes to /erection.html and color-codes by erection_status.
+    var erectionStyle = 'background:var(--off);color:var(--txt2);border:1px solid var(--border)';
+    var erectionIcon  = '<svg viewBox="0 0 24 24" style="stroke:var(--txt2);stroke-width:2;fill:none;width:14px;height:14px"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>';
+    if (p.erection_status === 'ready') {
+      erectionStyle = 'background:#FEE;color:#C0392B;border:1px solid #C0392B';
+      erectionIcon  = '<svg viewBox="0 0 24 24" style="stroke:#C0392B;stroke-width:2;fill:none;width:14px;height:14px"><polyline points="20,6 9,17 4,12"/></svg>';
+    } else if (p.erection_status === 'processing') {
+      erectionStyle = 'background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber)';
+      erectionIcon  = '<div class="spinner" style="width:12px;height:12px;border-width:2px;border-top-color:var(--amber)"></div>';
+    } else if (p.erection_status === 'error') {
+      erectionStyle = 'background:var(--red-bg);color:var(--red);border:1px solid var(--red)';
+      erectionIcon  = '<svg viewBox="0 0 24 24" style="stroke:var(--red);stroke-width:2;fill:none;width:14px;height:14px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>';
+    }
+    var erectionBtn = '<a class="btn btn-sm js-erection" href="/erection.html?project=' + encodeURIComponent(p.id) + '" style="' + erectionStyle + ';text-decoration:none;display:inline-flex;align-items:center;gap:6px">' + erectionIcon + 'Erection Sheets</a>';
+
     actions = '<div class="proj-actions">'
       + detailBtn
+      + erectionBtn
       + '<button class="btn btn-ghost btn-sm js-revision" title="Upload a revised IFC/KSS/NC1 drawing set">'
       +   '<svg viewBox="0 0 24 24"><polyline points="23,4 23,11 16,11"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 11"/></svg>Upload Revision</button>'
       + '<button class="btn btn-ghost btn-sm js-regen" title="Regenerate field app HTML from stored data (applies generator fixes)">'
