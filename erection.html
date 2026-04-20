@@ -11,6 +11,13 @@
   --border:#DDE4ED; --border2:#C3CFDC; --green:#00A845; --green-bg:#E6F7EC;
   --amber:#FF9F0A; --amber-bg:#FFF4E0; --red:#FF3B30; --red-bg:#FFE8E6;
   --blue:#0066CC; --blue-bg:#E8F2FF;
+  --accent:#FF6B00;   /* brand accent — alias of --orange. Referenced by
+                         progress bar fill, pending-card shimmer text, and
+                         the "Extracting..." label in sheet cards. Was
+                         undefined for months — progress bar fill rendered
+                         invisible because `background:var(--accent)` fell
+                         back to the initial (transparent) value. Defining
+                         it here fixes all three call sites at once. */
   --sf:'Barlow Condensed',sans-serif; --serif:'Barlow',sans-serif;
   --mo:ui-monospace,SFMono-Regular,Menlo,monospace;
 }
