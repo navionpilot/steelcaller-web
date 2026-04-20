@@ -34,7 +34,8 @@ button{cursor:pointer;font-family:var(--sans)}
 /* SIDEBAR */
 .sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--navy);display:flex;flex-direction:column;height:100vh;overflow-y:auto;flex-shrink:0}
 .sidebar::-webkit-scrollbar{width:0}
-.sb-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.07);display:block;cursor:pointer;transition:background .15s}
+.sb-logo:hover{background:rgba(255,255,255,.04)}
 .sb-logo-inner{display:flex;align-items:center;gap:10px}
 .sb-icon{width:40px;height:40px;background:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sb-name{font-family:var(--serif);font-size:22px;font-weight:800;color:#fff}
@@ -266,7 +267,7 @@ button{cursor:pointer;font-family:var(--sans)}
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
-  <div class="sb-logo">
+  <a class="sb-logo" href="/" title="Go to steelcaller.com">
     <div class="sb-logo-inner">
       <div class="sb-icon">
         <svg viewBox="0 0 30 30" width="26" height="26"><rect x="2" y="2" width="26" height="7" rx="1.5" fill="white"/><rect x="11" y="9" width="8" height="12" rx="0.8" fill="white"/><rect x="2" y="21" width="26" height="7" rx="1.5" fill="white"/></svg>
@@ -276,7 +277,7 @@ button{cursor:pointer;font-family:var(--sans)}
       </div>
     </div>
     <div class="sb-plan">Dashboard &middot; <strong>Pro Plan</strong></div>
-  </div>
+  </a>
   <nav class="sb-nav">
     <div class="sb-section">Projects</div>
     <div class="sb-link on" onclick="showView('projects')">
@@ -322,6 +323,10 @@ button{cursor:pointer;font-family:var(--sans)}
   <div class="topbar">
     <div class="tb-title" id="pageTitle">My Projects</div>
     <div class="tb-right">
+      <a class="btn btn-ghost btn-sm" href="/" title="Go to steelcaller.com">
+        <svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        View Website
+      </a>
       <button class="btn btn-ghost btn-sm" onclick="showView('account')">
         <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         Pro Plan
