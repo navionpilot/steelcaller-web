@@ -683,6 +683,92 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 /* ═══════════════════ PRICING ═══════════════════ */
 .pricing { background: var(--bg); }
+
+/* Unlimited-users banner — the key differentiator */
+.unlimited-banner {
+  max-width: 980px;
+  margin: 0 auto 48px;
+  background: var(--orange);
+  color: #fff;
+  border-radius: 20px;
+  padding: 28px 32px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  box-shadow: 0 20px 50px rgba(255, 107, 0, .25);
+}
+.unlimited-ico {
+  flex-shrink: 0;
+  width: 64px; height: 64px;
+  background: rgba(255, 255, 255, .18);
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.unlimited-ico svg { width: 32px; height: 32px; stroke: #fff; stroke-width: 2.2; fill: none; }
+.unlimited-text { flex: 1; }
+.unlimited-h {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1.15;
+  letter-spacing: -.01em;
+  margin-bottom: 6px;
+}
+.unlimited-b {
+  font-size: 15px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, .95);
+}
+.unlimited-b strong { font-weight: 700; color: #fff; }
+@media (max-width: 640px) {
+  .unlimited-banner { flex-direction: column; text-align: center; padding: 24px; }
+}
+
+/* Billing toggle (monthly / annual) */
+.bill-toggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+.bill-wrap {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 5px;
+  display: inline-flex;
+  position: relative;
+}
+.bill-btn {
+  padding: 10px 24px;
+  font-size: 14px; font-weight: 600;
+  color: var(--ink-2);
+  background: transparent;
+  border-radius: 8px;
+  position: relative; z-index: 1;
+  transition: color .18s;
+  font-family: var(--font-body);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.bill-btn.active { color: #fff; }
+.bill-slider {
+  position: absolute;
+  top: 5px; bottom: 5px; left: 5px;
+  width: 0;
+  background: var(--navy-0);
+  border-radius: 8px;
+  transition: left .22s cubic-bezier(.4,0,.2,1), width .22s cubic-bezier(.4,0,.2,1);
+  z-index: 0;
+  pointer-events: none;
+}
+.bill-wrap[data-mode="annual"] .bill-slider { /* positioning handled by JS */ }
+.save-pill {
+  background: var(--green-bg);
+  color: var(--green);
+  font-size: 11px; font-weight: 700;
+  padding: 2px 7px; border-radius: 10px;
+  letter-spacing: .04em;
+}
+
 .price-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -733,6 +819,13 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   font-size: 16px; font-weight: 500;
   color: var(--ink-2);
 }
+.price-billed-note {
+  font-size: 13px;
+  color: var(--steel-600);
+  margin-bottom: 8px;
+  min-height: 18px;
+}
+.price-billed-note strong { color: var(--green); font-weight: 700; }
 .price-desc {
   font-size: 14px; color: var(--ink-2);
   margin-bottom: 26px; min-height: 40px;
@@ -1335,11 +1428,36 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       <div class="section-label">Pricing</div>
       <h2 class="section-h2">Simple. <em>Transparent.</em></h2>
       <p class="section-sub">
-        No user fees. No setup cost. No per-seat charges. The subscription
-        covers everyone on your project &mdash; fabricator, erector, GC,
-        inspector.
+        Pay per project, or subscribe for unlimited use. Either way, every
+        user on the project is included.
       </p>
     </div>
+
+    <!-- UNLIMITED USERS BANNER -->
+    <div class="unlimited-banner">
+      <div class="unlimited-ico">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>
+      </div>
+      <div class="unlimited-text">
+        <div class="unlimited-h">1 user or 100 users &mdash; it's the same price.</div>
+        <div class="unlimited-b">
+          When you buy a project or subscription, anyone you send the
+          project link to gets instant access &mdash; ironworkers, foremen,
+          GCs, inspectors, detailers. <strong>We do not charge by the user.
+          Only by the project or subscription.</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- BILLING TOGGLE -->
+    <div class="bill-toggle">
+      <div class="bill-wrap" id="billToggle" data-mode="monthly">
+        <button class="bill-btn active" data-mode="monthly">Monthly</button>
+        <button class="bill-btn" data-mode="annual">Annual <span class="save-pill">Save 15%</span></button>
+        <div class="bill-slider"></div>
+      </div>
+    </div>
+
     <div class="price-grid">
 
       <div class="price-card">
@@ -1348,17 +1466,18 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
           <div class="price-amt-n">$249</div>
           <div class="price-amt-u">&nbsp;one-time</div>
         </div>
+        <div class="price-billed-note">90-day project access &middot; Unlimited users</div>
         <div class="price-desc">
-          Pay once per project. No subscription required. Best for
-          one-off jobs.
+          Pay once for a single project. No subscription required. Best
+          for one-off jobs or trying SteelCaller on your next build.
         </div>
         <ul class="price-feats">
-          <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Unlimited piece marks &amp; field users</li>
+          <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg><strong>Unlimited users</strong> on the project</li>
           <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>All features included</li>
           <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Unlimited revision uploads</li>
           <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Unlimited detail sheet PDFs</li>
           <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Shareable link &amp; QR code</li>
-          <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>90 days of live access after project completion</li>
+          <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>90 days live access after project completion</li>
         </ul>
         <a href="/login.html?tab=signup" class="price-cta secondary">Get Started &mdash; $249</a>
       </div>
@@ -1367,22 +1486,25 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
         <div class="price-tag">Best Value</div>
         <div class="price-name">Pro Subscription</div>
         <div class="price-amt">
-          <div class="price-amt-n">$799</div>
+          <div class="price-amt-n" id="subAmt" data-monthly="$499" data-annual="$424">$499</div>
           <div class="price-amt-u">&nbsp;/ month</div>
         </div>
+        <div class="price-billed-note" id="subNote"
+             data-monthly="Billed monthly &middot; Cancel anytime"
+             data-annual="Billed annually at $5,088 &middot; <strong>Save $900/yr</strong>">Billed monthly &middot; Cancel anytime</div>
         <div class="price-desc">
-          Unlimited projects, month to month. Pays for itself after
-          four projects per year.
+          Unlimited projects, unlimited users per project. Pays for itself
+          after three projects a year.
         </div>
         <ul class="price-feats">
           <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg><strong>Unlimited projects</strong> &mdash; run as many as you need</li>
+          <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg><strong>Unlimited users</strong> on every project</li>
           <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>All per-project features included</li>
           <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Priority processing queue</li>
           <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Projects stay live for the life of the subscription</li>
-          <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Priority email support</li>
           <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Cancel anytime, no contract</li>
         </ul>
-        <a href="/login.html?tab=signup&plan=pro" class="price-cta primary">Start Pro &mdash; $799/mo</a>
+        <a href="/login.html?tab=signup&plan=pro" class="price-cta primary" id="subCta">Start Pro &mdash; $499/mo</a>
       </div>
 
     </div>
@@ -1459,7 +1581,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
     </div>
     <div class="footer-bottom">
-      <div>&copy; 2025 SteelCaller. All rights reserved.</div>
+      <div>&copy; 2026 SteelCaller. All rights reserved.</div>
       <div class="footer-bottom-links">
         <a href="#">Press</a>
         <a href="#">Careers</a>
@@ -1468,6 +1590,47 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     </div>
   </div>
 </footer>
+
+<script>
+// Pricing billing toggle (monthly / annual)
+(function(){
+  var wrap    = document.getElementById('billToggle');
+  var btns    = wrap.querySelectorAll('.bill-btn');
+  var slider  = wrap.querySelector('.bill-slider');
+  var amt     = document.getElementById('subAmt');
+  var note    = document.getElementById('subNote');
+  var cta     = document.getElementById('subCta');
+
+  // Position slider to fully cover the currently-active button, whatever
+  // its width. Handles the "Annual" button being wider due to the Save
+  // pill — without this the old fixed-width slider left part of the
+  // Annual text visible.
+  function positionSlider() {
+    var active = wrap.querySelector('.bill-btn.active');
+    if (!active) return;
+    slider.style.left  = active.offsetLeft + 'px';
+    slider.style.width = active.offsetWidth + 'px';
+  }
+
+  btns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var mode = btn.dataset.mode;
+      wrap.dataset.mode = mode;
+      btns.forEach(function(b){ b.classList.toggle('active', b.dataset.mode === mode); });
+      positionSlider();
+      amt.textContent  = amt.dataset[mode];
+      note.innerHTML   = note.dataset[mode];
+      cta.innerHTML    = 'Start Pro &mdash; ' + amt.dataset[mode] + '/mo';
+    });
+  });
+
+  // Position once on load, and re-position on resize in case the layout
+  // shifts (e.g. mobile breakpoint).
+  window.addEventListener('load',   positionSlider);
+  window.addEventListener('resize', positionSlider);
+  positionSlider();  // immediate in case DOMContentLoaded already fired
+})();
+</script>
 
 </body>
 </html>
