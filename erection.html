@@ -88,6 +88,19 @@ body{font-family:var(--serif);background:var(--off);color:var(--txt);min-height:
 .sheet-list{display:flex;flex-direction:column;gap:10px}
 .sheet-card{background:var(--off);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
 .sheet-card.err{background:var(--red-bg);border-color:#F8C8C4}
+.sheet-card.pending{background:#FFF9E6;border-color:#FFD97A;border-style:dashed}
+.sheet-card.pending .sheet-icon{background:rgba(255,159,10,.12)}
+.sheet-card.pending .sheet-icon svg{stroke:var(--amber);animation:fade-pulse 1.6s ease-in-out infinite}
+
+@keyframes fade-pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+.pending-dots span{display:inline-block;animation:dot-bounce 1.3s ease-in-out infinite;font-size:22px;line-height:0.4;padding:0 1px}
+.pending-dots span:nth-child(2){animation-delay:0.16s}
+.pending-dots span:nth-child(3){animation-delay:0.32s}
+@keyframes dot-bounce { 0%,80%,100%{transform:translateY(0);opacity:0.4} 40%{transform:translateY(-3px);opacity:1} }
+
+.shimmer-bar{background:linear-gradient(90deg,#FFE0B2 0%,#FFAB3A 50%,#FFE0B2 100%);background-size:200% 100%;animation:shimmer 1.5s linear infinite}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 .sheet-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
 .sheet-icon{width:38px;height:38px;background:rgba(0,102,204,.08);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sheet-icon svg{width:20px;height:20px;stroke:var(--blue);stroke-width:2;fill:none}
@@ -395,9 +408,37 @@ function loadStats() {
 function renderBanner(status) {
   var el = document.getElementById('statusBanner');
   if (status === 'processing') {
+    // Count how many sheets have been extracted so far vs total pending.
+    // "Total pending" = total sheets in project (we only know the live count).
+    var total = (STATE.sheets || []).length;
+    var done = 0;
+    var errors = 0;
+    STATE.sheets.forEach(function(s){
+      if (s.error)                              { errors++; done++; }
+      else if (s.sheet_type || s.non_plan)      { done++; }
+      // sheets that are freshly uploaded with no metadata yet don't count as done
+    });
+    var pct = total ? Math.round(done / total * 100) : 0;
+
     el.className = 'banner processing';
     el.style.display = 'flex';
-    el.innerHTML = '<div class="banner-spinner"></div><span>Extracting metadata from uploaded sheets&hellip; this usually takes 5-15 seconds per sheet.</span>';
+    el.innerHTML =
+      '<div class="banner-spinner"></div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-weight:600;margin-bottom:6px">' +
+          'Extracting metadata&hellip; ' +
+          '<span style="color:var(--txt2);font-weight:500">' + done + ' of ' + total + ' done' +
+          (errors ? ' <span style="color:var(--red)">(' + errors + ' errors)</span>' : '') +
+          '</span>' +
+        '</div>' +
+        '<div style="background:rgba(0,0,0,0.08);border-radius:4px;height:8px;overflow:hidden">' +
+          '<div style="background:var(--accent);height:100%;width:' + pct + '%;transition:width 0.4s"></div>' +
+        '</div>' +
+        '<div style="font-size:12px;color:var(--txt3);margin-top:6px">' +
+          'Processing 3 sheets at a time, roughly 15-20 seconds per sheet. ' +
+          'You can leave this page and come back &mdash; extraction continues in the background.' +
+        '</div>' +
+      '</div>';
   } else if (status === 'uploading') {
     el.className = 'banner processing';
     el.style.display = 'flex';
@@ -543,8 +584,11 @@ function renderSheets() {
 // Build one sheet card's HTML (extracted from old renderSheets)
 function sheetCardHtml(s) {
   var errCls = s.error ? ' err' : '';
+  if (s.pending) errCls = ' pending';
   var ttl = '';
-  if (s.sheet_title) {
+  if (s.pending) {
+    ttl = '<span style="color:var(--accent)"><span class="pending-dots"><span>&middot;</span><span>&middot;</span><span>&middot;</span></span> Extracting&hellip;</span>';
+  } else if (s.sheet_title) {
     ttl = escapeHtml(s.sheet_title);
     if (s.segment) ttl += ' <span class="seg">&middot; SEG ' + escapeHtml(s.segment) + '</span>';
   } else if (s.sheet_type === 'elevation' && (s.elevation_view_count || 0) > 0) {
@@ -569,16 +613,31 @@ function sheetCardHtml(s) {
   html +=       '<div class="sheet-ttl">' + ttl + '</div>';
   html +=     '</div>';
   html +=     '<div class="sheet-actions">';
-  if (s.url) {
-    html +=     '<a class="act-btn" href="' + escapeAttr(s.url) + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>View PDF</a>';
+  if (s.pending) {
+    // Sheet is uploaded but not yet extracted. No actions available except
+    // delete — no View PDF URL, no Re-extract (still in queue), etc.
+    html +=     '<button class="act-btn del" onclick="deleteSheet(\'' + escapeAttr(s.filename) + '\')"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6"/></svg>Delete</button>';
+  } else {
+    if (s.url) {
+      html +=   '<a class="act-btn" href="' + escapeAttr(s.url) + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>View PDF</a>';
+    }
+    html +=     '<button class="act-btn" onclick="retagSheet(\'' + escapeAttr(s.filename) + '\')" title="Change sequence tag"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Seq</button>';
+    html +=     '<button class="act-btn" onclick="reextract(\'' + escapeAttr(s.filename) + '\')"><svg viewBox="0 0 24 24"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Re-extract</button>';
+    html +=     '<button class="act-btn del" onclick="deleteSheet(\'' + escapeAttr(s.filename) + '\')"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6"/></svg>Delete</button>';
   }
-  html +=       '<button class="act-btn" onclick="retagSheet(\'' + escapeAttr(s.filename) + '\')" title="Change sequence tag"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Seq</button>';
-  html +=       '<button class="act-btn" onclick="reextract(\'' + escapeAttr(s.filename) + '\')"><svg viewBox="0 0 24 24"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Re-extract</button>';
-  html +=       '<button class="act-btn del" onclick="deleteSheet(\'' + escapeAttr(s.filename) + '\')"><svg viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6"/></svg>Delete</button>';
   html +=     '</div>';
   html +=   '</div>';
 
-  if (s.sheet_type === 'elevation' && (s.elevation_view_count || 0) > 0) {
+  if (s.pending) {
+    // Pending extraction — show a shimmering loading bar. Gets replaced
+    // with real metadata once extraction finishes.
+    html += '<div class="sheet-meta">';
+    html += '<div class="meta-item" style="color:var(--accent);display:flex;align-items:center;gap:10px">';
+    html +=   '<div class="shimmer-bar" style="flex:1;height:6px;border-radius:3px"></div>';
+    html +=   '<span style="font-size:12px;white-space:nowrap">In queue</span>';
+    html += '</div>';
+    html += '</div>';
+  } else if (s.sheet_type === 'elevation' && (s.elevation_view_count || 0) > 0) {
     // Elevation sheet with views — show view count + columns served.
     // These sheets route vertical bracing and columns via elevation lookup.
     html += '<div class="sheet-meta">';
@@ -795,15 +854,17 @@ function uploadOneBatchWithRetry(batch, row, batchNum, totalBatches, attempt, cb
 // ── Poll for extraction completion ────────────────────────────────────────
 function startPolling() {
   if (STATE.pollTimer) clearInterval(STATE.pollTimer);
+  // 2s during active extraction = smooth progress bar without hammering the
+  // server. When status flips to 'ready' or 'error', we stop polling.
   STATE.pollTimer = setInterval(function(){
     loadSheets().then(function(){
-      if (STATE.status !== 'processing') {
+      if (STATE.status !== 'processing' && STATE.status !== 'uploading') {
         clearInterval(STATE.pollTimer);
         STATE.pollTimer = null;
         loadStats();  // refresh placed count now extraction is done
       }
     });
-  }, 3500);
+  }, 2000);
 }
 
 // ── Actions on individual sheets ──────────────────────────────────────────
