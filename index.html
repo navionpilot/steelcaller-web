@@ -110,6 +110,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 .nav-links a { transition: color .15s; }
 .nav-links a:hover { color: #fff; }
+.nav-links a.active { color: var(--orange); }
 .nav-cta {
   display: flex; gap: 10px; align-items: center;
 }
@@ -872,9 +873,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       </div>
     </a>
     <div class="nav-links">
-      <a href="#built-for">Built For</a>
+      <a href="/" class="active">Field App</a>
+      <a href="/estimate.html">Estimate</a>
       <a href="#how-it-works">How It Works</a>
-      <a href="#revisions">Revisions</a>
       <a href="#features">Features</a>
       <a href="#pricing">Pricing</a>
     </div>
@@ -1448,7 +1449,15 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       </div>
 
       <div class="footer-col">
-        <div class="footer-col-h">Product</div>
+        <div class="footer-col-h">Products</div>
+        <ul>
+          <li><a href="/">SteelCaller Field App</a></li>
+          <li><a href="/estimate.html">SteelCaller Estimate</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-col-h">Field App</div>
         <ul>
           <li><a href="#built-for">Built For</a></li>
           <li><a href="#how-it-works">How It Works</a></li>
@@ -1458,19 +1467,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
       </div>
 
       <div class="footer-col">
-        <div class="footer-col-h">Files</div>
-        <ul>
-          <li><a href="#">IFC Export Guide</a></li>
-          <li><a href="#">KSS Export Guide</a></li>
-          <li><a href="#">NC1 Export Guide</a></li>
-          <li><a href="#">Supported Software</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
         <div class="footer-col-h">Company</div>
         <ul>
-          <li><a href="#">About</a></li>
           <li><a href="mailto:support@steelcaller.com">Support</a></li>
           <li><a href="#">Privacy Policy</a></li>
           <li><a href="#">Terms of Service</a></li>
