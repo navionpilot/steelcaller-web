@@ -4,9 +4,17 @@
   <!-- Homepage -->
   <url>
     <loc>https://steelcaller.com/</loc>
-    <lastmod>2026-04-19</lastmod>
+    <lastmod>2026-04-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+
+  <!-- Estimate product landing (voice-driven takeoff for estimators) -->
+  <url>
+    <loc>https://steelcaller.com/estimate.html</loc>
+    <lastmod>2026-04-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
 
   <!-- QR Code Landing Page (printed on drawings, shared in the field) -->
