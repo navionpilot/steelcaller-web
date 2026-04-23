@@ -123,6 +123,63 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   transition: all .15s;
 }
 .btn-login:hover { background: rgba(255, 255, 255, .06); }
+
+/* Login-product dropdown (Field App vs Estimate choice) */
+.login-dropdown { position: relative; }
+.login-dropdown-btn {
+  color: rgba(255, 255, 255, .88);
+  font-weight: 600; font-size: 14px;
+  padding: 9px 14px 9px 16px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  background: none;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: all .15s;
+}
+.login-dropdown-btn:hover { background: rgba(255, 255, 255, .06); }
+.login-dropdown-btn svg {
+  transition: transform .2s;
+}
+.login-dropdown.open .login-dropdown-btn svg { transform: rotate(180deg); }
+.login-dropdown-menu {
+  position: absolute; top: calc(100% + 6px); right: 0;
+  min-width: 220px;
+  background: var(--navy-1);
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 10px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .5);
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: all .15s;
+  z-index: 200;
+}
+.login-dropdown.open .login-dropdown-menu {
+  opacity: 1; visibility: visible; transform: translateY(0);
+}
+.login-dropdown-menu a {
+  display: block;
+  padding: 12px 16px;
+  color: rgba(255, 255, 255, .8);
+  font-size: 14px; font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, .05);
+  transition: all .12s;
+}
+.login-dropdown-menu a:last-child { border-bottom: none; }
+.login-dropdown-menu a:hover {
+  background: rgba(255, 107, 0, .1);
+  color: #fff;
+}
+.login-dropdown-menu a .product-label {
+  display: block;
+  font-size: 10px; font-weight: 700;
+  color: var(--orange);
+  letter-spacing: .12em; text-transform: uppercase;
+  margin-bottom: 3px;
+  font-family: var(--font-mono);
+}
 .btn-primary {
   background: var(--orange); color: #fff;
   font-weight: 700; font-size: 14px;
@@ -1039,16 +1096,24 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     <div class="nav-links">
       <a href="/" class="active">Field App</a>
       <a href="/estimate.html">Estimate</a>
-      <a href="#how-it-works">How It Works</a>
-      <a href="#features">Features</a>
-      <a href="#pricing">Pricing</a>
     </div>
     <div class="nav-cta">
-      <a href="/login.html" class="btn-login">Log In</a>
-      <a href="/login.html?tab=signup" class="btn-primary">
-        Get Started
-        <svg viewBox="0 0 24 24" width="14" height="14" style="stroke:#fff;stroke-width:2.5;fill:none"><polyline points="9,18 15,12 9,6"/></svg>
-      </a>
+      <div class="login-dropdown" id="loginDropdown">
+        <button type="button" class="login-dropdown-btn" aria-haspopup="true" aria-expanded="false">
+          Log In
+          <svg viewBox="0 0 24 24" width="11" height="11" style="stroke:currentColor;stroke-width:2.5;fill:none"><polyline points="6,9 12,15 18,9"/></svg>
+        </button>
+        <div class="login-dropdown-menu" role="menu">
+          <a href="/login.html" role="menuitem">
+            <span class="product-label">Field App</span>
+            Sign in to your project dashboard
+          </a>
+          <a href="https://app.steelcaller.com/login" role="menuitem">
+            <span class="product-label">Estimate</span>
+            Sign in to your estimating workspace
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </nav>
@@ -1720,6 +1785,35 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   window.addEventListener('load',   positionSlider);
   window.addEventListener('resize', positionSlider);
   positionSlider();  // immediate in case DOMContentLoaded already fired
+})();
+
+// Login product-chooser dropdown (Field App vs Estimate)
+(function(){
+  var dropdown = document.getElementById('loginDropdown');
+  if (!dropdown) return;
+  var btn = dropdown.querySelector('.login-dropdown-btn');
+
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    var isOpen = dropdown.classList.toggle('open');
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+
+  // Close when clicking outside
+  document.addEventListener('click', function(e){
+    if (!dropdown.contains(e.target)) {
+      dropdown.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') {
+      dropdown.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
 })();
 </script>
 
