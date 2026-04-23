@@ -814,6 +814,170 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 .cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 
+/* ═══════════════════ BRAND CHOOSER HERO ═══════════════════ */
+/* Replaces the old single-product hero. Presents both SteelCaller
+   products side-by-side so a first-time visitor can pick which one
+   matches their role. */
+.hero-brand {
+  background: var(--navy-0);
+  background-image:
+    radial-gradient(ellipse 900px 500px at 50% 20%, rgba(255, 107, 0, .18), transparent 70%),
+    radial-gradient(ellipse 900px 500px at 50% 80%, rgba(30, 47, 78, .6), transparent 70%);
+  color: #fff; position: relative; overflow: hidden;
+}
+.hero-brand::before {
+  content: ''; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at 50% 40%, #000 40%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 40%, #000 40%, transparent 80%);
+  pointer-events: none;
+}
+.hero-brand-inner {
+  max-width: 1180px; margin: 0 auto;
+  padding: 80px 28px 96px;
+  position: relative;
+}
+.hero-brand-top { text-align: center; margin-bottom: 56px; }
+.hero-brand-h1 {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(40px, 5.5vw, 64px);
+  line-height: 1.05; letter-spacing: -.025em;
+  margin-bottom: 20px;
+}
+.hero-brand-h1 em { color: var(--orange); font-style: normal; }
+.hero-brand-sub {
+  font-size: clamp(16px, 1.4vw, 19px);
+  line-height: 1.55; color: rgba(255, 255, 255, .7);
+  max-width: 580px; margin: 0 auto;
+}
+
+/* Two-column product chooser grid */
+.chooser-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 1100px; margin: 0 auto;
+}
+.chooser-card {
+  position: relative;
+  display: flex; flex-direction: column;
+  padding: 36px 32px 32px;
+  background: var(--navy-1);
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 20px;
+  color: #fff;
+  transition: all .2s;
+  overflow: hidden;
+}
+.chooser-card::after {
+  content: ''; position: absolute; inset: 0;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  transition: border-color .2s;
+  pointer-events: none;
+}
+.chooser-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 107, 0, .4);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, .5), 0 0 0 1px rgba(255, 107, 0, .1);
+}
+/* Estimate card — subtle emphasis (newer product) */
+.chooser-card-estimate {
+  border-color: rgba(255, 107, 0, .3);
+  background:
+    linear-gradient(180deg, rgba(255, 107, 0, .06), transparent 50%),
+    var(--navy-1);
+}
+.chooser-new-pill {
+  position: absolute; top: 18px; right: 18px;
+  font-family: var(--font-mono); font-weight: 700;
+  font-size: 10px; letter-spacing: .14em;
+  color: #fff;
+  background: var(--orange);
+  padding: 5px 11px; border-radius: 999px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(255, 107, 0, .4);
+}
+.chooser-icon {
+  width: 52px; height: 52px;
+  background: var(--orange-bg);
+  border: 1px solid rgba(255, 107, 0, .25);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 22px;
+}
+.chooser-icon svg { width: 26px; height: 26px; fill: none; stroke: var(--orange); stroke-width: 1.8; }
+.chooser-name {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: 26px; letter-spacing: -.02em;
+  margin-bottom: 6px; line-height: 1.15;
+}
+.chooser-tag {
+  font-family: var(--font-mono); font-weight: 700;
+  font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 16px;
+}
+.chooser-desc {
+  color: rgba(255, 255, 255, .7);
+  font-size: 15px; line-height: 1.6;
+  margin-bottom: 20px;
+}
+.chooser-feats { list-style: none; padding: 0; margin: 0 0 24px; }
+.chooser-feats li {
+  padding: 6px 0;
+  font-size: 14px; color: rgba(255, 255, 255, .82);
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.chooser-feats li svg {
+  width: 14px; height: 14px;
+  fill: none; stroke: var(--orange); stroke-width: 3;
+  flex-shrink: 0; margin-top: 4px;
+}
+.chooser-price {
+  font-family: var(--font-mono); font-weight: 700;
+  font-size: 12px; letter-spacing: .08em;
+  color: rgba(255, 255, 255, .55);
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, .08);
+  margin-bottom: 16px;
+}
+.chooser-price strong { color: #fff; font-weight: 700; }
+.chooser-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 15px;
+  padding: 13px 22px; border-radius: 9px;
+  transition: all .2s;
+  margin-top: auto;
+  align-self: flex-start;
+}
+.chooser-card-estimate .chooser-cta {
+  background: var(--orange); color: #fff;
+  box-shadow: 0 8px 20px rgba(255, 107, 0, .25);
+}
+.chooser-card-estimate:hover .chooser-cta {
+  background: var(--orange-2);
+  box-shadow: 0 12px 28px rgba(255, 107, 0, .4);
+}
+.chooser-card-fieldapp .chooser-cta {
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .18);
+  color: #fff;
+}
+.chooser-card-fieldapp:hover .chooser-cta {
+  background: rgba(255, 255, 255, .14);
+  border-color: rgba(255, 255, 255, .28);
+}
+@media (max-width: 780px) {
+  .chooser-grid { grid-template-columns: 1fr; gap: 18px; }
+  .hero-brand-inner { padding: 56px 20px 72px; }
+  .hero-brand-top { margin-bottom: 40px; }
+  .chooser-card { padding: 28px 24px 26px; }
+}
+
 /* ═══════════════════ FOOTER ═══════════════════ */
 .footer {
   background: #070D17; color: rgba(255, 255, 255, .5);
@@ -889,52 +1053,83 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   </div>
 </nav>
 
-<!-- ═══════════════════ HERO ═══════════════════ -->
-<section class="hero">
-  <div class="hero-inner">
-    <div class="hero-content">
-      <h1 class="hero-h1">
-        Every Mark.<br>
-        Every Location.<br>
-        <em>One Field App.</em>
+<!-- ═══════════════════ BRAND CHOOSER HERO ═══════════════════ -->
+<!-- Multi-product entry. Visitor picks which app matches their role
+     before scrolling into product-specific content (Field App below). -->
+<section class="hero-brand">
+  <div class="hero-brand-inner">
+    <div class="hero-brand-top">
+      <h1 class="hero-brand-h1">
+        Software for steel,<br>
+        <em>built by people who've built steel.</em>
       </h1>
-      <p class="hero-sub">
-        Fabricators upload <strong>IFC, KSS, and NC1 files once</strong>
-        &mdash; plus shop drawings. Erectors and field crews get instant
-        access to every piece mark, bolt spec, elevation, detail sheet,
-        and revision alert &mdash; on any phone, no login required.
+      <p class="hero-brand-sub">
+        Two apps. One brand. Pick the one that matches the work you're
+        doing today.
       </p>
-      <div class="hero-actions">
-        <a href="/login.html?tab=signup" class="btn-hero-primary">
-          Upload Your First Project
-          <svg viewBox="0 0 24 24" width="16" height="16" style="stroke:#fff;stroke-width:2.5;fill:none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
-        </a>
-        <a href="#how-it-works" class="btn-hero-ghost">See How It Works</a>
-      </div>
-      <div class="hero-proof">
-        <div class="hero-proof-stat">
-          <div class="hero-proof-n">3 Files</div>
-          <div class="hero-proof-l">IFC &middot; KSS &middot; NC1</div>
-        </div>
-        <div class="hero-proof-stat">
-          <div class="hero-proof-n">&lt; 3 min</div>
-          <div class="hero-proof-l">To Live App</div>
-        </div>
-        <div class="hero-proof-stat">
-          <div class="hero-proof-n">EN / ES</div>
-          <div class="hero-proof-l">Bilingual</div>
-        </div>
-        <div class="hero-proof-stat">
-          <div class="hero-proof-n">$249</div>
-          <div class="hero-proof-l">Per Project</div>
-        </div>
-      </div>
     </div>
-    <div class="hero-visual">
-      <img src="shot-search.png" alt="SteelCaller field app on phone showing piece marks, revision alerts, and voice lookup">
+
+    <div class="chooser-grid">
+
+      <!-- ESTIMATE (left, emphasized) -->
+      <a href="/estimate.html" class="chooser-card chooser-card-estimate">
+        <div class="chooser-new-pill">New</div>
+        <div class="chooser-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </div>
+        <div class="chooser-name">SteelCaller Estimate</div>
+        <div class="chooser-tag">For Estimators Bidding Jobs</div>
+        <div class="chooser-desc">
+          Voice-driven steel takeoff. Pair your phone, dictate pieces, and
+          the app parses shapes, quantities, and lengths automatically.
+          Cost recap and scope letters auto-assemble.
+        </div>
+        <ul class="chooser-feats">
+          <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Voice takeoff &amp; KISS/BOM import from SDS/2</li>
+          <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>1,229-part catalog with auto unit weights</li>
+          <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Auto-assembled scope letter PDFs</li>
+        </ul>
+        <div class="chooser-price">
+          <strong>$249/mo</strong> &middot; save 20% annual
+        </div>
+        <span class="chooser-cta">
+          Learn more
+          <svg viewBox="0 0 24 24" width="14" height="14" style="stroke:currentColor;stroke-width:2.5;fill:none"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+        </span>
+      </a>
+
+      <!-- FIELD APP (right) -->
+      <a href="#field-app" class="chooser-card chooser-card-fieldapp">
+        <div class="chooser-icon">
+          <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+        </div>
+        <div class="chooser-name">SteelCaller Field App</div>
+        <div class="chooser-tag">For Erectors &amp; Field Crews</div>
+        <div class="chooser-desc">
+          Fabricators upload IFC, KSS, and NC1 files once. Erectors and
+          field crews access every piece mark, bolt spec, elevation, and
+          revision alert &mdash; on any phone, no login required.
+        </div>
+        <ul class="chooser-feats">
+          <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>No app install &mdash; QR code pairing</li>
+          <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Revision alerts &amp; detail sheets on phone</li>
+          <li><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Unlimited users per project &mdash; never a seat fee</li>
+        </ul>
+        <div class="chooser-price">
+          <strong>$249 per project</strong> &middot; or $499/mo Pro
+        </div>
+        <span class="chooser-cta">
+          Learn more below
+          <svg viewBox="0 0 24 24" width="14" height="14" style="stroke:currentColor;stroke-width:2.5;fill:none"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </a>
+
     </div>
   </div>
 </section>
+
+<!-- ═══════════════════ FIELD APP SECTION ANCHOR ═══════════════════ -->
+<div id="field-app"></div>
 
 <!-- ═══════════════════ BUILT FOR ═══════════════════ -->
 <section class="section built-for" id="built-for">
