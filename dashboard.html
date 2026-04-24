@@ -276,7 +276,7 @@ button{cursor:pointer;font-family:var(--sans)}
         <div class="sb-name">Steel<span>Caller</span></div>
       </div>
     </div>
-    <div class="sb-plan">Dashboard &middot; <strong>Pro Plan</strong></div>
+    <div class="sb-plan" id="sidebarPlanLabel">Dashboard &middot; <strong>Loading...</strong></div>
   </a>
   <nav class="sb-nav">
     <div class="sb-section">Projects</div>
@@ -329,7 +329,7 @@ button{cursor:pointer;font-family:var(--sans)}
       </a>
       <button class="btn btn-ghost btn-sm" onclick="showView('account')">
         <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-        Pro Plan
+        <span id="topbarPlanLabel">Loading...</span>
       </button>
       <button class="btn btn-primary" onclick="showView('new-project')">
         <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -344,7 +344,7 @@ button{cursor:pointer;font-family:var(--sans)}
       <div class="stat-card"><div class="stat-n orange" id="sTotal">0</div><div class="stat-l">Total Projects</div><div class="stat-sub">This account</div></div>
       <div class="stat-card"><div class="stat-n green" id="sLive">0</div><div class="stat-l">Active &amp; Live</div><div class="stat-sub">Field crew can access</div></div>
       <div class="stat-card"><div class="stat-n amber" id="sProc">0</div><div class="stat-l">Processing</div><div class="stat-sub">Files being parsed</div></div>
-      <div class="stat-card"><div class="stat-n">&#8734;</div><div class="stat-l">Projects This Month</div><div class="stat-sub">Pro Plan &mdash; unlimited</div></div>
+      <div class="stat-card"><div class="stat-n">&#8734;</div><div class="stat-l">Projects This Month</div><div class="stat-sub" id="statPlanLabel">Loading...</div></div>
     </div>
     <div class="section-hdr">
       <div>
@@ -480,16 +480,10 @@ button{cursor:pointer;font-family:var(--sans)}
           </div>
         </div>
         <div>
-          <div class="price-box">
-            <div class="price-plan">Pro Plan &mdash; Unlimited</div>
-            <div class="price-amt">$0<span>/this project</span></div>
-            <div class="price-desc">Your Pro subscription covers this project.</div>
-            <div class="price-feats">
-              <div class="price-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Unlimited users per project</div>
-              <div class="price-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Unlimited piece marks</div>
-              <div class="price-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Voice lookup + bilingual</div>
-              <div class="price-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Priority processing</div>
-            </div>
+          <div class="price-box" id="wizardPriceCard">
+            <div class="price-plan">Loading...</div>
+            <div class="price-amt">&mdash;<span></span></div>
+            <div class="price-desc">Checking your subscription status...</div>
           </div>
           <div style="font-size:13px;color:var(--txt3);line-height:1.65;background:var(--off);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px">
             Processing typically takes <strong style="color:var(--txt)">2-5 minutes</strong>. You'll get an email when the field app is ready.
@@ -1183,7 +1177,80 @@ function refreshSubscriptionCard() {
     });
 }
 
+function updateChromePlanLabels(sub) {
+  /* Update the "Pro Plan" labels scattered through the dashboard chrome:
+     - Sidebar under the logo
+     - Topbar button next to New Project
+     - Stats card "Projects This Month" subtitle
+     - Wizard Step 3 price card on the right side
+
+     These used to be hardcoded; now they reflect real subscription state. */
+  var planDisplay, planSubtitle, wizardPlan, wizardAmt, wizardDesc, wizardFeats;
+
+  if (sub && sub.plan === 'owner') {
+    planDisplay  = 'Owner Access';
+    planSubtitle = 'Owner &mdash; unlimited';
+    wizardPlan   = 'Owner Access &mdash; Unlimited';
+    wizardAmt    = '$0<span>/this project</span>';
+    wizardDesc   = 'You have owner-level access. This project is covered.';
+    wizardFeats  = [
+      'Unlimited projects', 'Unlimited users per project',
+      'Voice lookup + bilingual', 'Priority processing'
+    ];
+  } else if (sub && sub.active && (sub.plan === 'monthly' || sub.plan === 'annual')) {
+    planDisplay  = sub.plan === 'annual' ? 'Pro (Annual)' : 'Pro (Monthly)';
+    planSubtitle = 'Pro Plan &mdash; unlimited';
+    wizardPlan   = 'Pro Plan &mdash; Unlimited';
+    wizardAmt    = '$0<span>/this project</span>';
+    wizardDesc   = 'Your Pro subscription covers this project.';
+    wizardFeats  = [
+      'Unlimited users per project', 'Unlimited piece marks',
+      'Voice lookup + bilingual', 'Priority processing'
+    ];
+  } else {
+    planDisplay  = 'No Subscription';
+    planSubtitle = 'Pay per project';
+    wizardPlan   = 'This Project';
+    wizardAmt    = '$89<span>/one-time</span>';
+    wizardDesc   = 'You\'ll be prompted to pay $89 or upgrade to Pro when you click Launch.';
+    wizardFeats  = [
+      'Unlimited users on this project',
+      '90 day live access after completion',
+      'No recurring charges',
+      'Upgrade to Pro anytime to save'
+    ];
+  }
+
+  /* Sidebar label */
+  var sidebarEl = document.getElementById('sidebarPlanLabel');
+  if (sidebarEl) sidebarEl.innerHTML = 'Dashboard &middot; <strong>' + planDisplay + '</strong>';
+
+  /* Topbar button label */
+  var topbarEl = document.getElementById('topbarPlanLabel');
+  if (topbarEl) topbarEl.textContent = planDisplay;
+
+  /* Stats card subtitle */
+  var statEl = document.getElementById('statPlanLabel');
+  if (statEl) statEl.innerHTML = planSubtitle;
+
+  /* Wizard Step 3 price card */
+  var wizardEl = document.getElementById('wizardPriceCard');
+  if (wizardEl) {
+    var featsHtml = wizardFeats.map(function(f) {
+      return '<div class="price-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>' + f + '</div>';
+    }).join('');
+    wizardEl.innerHTML =
+      '<div class="price-plan">' + wizardPlan + '</div>' +
+      '<div class="price-amt">' + wizardAmt + '</div>' +
+      '<div class="price-desc">' + wizardDesc + '</div>' +
+      '<div class="price-feats">' + featsHtml + '</div>';
+  }
+}
+
 function renderSubscriptionCard(sub) {
+  /* Update the 4 scattered "Pro Plan" labels first, then the main billing card */
+  updateChromePlanLabels(sub);
+
   var card = document.getElementById('subscriptionCard');
   if (!card) return;
 
