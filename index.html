@@ -189,10 +189,45 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 .btn-primary:hover { background: var(--orange-2); }
 @media (max-width: 820px) {
-  .nav-links { display: none; }
+  /* Stack the nav to TWO ROWS: logo+login on top, nav-links on bottom.
+     Users on phones need a way to reach product pages from the nav. */
+  .nav-inner {
+    flex-wrap: wrap;
+    row-gap: 10px;
+    padding: 12px 20px;
+  }
   .logo-tag { display: none; }
-  .logo-name { font-size: 22px; }
-  .logo-mark { width: 40px; height: 40px; }
+  .logo-name { font-size: 20px; }
+  .logo-mark { width: 36px; height: 36px; }
+  .nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    gap: 8px;
+    margin-left: 0 !important;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+  }
+  .nav-links a {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: rgba(255, 107, 0, .08);
+    border: 1px solid rgba(255, 107, 0, .25);
+    color: var(--orange);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .nav-links a.active {
+    background: var(--orange);
+    color: #fff;
+    border-color: var(--orange);
+  }
+  /* Tighten the brand-chooser hero — smaller headline, less padding, so
+     the product cards are visible within the first mobile viewport. */
+  .hero-brand-inner { padding: 32px 16px 48px; }
+  .hero-brand-top { margin-bottom: 24px; }
+  .hero-brand-h1 { font-size: 32px; margin-bottom: 12px; }
+  .hero-brand-sub { font-size: 15px; }
 }
 
 /* ═══════════════════ HERO ═══════════════════ */
@@ -1029,10 +1064,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   border-color: rgba(255, 255, 255, .28);
 }
 @media (max-width: 780px) {
-  .chooser-grid { grid-template-columns: 1fr; gap: 18px; }
-  .hero-brand-inner { padding: 56px 20px 72px; }
-  .hero-brand-top { margin-bottom: 40px; }
-  .chooser-card { padding: 28px 24px 26px; }
+  .chooser-grid { grid-template-columns: 1fr; gap: 14px; }
+  .chooser-card { padding: 24px 20px 22px; }
+  .chooser-name { font-size: 22px; }
+  .chooser-desc { font-size: 14px; margin-bottom: 14px; }
+  .chooser-feats li { font-size: 13px; padding: 4px 0; }
 }
 
 /* ═══════════════════ FOOTER ═══════════════════ */
