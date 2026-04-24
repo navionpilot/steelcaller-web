@@ -528,16 +528,13 @@ button{cursor:pointer;font-family:var(--sans)}
       </div>
       <div class="form-card">
         <div class="form-section-title"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Current Plan</div>
-        <div style="background:var(--navy);border-radius:10px;padding:18px;color:#fff;margin-bottom:14px">
-          <div style="font-family:var(--serif);font-size:13px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Pro Subscription</div>
-          <div style="font-family:var(--serif);font-size:36px;font-weight:900">$199<span style="font-size:16px;color:rgba(255,255,255,.5);font-weight:400">/month</span></div>
-          <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:8px;line-height:1.55">Unlimited projects &middot; Unlimited users per project</div>
-          <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)">Save 20% by switching to annual billing &mdash; $1,908/yr ($159/mo effective)</div>
+        <div id="subscriptionCard" style="background:var(--navy);border-radius:10px;padding:18px;color:#fff;margin-bottom:14px">
+          <div style="font-family:var(--serif);font-size:13px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Loading...</div>
+          <div style="font-family:var(--serif);font-size:24px;font-weight:900;margin-bottom:6px">&nbsp;</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:8px;line-height:1.55">Checking your subscription status...</div>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-ghost">Manage Billing</button>
-          <button class="btn btn-ghost btn-sm">Switch to Annual</button>
-          <button class="btn btn-danger btn-sm">Cancel Plan</button>
+        <div id="subscriptionActions" style="display:flex;gap:8px;flex-wrap:wrap">
+          <!-- Populated dynamically by renderSubscriptionCard() -->
         </div>
       </div>
       <div class="form-card">
@@ -825,6 +822,57 @@ button{cursor:pointer;font-family:var(--sans)}
   <span id="toastMsg">Done</span>
 </div>
 
+<!-- PAYWALL MODAL (Ship #8) -->
+<div id="paywallModal" style="display:none;position:fixed;inset:0;background:rgba(15,22,42,.78);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)">
+  <div style="background:#fff;border-radius:16px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.4)">
+    <div style="padding:32px 32px 0 32px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-family:var(--serif);font-size:13px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1.2px">Payment Required</div>
+        <button onclick="hidePaywallModal()" style="border:none;background:transparent;cursor:pointer;color:var(--txt3);font-size:24px;padding:4px 8px">&times;</button>
+      </div>
+      <div style="font-family:var(--serif);font-size:28px;font-weight:900;color:var(--txt);margin-bottom:6px">Launch this project</div>
+      <div style="font-size:14px;color:var(--txt3);margin-bottom:22px;line-height:1.5">Choose how you'd like to pay. You can always upgrade later from your account page.</div>
+    </div>
+
+    <div style="padding:0 32px 24px 32px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <!-- Per-project option -->
+      <div style="border:1.5px solid var(--border);border-radius:14px;padding:22px 20px;background:#fff;display:flex;flex-direction:column">
+        <div style="font-family:var(--serif);font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Per Project</div>
+        <div style="font-family:var(--serif);font-size:36px;font-weight:900;color:var(--txt);line-height:1">$89</div>
+        <div style="font-size:13px;color:var(--txt3);margin-top:4px;margin-bottom:14px">one-time, this project</div>
+        <ul style="list-style:none;padding:0;margin:0 0 18px 0;font-size:13px;color:var(--txt2);line-height:1.85">
+          <li>&#10003; This project only</li>
+          <li>&#10003; Unlimited users per project</li>
+          <li>&#10003; 90 day access after completion</li>
+          <li>&#10003; No recurring charges</li>
+        </ul>
+        <button class="btn btn-ghost" id="payPerProjectBtn" onclick="startProjectCheckout()" style="margin-top:auto;width:100%;justify-content:center">Pay $89 for This Project</button>
+      </div>
+      <!-- Pro option -->
+      <div style="border:2px solid var(--orange);border-radius:14px;padding:22px 20px;background:linear-gradient(135deg,#fff7f0 0%,#fff 100%);display:flex;flex-direction:column;position:relative">
+        <div style="position:absolute;top:-10px;right:18px;background:var(--orange);color:#fff;font-family:var(--serif);font-size:10px;font-weight:700;letter-spacing:1px;padding:4px 10px;border-radius:10px;text-transform:uppercase">Best Value</div>
+        <div style="font-family:var(--serif);font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Pro &mdash; Monthly</div>
+        <div style="font-family:var(--serif);font-size:36px;font-weight:900;color:var(--txt);line-height:1">$199<span style="font-size:14px;color:var(--txt3);font-weight:400">/mo</span></div>
+        <div style="font-size:13px;color:var(--txt3);margin-top:4px;margin-bottom:14px">unlimited projects</div>
+        <ul style="list-style:none;padding:0;margin:0 0 14px 0;font-size:13px;color:var(--txt2);line-height:1.85">
+          <li>&#10003; Unlimited projects</li>
+          <li>&#10003; Unlimited users per project</li>
+          <li>&#10003; 90 day access per project</li>
+          <li>&#10003; Cancel anytime</li>
+        </ul>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:auto">
+          <button class="btn btn-primary" onclick="startSubscriptionCheckout('monthly')" style="width:100%;justify-content:center">Upgrade &mdash; $199/mo</button>
+          <button class="btn btn-ghost btn-sm" onclick="startSubscriptionCheckout('annual')" style="width:100%;justify-content:center">Or Annual &mdash; $159/mo (save 20%)</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:16px 32px;border-top:1px solid var(--border);background:var(--off);font-size:12px;color:var(--txt3);text-align:center;border-radius:0 0 16px 16px">
+      Secure checkout powered by Stripe. Cancel anytime from your Account settings.
+    </div>
+  </div>
+</div>
+
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────
 var API = 'https://steelcaller-api.onrender.com';
@@ -837,6 +885,7 @@ var API = 'https://steelcaller-api.onrender.com';
 //
 // loadProjects() is guarded on this being set.
 var FAB_ID = null;
+var currentUserEmail = '';  // Ship #8: set in DOMContentLoaded from session.user.email
 
 // One-time cleanup: kill the old per-browser random ID if present. We
 // don't use it anymore. Harmless if already absent.
@@ -960,6 +1009,39 @@ function launchProject() {
   if (!num || !name)       { showToast('Job Number and Name are required', false); goStep(1); return; }
 
   btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Checking subscription...';
+
+  /* Ship #8: check subscription status before allowing project creation.
+     If user has active Pro (or is owner), proceed with the normal flow.
+     Otherwise show paywall modal with per-project vs Pro options. */
+  fetch(API + '/api/fabricators/' + FAB_ID + '/subscription-status')
+    .then(function(r) { return r.json(); })
+    .then(function(sub) {
+      if (sub && sub.active) {
+        return launchProjectAsPro();
+      } else {
+        /* Stash the pending project so we can resume after Stripe redirect */
+        stashPendingProject();
+        showPaywallModal();
+        btn.disabled = false;
+        btn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21 5,3"/></svg> Launch Project';
+      }
+    })
+    .catch(function(err) {
+      showToast('Error checking subscription: ' + err.message, false);
+      btn.disabled = false;
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21 5,3"/></svg> Launch Project';
+    });
+}
+
+/* The ORIGINAL project-launch flow, now only reachable if the user is Pro
+   or an owner. Unchanged behavior from before Ship #8. */
+function launchProjectAsPro() {
+  var btn = document.getElementById('launchBtn');
+  var num  = document.getElementById('jobNum').value.trim();
+  var name = document.getElementById('jobName').value.trim();
+
+  btn.disabled = true;
   btn.innerHTML = '<div class="spinner"></div> Creating project...';
 
   var loc  = document.getElementById('jobLocation').value.trim();
@@ -976,8 +1058,18 @@ function launchProject() {
   f1.append('erector', erec);
   f1.append('fabricator_name', fab);
 
-  fetch(API + '/api/projects', { method: 'POST', body: f1 })
-    .then(function(r) { return r.json(); })
+  return fetch(API + '/api/projects', { method: 'POST', body: f1 })
+    .then(function(r) {
+      if (r.status === 402) {
+        /* Defensive: backend paywall fired even though we thought we were Pro.
+           Could happen if subscription ended between the check and the
+           create call. Fall back to paywall modal. */
+        stashPendingProject();
+        showPaywallModal();
+        throw new Error('__PAYWALL__');
+      }
+      return r.json();
+    })
     .then(function(proj) {
       btn.innerHTML = '<div class="spinner"></div> Uploading files...';
       var f2 = new FormData();
@@ -985,9 +1077,7 @@ function launchProject() {
       if (selectedFiles.kss) f2.append('kss_file', selectedFiles.kss);
       if (selectedFiles.nc1) f2.append('nc1_file', selectedFiles.nc1);
       return fetch(API + '/api/projects/' + proj.project_id + '/process', { method: 'POST', body: f2 })
-        .then(function() {
-          return proj;
-        });
+        .then(function() { return proj; });
     })
     .then(function(proj) {
       btn.innerHTML = '<div class="spinner"></div> Uploading files...';
@@ -1003,10 +1093,163 @@ function launchProject() {
       loadProjects();
     })
     .catch(function(err) {
+      if (err.message === '__PAYWALL__') {
+        /* Already handled — show paywall, restore button, no toast needed */
+        btn.disabled = false;
+        btn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21 5,3"/></svg> Launch Project';
+        return;
+      }
       showToast('Error: ' + err.message, false);
       btn.disabled = false;
       btn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21 5,3"/></svg> Launch Project';
     });
+}
+
+/* ─── Stripe checkout helpers (Ship #8) ───────────────────────────────── */
+function stashPendingProject() {
+  /* Save the wizard form values so if the user bails from the paywall
+     modal, the data is still in the form when they return. Nothing to
+     do right now — the form keeps values natively — but keep this
+     function as an extension point. */
+}
+
+function showPaywallModal() {
+  var m = document.getElementById('paywallModal');
+  if (m) m.style.display = 'flex';
+}
+
+function hidePaywallModal() {
+  var m = document.getElementById('paywallModal');
+  if (m) m.style.display = 'none';
+}
+
+function startProjectCheckout() {
+  /* User clicked "Pay $89 for this project" in paywall modal.
+     Builds a Stripe Checkout Session from the wizard form data. */
+  var email = (typeof currentUserEmail !== 'undefined' && currentUserEmail) || '';
+  var fd = new FormData();
+  fd.append('fabricator_id', FAB_ID);
+  fd.append('fabricator_email', email);
+  fd.append('job_number',  document.getElementById('jobNum').value.trim());
+  fd.append('job_name',    document.getElementById('jobName').value.trim());
+  fd.append('job_location',document.getElementById('jobLocation').value.trim());
+  fd.append('contractor',  document.getElementById('jobContractor').value.trim());
+  fd.append('erector',     document.getElementById('jobErector').value.trim());
+  fd.append('fabricator_name', document.getElementById('jobFabricator').value.trim());
+
+  var btn = document.getElementById('payPerProjectBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Opening checkout...'; }
+
+  fetch(API + '/api/stripe/checkout-project', { method: 'POST', body: fd })
+    .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, data: j }; }); })
+    .then(function(res) {
+      if (!res.ok || !res.data.url) throw new Error((res.data && res.data.detail) || 'Could not start checkout');
+      window.location.href = res.data.url;
+    })
+    .catch(function(err) {
+      showToast('Checkout error: ' + err.message, false);
+      if (btn) { btn.disabled = false; btn.innerHTML = 'Pay $89 for This Project'; }
+    });
+}
+
+function startSubscriptionCheckout(plan) {
+  /* User clicked "Upgrade to Pro" (monthly or annual) in paywall or
+     account view. plan must be 'monthly' or 'annual'. */
+  var email = (typeof currentUserEmail !== 'undefined' && currentUserEmail) || '';
+  var fd = new FormData();
+  fd.append('fabricator_id', FAB_ID);
+  fd.append('fabricator_email', email);
+  fd.append('plan', plan);
+
+  fetch(API + '/api/stripe/checkout-subscription', { method: 'POST', body: fd })
+    .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, data: j }; }); })
+    .then(function(res) {
+      if (!res.ok || !res.data.url) throw new Error((res.data && res.data.detail) || 'Could not start checkout');
+      window.location.href = res.data.url;
+    })
+    .catch(function(err) {
+      showToast('Checkout error: ' + err.message, false);
+    });
+}
+
+function refreshSubscriptionCard() {
+  /* Called on dashboard load. Replaces the hardcoded "Pro Plan" card
+     with real subscription state from the backend. */
+  fetch(API + '/api/fabricators/' + FAB_ID + '/subscription-status')
+    .then(function(r) { return r.json(); })
+    .then(function(sub) { renderSubscriptionCard(sub); })
+    .catch(function(err) {
+      console.log('[sub-card] error:', err);
+    });
+}
+
+function renderSubscriptionCard(sub) {
+  var card = document.getElementById('subscriptionCard');
+  if (!card) return;
+
+  if (sub && sub.plan === 'owner') {
+    card.innerHTML =
+      '<div style="font-family:var(--serif);font-size:13px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Owner Access</div>' +
+      '<div style="font-family:var(--serif);font-size:32px;font-weight:900">Unlimited</div>' +
+      '<div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:8px;line-height:1.55">You have owner-level access \u2014 unlimited projects, no billing.</div>';
+    var actions = document.getElementById('subscriptionActions');
+    if (actions) actions.innerHTML = '<span style="font-size:13px;color:var(--txt3)">No billing applies to your account.</span>';
+    return;
+  }
+
+  if (sub && sub.active && (sub.plan === 'monthly' || sub.plan === 'annual')) {
+    var isAnnual = sub.plan === 'annual';
+    var priceLine = isAnnual ? '$1,908<span style="font-size:16px;color:rgba(255,255,255,.5);font-weight:400">/year</span>' : '$199<span style="font-size:16px;color:rgba(255,255,255,.5);font-weight:400">/month</span>';
+    var subLine = isAnnual ? 'Annual plan \u2014 $159/month effective' : 'Unlimited projects \u2022 Unlimited users per project';
+    var nextLine = '';
+    if (sub.current_period_end) {
+      var d = new Date(sub.current_period_end);
+      nextLine = '<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)">Next billing: ' + d.toLocaleDateString() + '</div>';
+    }
+    card.innerHTML =
+      '<div style="font-family:var(--serif);font-size:13px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Pro Subscription \u2014 ' + (isAnnual ? 'Annual' : 'Monthly') + '</div>' +
+      '<div style="font-family:var(--serif);font-size:36px;font-weight:900">' + priceLine + '</div>' +
+      '<div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:8px;line-height:1.55">' + subLine + '</div>' +
+      nextLine;
+    return;
+  }
+
+  /* No active subscription — show upgrade prompt */
+  card.innerHTML =
+    '<div style="font-family:var(--serif);font-size:13px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">No Active Subscription</div>' +
+    '<div style="font-family:var(--serif);font-size:24px;font-weight:900;margin-bottom:6px">Pay per project, or upgrade</div>' +
+    '<div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:8px;line-height:1.55">Per project: $89 \u2022 Monthly: $199 \u2022 Annual: $1,908 ($159/mo effective)</div>';
+  var actions = document.getElementById('subscriptionActions');
+  if (actions) {
+    actions.innerHTML =
+      '<button class="btn btn-primary btn-sm" onclick="startSubscriptionCheckout(\'monthly\')">Start Monthly \u2014 $199/mo</button>' +
+      '<button class="btn btn-primary btn-sm" onclick="startSubscriptionCheckout(\'annual\')">Start Annual \u2014 Save 20%</button>';
+  }
+}
+
+function handleStripeRedirect() {
+  /* On dashboard load, check if we returned from a Stripe redirect. Show
+     a toast/banner, then strip the query params so refresh doesn't repeat. */
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('project_purchase') === 'success') {
+    showToast('&#10003; Project purchase complete \u2014 uploading files next', true);
+    /* TODO Phase 2: retrieve session_id, look up project_id from Supabase,
+       upload the pending files. For Phase 1 users need to refresh the
+       projects list and manually click into the new awaiting_upload project
+       to continue file upload. */
+    history.replaceState(null, '', '/dashboard.html');
+    setTimeout(function() { loadProjects && loadProjects(); }, 500);
+  } else if (params.get('project_purchase') === 'cancel') {
+    showToast('Project purchase cancelled \u2014 no charge made', false);
+    history.replaceState(null, '', '/dashboard.html');
+  } else if (params.get('subscription') === 'success') {
+    showToast('&#10003; Welcome to SteelCaller Pro!', true);
+    history.replaceState(null, '', '/dashboard.html');
+    setTimeout(refreshSubscriptionCard, 1000);
+  } else if (params.get('subscription') === 'cancel') {
+    showToast('Subscription checkout cancelled', false);
+    history.replaceState(null, '', '/dashboard.html');
+  }
 }
 
 function pollStatus(id, attempts) {
@@ -1810,9 +2053,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Use the auth user's stable UUID as the fabricator_id. This is the
     // same on every device because it lives in Supabase, not localStorage.
     FAB_ID = session.user.id;
+    currentUserEmail = session.user.email || '';
     updateSidebarUser(session.user);
     loadProjects();
     loadAccount();
+    /* Ship #8 — Stripe integration */
+    refreshSubscriptionCard();
+    handleStripeRedirect();
   });
 
   // Listen for auth changes (logout etc.)
